@@ -10,3 +10,5 @@
 /src/lib/SimpleCallingBot/.vs/SimpleCallingBot
 /src/lib/SimpleCallingBot/bin/Debug/net7.0
 /src/lib/SimpleCallingBot/obj
+/src/tests/UnitTests/bin/Debug/net7.0
+/src/tests/UnitTests/obj
