@@ -1,5 +1,6 @@
 ﻿using Microsoft.Graph;
 using SimpleCallingBot;
+using SimpleCallingBot.Models;
 
 namespace PstnBot;
 

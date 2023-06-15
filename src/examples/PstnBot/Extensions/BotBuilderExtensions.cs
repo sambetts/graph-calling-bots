@@ -1,4 +1,4 @@
-﻿using SimpleCallingBot;
+﻿using SimpleCallingBot.Models;
 
 namespace PstnBot;
 
