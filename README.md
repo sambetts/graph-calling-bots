@@ -1,2 +1,139 @@
-# graph-calling-bots
+# Teams Calling Bots (with optional PSTN)
 MS Graph calling bots built with ASP.Net 7 components
+
+This is a project to demonstrate how calling bots can work in Teams, using service-hosted media (static WAV files only). It _doesn’t_ use the Graph Communications Calling SDK except for some model classes, as I wanted a more .Net standardised app model: abstracted state persistence, standard logging libraries etc, that fit much better into things like functions apps where you don’t necessarily keep everything in memory. 
+
+The calling logic therefore is much simplified and just uses standard .Net 7 classes, which makes it more lightweight but also means it can’t handle app-hosted media for now. 
+
+For PSTN bots especially we just want some basic logic-flow controls:
+
+* Call answered.
+* Play pre-recorded media.
+* Record responses.
+
+That way we can build nice clean bots on a minimalist framework. 
+
+```C#
+public class SurveyCallingBot : BaseStatelessGraphCallingBot
+{
+    protected SurveyCallingBot(BotOptions botOptions, ICallStateManager callStateManager, ILogger logger) : base(botOptions, callStateManager, logger)
+    {
+        this.MediaMap[NotificationPromptName] = new MediaPrompt
+        {
+            MediaInfo = new MediaInfo
+            {
+                Uri = new Uri(botOptions.BotBaseUrl + "/audio/corpsurvey.wav").ToString(),
+                ResourceId = Guid.NewGuid().ToString(),
+            },
+        };
+    }
+
+    protected override async Task CallConnectedWithAudio(ActiveCallState callState)
+    {
+        await base.SubscribeToToneAsync(callState.CallId);
+        await base.PlayPromptAsync(callState.CallId, MediaMap.Select(m => m.Value));
+    }
+
+    protected override Task NewTonePressed(ActiveCallState callState, Tone tone)
+    {
+        _logger.LogInformation($"New tone pressed: {tone}");
+        return Task.CompletedTask;
+    }
+}
+```
+## Configuration
+These configuration settings are needed:
+
+Name | Description
+--------------- | -----------
+Bot:AppId | ID of bot Azure AD application
+Bot:AppInstanceObjectId | For PSTN calls only: object ID of the user account used for calling
+Bot:AppInstanceObjectIdName | For PSTN calls only: object ID of the user account used for calling
+Bot:TenantId | Tenant ID of Azure AD application
+Bot:AppSecret | Bot app secret
+Bot:BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
+
+## Setup Bot
+The official documentation is here: https://learn.microsoft.com/en-us/graph/cloud-communications-phone-number#prerequisite-register-a-bot 
+
+I had problems with it so resorted to my own setup methodology, but “your mileage may vary”. 
+
+Note, that for all these steps you can do them all in PowerShell if you wish. I’m not a sysadmin so this is what works best for me. 
+
+1. Go to: https://dev.teams.microsoft.com/ and create a new app.
+2. In app features, add a new bot. You can reuse a previously created bot or create a new one.
+3. Find the client-id in Azure portal.
+4. Create or get a previous client secret for the bot app registration.
+5. Every bot has an application registration in Azure AD, for which we’ll need to assign permissions.
+
+Permissions needed (application):
+
+* Calls.AccessMedia.All
+* Calls.Initiate.All
+* Calls.JoinGroupCall.All
+* Calls.JoinGroupCallAsGuest.All
+
+All these permissions need administrator consent to be effective. 
+That should be enough to make calls to Teams users (P2P – more permissions are needed if calling a group).
+
+## Optional: Setup PSTN Calling
+If you need PSTN calling, here are the extra steps. 
+
+You need:
+1. A tenant with Teams + Teams Phone.
+2. Phone numbers available to assign. 
+3. Available Teams licenses: Microsoft Teams Domestic Calling Plan, Microsoft Teams Phone Resource Account.
+4. A resource account in Teams.
+
+### Create Resource Account
+Got Teams admin centre: https://admin.teams.microsoft.com/company-wide-settings/resource-accounts
+
+Create an account. This will be the user object from which calls will be made, so it needs a UPN & display name. 
+![alt](imgs/image001.png)
+For now, the type we’ll set as “auto attendant” but we’ll change later.
+Find the user in Azure AD and copy the object ID.
+![alt](imgs/image002.png)
+Now we need to link this account back to our bot. 
+
+### Assign Resource Account Licenses and Ensure Region
+In O365 administration, find the user and make sure the region of the user is set to the same as your target phone-number, and it has the right licenses assigned. 
+![alt](imgs/image003.png)
+### Assign Resource Account Phone Number
+Back in Teams admin, find your resource account and select the row (not the display name). Click “Assign/unassign” in the toolbar. 
+![alt](imgs/image004.png)
+From here you can search for your phone number. 
+![alt](imgs/image005.jpg)
+*Note:* it can take a while for the admin centre to see license changes, especially for new users. It’s best to do this in PowerShell really, but if like me you’d prefer to use the UI where possible, it means you’ll have to wait.
+
+### Link Resource Account to Bot
+Finally we need PowerShell to link this resource account to the bot application. 
+
+```PowerShell
+Connect-MicrosoftTeams
+Sync-CsOnlineApplicationInstance -ObjectId c096d477-697a-49b6-8ac5-xxxxxxx -ApplicationId d2a35726-10be-4092-8ea0-xxxxxxxxxx
+```
+
+The “application ID” is the client ID of your bot app registration. 
+
+### Important: Verify Phone Account Link 
+Check these three details. Run this PowerShell:
+
+```PowerShell
+Get-CsOnlineApplicationInstance
+```
+1.       Application ID matches your bot app registration client ID.
+2.       Object ID matches your resources user account.
+3.       There is a phone-number assigned. 
+![alt](imgs/image006.jpg)
+Unless all 3 details are correct, the calls won’t work.
+
+## Publishing the Bot
+You can either publish this to a public site with an SSL endpoint, or just NGrok or some reverse-proxy tool to run from your local machine. In either case the bot will need a base URL configuration.
+
+## Testing the Bot
+POST this JSon to the bot endpoint /StartCall:
+```json
+{
+  "PhoneNumber": "+34682796XXX"
+}
+```
