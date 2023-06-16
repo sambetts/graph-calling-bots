@@ -111,6 +111,7 @@ Back in Teams admin, find your resource account and select the row (not the disp
 From here you can search for your phone number. 
 
 ![alt](imgs/image005.jpg)
+
 *Note:* it can take a while for the admin centre to see license changes, especially for new users. It’s best to do this in PowerShell really, but if like me you’d prefer to use the UI where possible, it means you’ll have to wait.
 
 ### Link Resource Account to Bot
@@ -129,6 +130,7 @@ Check these three details. Run this PowerShell:
 ```PowerShell
 Get-CsOnlineApplicationInstance
 ```
+
 1.       Application ID matches your bot app registration client ID.
 2.       Object ID matches your resources user account.
 3.       There is a phone-number assigned.
