@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace SimpleCallingBot.Models;
+namespace SimpleCallingBotEngine.Models;
 
 public class ClientContextModel
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Graph;
 
-namespace SimpleCallingBot;
+namespace SimpleCallingBotEngine;
 
 public interface ICallStateManager
 {

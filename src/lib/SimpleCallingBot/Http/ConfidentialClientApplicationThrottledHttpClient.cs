@@ -1,13 +1,11 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
-using PstnBot;
 using System.Net.Http.Headers;
 
-namespace Graph.SimpleCallingBot.Http;
+namespace SimpleCallingBotEngine.Http;
 
 /// <summary>
-/// HttpClient that can handle HTTP 429s automatically
+/// HttpClient that can handle HTTP 429s automatically + handles token acquisition for MS Graph
 /// </summary>
 public class ConfidentialClientApplicationThrottledHttpClient : AutoThrottleHttpClient
 {

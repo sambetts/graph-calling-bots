@@ -1,13 +1,13 @@
 ﻿using Microsoft.Graph;
-using SimpleCallingBot;
-using SimpleCallingBot.Models;
+using SimpleCallingBotEngine;
+using SimpleCallingBotEngine.Models;
 
 namespace PstnBot;
 
 /// <summary>
 /// The core bot logic.
 /// </summary>
-public class PstnCallingBot : WebApiGraphCallingBot
+public class PstnCallingBot : StatelessGraphCallingBot
 {
     /// <remarks>
     /// message: "There is an incident occured. Press '1' to join the incident meeting. Press '0' to listen to the instruction again. ".
@@ -19,7 +19,7 @@ public class PstnCallingBot : WebApiGraphCallingBot
     /// <summary>
     /// Initializes a new instance of the <see cref="PstnCallingBot" /> class.
     /// </summary>
-    public PstnCallingBot(BotOptions botOptions, ILogger logger, ICallStateManager callStateManager) : base(botOptions, logger, callStateManager)
+    public PstnCallingBot(BotOptions botOptions, ILogger logger, ICallStateManager callStateManager) : base(botOptions, callStateManager, logger)
     {
 
         this.MediaMap[NotificationPromptName] = new MediaPrompt

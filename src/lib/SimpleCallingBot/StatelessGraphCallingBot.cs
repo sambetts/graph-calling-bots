@@ -1,27 +1,30 @@
-﻿using Graph.SimpleCallingBot.Http;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Communications.Client.Authentication;
 using Microsoft.AspNetCore.Http;
-using ServiceHostedMediaBot.Extensions;
 using Microsoft.Graph;
 using System.Net.Http.Json;
 using System.Text.Json;
-using SimpleCallingBot.Models;
+using SimpleCallingBotEngine.Models;
+using SimpleCallingBotEngine.Http;
+using SimpleCallingBotEngineEngine;
 
-namespace SimpleCallingBot;
+namespace SimpleCallingBotEngine;
 
 /// <summary>
-/// A simple, service-hosted bot that can make outbound calls and play prompts.
+/// A simple, stateless bot that can make outbound calls and play prompts.
 /// </summary>
-public abstract class WebApiGraphCallingBot
+public abstract class StatelessGraphCallingBot
 {
     protected readonly BotOptions _botOptions;
     protected readonly ILogger _logger;
     private readonly ICallStateManager _callStateManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
+    private readonly BotNotificationsHandler _botNotificationsHandler;
 
-    public WebApiGraphCallingBot(BotOptions botOptions, ILogger logger, ICallStateManager callStateManager)
+    public BotNotificationsHandler BotNotificationsHandler => _botNotificationsHandler;
+
+    public StatelessGraphCallingBot(BotOptions botOptions, ICallStateManager callStateManager, ILogger logger)
     {
         _botOptions = botOptions;
         _logger = logger;
@@ -29,9 +32,16 @@ public abstract class WebApiGraphCallingBot
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botOptions.AppId, _botOptions.AppSecret, _botOptions.TenantId, false, logger);
 
         var name = this.GetType().Assembly.GetName().Name ?? "CallingBot";
-        this._authenticationProvider = new AuthenticationProvider(name, _botOptions.AppId, _botOptions.AppSecret, _logger);
-    }
+        _authenticationProvider = new AuthenticationProvider(name, _botOptions.AppId, _botOptions.AppSecret, _logger);
 
+        // Create a callback handler for notifications. Do so on each request as no state is held.
+        var callBacks = new NotificationCallbackInfo
+        {
+            CallConnected = CallConnected,
+            NewTonePressed = NewTonePressed,
+        };
+        _botNotificationsHandler = new BotNotificationsHandler(_callStateManager, callBacks, _logger);
+    }
 
     public async Task<bool> ValidateNotificationRequestAsync(HttpRequest request)
     {
@@ -56,63 +66,6 @@ public abstract class WebApiGraphCallingBot
         return false;
     }
 
-    public async Task HandleNotificationsAsync(CommsNotificationsPayload notificationPayload)
-    {
-        foreach (var callnotification in notificationPayload.CommsNotifications)
-        {
-            var updateCall = false;
-            var callState = await _callStateManager.GetByNotificationResourceId(callnotification.ResourceUrl);
-
-            if (callState != null && callState.HasValidCallId)
-            {
-                // Is this notification for a call we're tracking?
-                if (callnotification.AssociatedCall?.CallChainId != null)
-                {
-                    // Update call state
-                    callState.State = callnotification.AssociatedCall.State;
-                    updateCall = true;
-                    await HandleCallNotificationAsync(callnotification, callState);
-
-                }
-                else if (callnotification.AssociatedCall?.ToneInfo != null)
-                {
-                    updateCall = true;
-                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState);
-                }
-
-                if (updateCall)
-                {
-                    await _callStateManager.UpdateByResourceId(callState);
-                }
-            }
-            else
-            {
-                _logger.LogWarning($"Received notification for unknown call {callnotification.ResourceUrl}");
-            }
-        }
-    }
-
-    private async Task HandleToneNotificationAsync(ToneInfo toneInfo, ActiveCallState callState)
-    {
-        if (toneInfo.Tone != null)
-        {
-            callState.TonesPressed.Add(toneInfo.Tone.Value);
-            await NewTonePressed(callState, toneInfo.Tone.Value);
-        }
-        else
-        {
-            _logger.LogWarning($"Received notification for unknown tone on call {callState.CallId}");
-        }
-    }
-
-    private async Task HandleCallNotificationAsync(CallNotification callnotification, ActiveCallState callState)
-    {
-        if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED && callnotification.AssociatedCall?.State == CallState.Established)
-        {
-            _logger.LogInformation($"Call {callState.CallId} connected");
-            await CallConnected(callState);
-        }
-    }
 
     protected abstract Task CallConnected(ActiveCallState callState);
     protected virtual Task NewTonePressed(ActiveCallState callState, Tone tone) 
@@ -121,7 +74,10 @@ public abstract class WebApiGraphCallingBot
         return Task.CompletedTask;  
     }
 
-    public async Task<Call> StartNewCall(Call newCall)
+
+    #region Bot Actions
+
+    protected async Task<Call> StartNewCall(Call newCall)
     {
         var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
 
@@ -136,17 +92,21 @@ public abstract class WebApiGraphCallingBot
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    public async Task<PlayPromptOperation> PlayPromptAsync(string callId, List<MediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation> PlayPromptAsync(string callId, List<MediaPrompt> mediaPrompts)
     {
         _logger.LogInformation($"Playing {mediaPrompts.Count} media prompts to call {callId}");
         return await PostDataAndReturnResult<PlayPromptOperation>($"/communications/calls/{callId}/playPrompt", new PlayPromptRequest { Prompts = mediaPrompts });
     }
 
-    public async Task SubscribeToToneAsync(string callId)
+    protected async Task SubscribeToToneAsync(string callId)
     {
         _logger.LogInformation($"Subscribing to tones for call {callId}");
         await PostData($"/communications/calls/{callId}/subscribeToTone", new ClientContextModel());
     }
+
+    #endregion
+
+    #region HTTP Calls
 
     async Task<T> PostDataAndReturnResult<T>(string urlMinusRoot, object payload)
     {
@@ -166,4 +126,6 @@ public abstract class WebApiGraphCallingBot
 
         return content ?? throw new Exception("Unexpected Graph response");
     }
+
+    #endregion
 }

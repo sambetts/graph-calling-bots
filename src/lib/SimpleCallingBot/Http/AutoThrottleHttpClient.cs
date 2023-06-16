@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace PstnBot;
-
+namespace SimpleCallingBotEngine.Http;
 
 public class AutoThrottleHttpClient : HttpClient
 {

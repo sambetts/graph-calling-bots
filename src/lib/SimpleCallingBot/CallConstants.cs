@@ -1,5 +1,5 @@
 ﻿
-namespace SimpleCallingBot;
+namespace SimpleCallingBotEngine;
 
 internal class CallConstants
 {

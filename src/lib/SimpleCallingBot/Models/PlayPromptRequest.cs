@@ -1,7 +1,7 @@
 ﻿using Microsoft.Graph;
 using System.Text.Json.Serialization;
 
-namespace SimpleCallingBot.Models;
+namespace SimpleCallingBotEngine.Models;
 
 
 public class PlayPromptRequest : ClientContextModel

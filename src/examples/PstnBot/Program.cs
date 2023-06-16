@@ -1,28 +1,23 @@
-using Microsoft.Graph.Communications.Common.Telemetry;
 using PstnBot;
-using SimpleCallingBot;
+using SimpleCallingBotEngine;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.Bind("");
-
+// Add logging
 var logger = LoggerFactory.Create(config =>
 {
+    config.AddTraceSource(new System.Diagnostics.SourceSwitch("SourceSwitch"));
     config.AddConsole();
-}).CreateLogger("Console logger");
+}).CreateLogger("Calling Bot");
 builder.Services.AddSingleton(logger);
 
 // Add services to the container.
-
 builder.Services.AddCallingBot(options => builder.Configuration.Bind("Bot", options));
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var graphLogger = new GraphLogger(typeof(Program).Assembly.GetName().Name);
-builder.Services.AddSingleton<IGraphLogger>(graphLogger);
 builder.Services.AddSingleton<ICallStateManager, ConcurrentInMemoryCallStateManager>();
 
 var app = builder.Build();
@@ -36,9 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

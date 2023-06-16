@@ -1,4 +1,4 @@
-﻿namespace SimpleCallingBot.Models;
+﻿namespace SimpleCallingBotEngine.Models;
 
 public class BotOptions
 {

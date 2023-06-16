@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\SimpleCallingBot\SimpleCallingBot.csproj" />
+    <ProjectReference Include="..\..\lib\SimpleCallingBot\SimpleCallingBotEngine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

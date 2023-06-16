@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SimpleCallingBot.Models;
+using SimpleCallingBotEngine.Models;
 
 namespace PstnBot;
 
@@ -25,7 +25,7 @@ public class PlatformCallController : ControllerBase
         var validRequest = await _callingBot.ValidateNotificationRequestAsync(this.Request);
         if (validRequest)
         {
-            await _callingBot.HandleNotificationsAsync(notifications);
+            await _callingBot.BotNotificationsHandler.HandleNotificationsAsync(notifications);
             return Accepted();
         }
         else

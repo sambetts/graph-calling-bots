@@ -5,9 +5,9 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot", "examples\PstnBot\PstnBot.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCallingBot", "lib\SimpleCallingBot\SimpleCallingBot.csproj", "{04AE4447-8258-4991-9D4F-4E52BBBFCD19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCallingBotEngine", "lib\SimpleCallingBot\SimpleCallingBotEngine.csproj", "{04AE4447-8258-4991-9D4F-4E52BBBFCD19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "tests\UnitTests\UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "tests\UnitTests\UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

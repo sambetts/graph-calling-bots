@@ -1,4 +1,4 @@
-﻿namespace SimpleCallingBot;
+﻿namespace SimpleCallingBotEngine;
 
 public class ConcurrentInMemoryCallStateManager : ICallStateManager
 {
