@@ -131,9 +131,9 @@ Check these three details. Run this PowerShell:
 Get-CsOnlineApplicationInstance
 ```
 
-1.       Application ID matches your bot app registration client ID.
-2.       Object ID matches your resources user account.
-3.       There is a phone-number assigned.
+1. Application ID matches your bot app registration client ID.
+2. Object ID matches your resources user account.
+4. There is a phone-number assigned.
 
 ![alt](imgs/image006.jpg)
 
