@@ -6,9 +6,9 @@ namespace PstnBot;
 [Route("[controller]")]
 public class StartCallController : Controller
 {
-    private readonly PstnCallingBot _callingBot;
+    private readonly RickrollPstnBot _callingBot;
 
-    public StartCallController(PstnCallingBot callingBot)
+    public StartCallController(RickrollPstnBot callingBot)
     {
         _callingBot = callingBot;
     }
@@ -24,7 +24,7 @@ public class StartCallController : Controller
             throw new ArgumentNullException(nameof(startCallData));
         }
 
-        var call = await this._callingBot.StartP2PCall(startCallData.PhoneNumber).ConfigureAwait(false);
+        var call = await this._callingBot.StartPTSNCall(startCallData.PhoneNumber).ConfigureAwait(false);
 
         return call;
     }

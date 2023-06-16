@@ -65,14 +65,15 @@ public class EngineTests
     [TestMethod]
     public async Task BotNotificationsHandlerNormalFlowTests()
     {
-        var callConnectedCalled = false;    
+        var callConnectedCount = 0;
+        var callTerminatedCount = 0;
         var toneList = new List<Tone>();
         var callStateManager = new ConcurrentInMemoryCallStateManager();
         var callbackInfo = new NotificationCallbackInfo 
         {
             CallConnectedWithAudio = (callState) => 
             {
-                callConnectedCalled = true;
+                callConnectedCount++;
                 return Task.CompletedTask;
             },
             NewTonePressed = (callState, tone) =>
@@ -81,6 +82,11 @@ public class EngineTests
                 Console.WriteLine($"DEBUG: Tone pressed: {tone}");   
                 return Task.CompletedTask;
             },
+            CallTerminated= (callState) =>
+            {
+                callTerminatedCount++;
+                return Task.CompletedTask;
+            }
         };
         var notificationsManager = new BotNotificationsHandler(callStateManager, callbackInfo, _logger);
 
@@ -98,11 +104,11 @@ public class EngineTests
 
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
             CallState.Established);
-        Assert.IsFalse(callConnectedCalled);
+        Assert.IsTrue(callConnectedCount == 0);
 
         // Connect audio. Should trigger the callback
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedWithAudio);
-        Assert.IsTrue(callConnectedCalled);
+        Assert.IsTrue(callConnectedCount == 1);
 
         // Press buttons. Should trigger the callback
         Assert.IsTrue(toneList.Count == 0);
@@ -112,6 +118,8 @@ public class EngineTests
         // Terminate the call
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.HangUp);
         Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
+        Assert.IsTrue(callConnectedCount == 1);
+        Assert.IsTrue(callTerminatedCount == 1);
 
         Assert.IsTrue(callStateManager.Count == 0);
     }

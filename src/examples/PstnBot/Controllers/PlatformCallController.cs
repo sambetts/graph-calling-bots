@@ -8,9 +8,9 @@ namespace PstnBot;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly PstnCallingBot _callingBot;
+    private readonly RickrollPstnBot _callingBot;
 
-    public PlatformCallController(PstnCallingBot callingBot)
+    public PlatformCallController(RickrollPstnBot callingBot)
     {
         _callingBot = callingBot;
     }

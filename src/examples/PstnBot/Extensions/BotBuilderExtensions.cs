@@ -13,6 +13,6 @@ public static class BotBuilderExtensions
         botOptionsAction(options);
         services.AddSingleton(options);
 
-        return services.AddSingleton<PstnCallingBot>();
+        return services.AddSingleton<RickrollPstnBot>();
     }
 }

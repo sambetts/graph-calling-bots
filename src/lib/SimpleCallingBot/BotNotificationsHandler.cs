@@ -35,31 +35,36 @@ public class BotNotificationsHandler
                 {
                     if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED)
                     {
-                        // Update call state
-                        updateCall = true;
-                        callState.State = callnotification.AssociatedCall.State;
-
                         // An update happened to the call
-                        if (callnotification.AssociatedCall.State == CallState.Established)
+                        if (callState.State != callnotification.AssociatedCall.State && callnotification.AssociatedCall.State == CallState.Established)
                         {
-                            if (callnotification.AssociatedCall.MediaState != null && callnotification.AssociatedCall.MediaState.Audio.HasValue && callnotification.AssociatedCall.MediaState.Audio.Value == MediaState.Active)
-                            {
-                                _logger.LogInformation($"Call {callState.CallId} connected with audio");
-                                if (_callbackInfo.CallConnectedWithAudio != null) await _callbackInfo.CallConnectedWithAudio(callState);
-                            }
-                            else
-                            {
-                                _logger.LogInformation($"Call {callState.CallId} established");
-                            }
+                            // Call state changed to established from previous state
+                            _logger.LogInformation($"Call {callState.CallId} established");
+
+                            // Update call state
+                            updateCall = true;
+                            callState.State = callnotification.AssociatedCall.State;
+                        }
+                        else if (callnotification.AssociatedCall.MediaState != null && callnotification.AssociatedCall.MediaState.Audio.HasValue && callnotification.AssociatedCall.MediaState.Audio.Value == MediaState.Active)
+                        {
+                            // No change in call state - but audio is now active
+                            _logger.LogInformation($"Call {callState.CallId} connected with audio");
+                            if (_callbackInfo.CallConnectedWithAudio != null) await _callbackInfo.CallConnectedWithAudio(callState);
                         }
                     }
-                    
-                    else if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_DELETED && callnotification.AssociatedCall?.State == CallState.Terminated)
+                    else if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_DELETED && callnotification.AssociatedCall.State == CallState.Terminated)
                     {
-                        // Hang up
-                        _logger.LogInformation($"Call {callState.CallId} finished");
-                        await _callStateManager.Remove(callState.ResourceUrl);
-                        if (_callbackInfo.CallConnectedWithAudio != null) await _callbackInfo.CallConnectedWithAudio(callState);
+                        // Hang up and remove state
+                        if (!string.IsNullOrEmpty(callState.CallId))
+                        {
+                            _logger.LogInformation($"Call {callState.CallId} finished");
+                            await _callStateManager.Remove(callState.ResourceUrl);
+                            if (_callbackInfo.CallTerminated != null) await _callbackInfo.CallTerminated(callState.CallId);
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Unkown call finished");
+                        }
                     }
                 }
 
@@ -77,7 +82,7 @@ public class BotNotificationsHandler
             }
             else
             {
-                // Is this notification for a new call?
+                // Not seen this call before. Is this notification for a new call?
                 if (callnotification.AssociatedCall != null && callnotification.AssociatedCall.State == CallState.Establishing)
                 {
                     // Remember the call ID for later
@@ -116,5 +121,6 @@ public class BotNotificationsHandler
 public class NotificationCallbackInfo
 {
     public Func<ActiveCallState, Task>? CallConnectedWithAudio { get; set; }
+    public Func<string, Task>? CallTerminated { get; set; }
     public Func<ActiveCallState, Tone, Task>? NewTonePressed { get; set; }
 }
