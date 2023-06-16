@@ -89,19 +89,27 @@ You need:
 Got Teams admin centre: https://admin.teams.microsoft.com/company-wide-settings/resource-accounts
 
 Create an account. This will be the user object from which calls will be made, so it needs a UPN & display name. 
+
 ![alt](imgs/image001.png)
+
 For now, the type we’ll set as “auto attendant” but we’ll change later.
 Find the user in Azure AD and copy the object ID.
+
 ![alt](imgs/image002.png)
+
 Now we need to link this account back to our bot. 
 
 ### Assign Resource Account Licenses and Ensure Region
 In O365 administration, find the user and make sure the region of the user is set to the same as your target phone-number, and it has the right licenses assigned. 
+
 ![alt](imgs/image003.png)
+
 ### Assign Resource Account Phone Number
 Back in Teams admin, find your resource account and select the row (not the display name). Click “Assign/unassign” in the toolbar. 
 ![alt](imgs/image004.png)
+
 From here you can search for your phone number. 
+
 ![alt](imgs/image005.jpg)
 *Note:* it can take a while for the admin centre to see license changes, especially for new users. It’s best to do this in PowerShell really, but if like me you’d prefer to use the UI where possible, it means you’ll have to wait.
 
@@ -123,8 +131,10 @@ Get-CsOnlineApplicationInstance
 ```
 1.       Application ID matches your bot app registration client ID.
 2.       Object ID matches your resources user account.
-3.       There is a phone-number assigned. 
+3.       There is a phone-number assigned.
+
 ![alt](imgs/image006.jpg)
+
 Unless all 3 details are correct, the calls won’t work.
 
 ## Publishing the Bot
