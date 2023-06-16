@@ -6,42 +6,67 @@ public class ConcurrentInMemoryCallStateManager : ICallStateManager
 
     public Task AddCallState(ActiveCallState callState)
     {
+        if (callState is null || callState.CallId == null)
+        {
+            throw new ArgumentNullException(nameof(callState));
+        }
         lock (this)
         {
-            _callStates.Add(callState.ResourceUrl, callState);
+            _callStates.Add(callState.CallId, callState);
         }
         return Task.CompletedTask;
     }
 
-    public Task<ActiveCallState?> GetByNotificationResourceId(string resourceId)
+    public Task<ActiveCallState?> GetByNotificationResourceUrl(string resourceUrl)
     {
+        var callId = ActiveCallState.GetCallId(resourceUrl);
+        if (callId == null) return Task.FromResult<ActiveCallState?>(null);
         lock (this)
         {
             ActiveCallState? callState = null;
 
-            _callStates.TryGetValue(resourceId, out callState);
+            _callStates.TryGetValue(callId, out callState);
             return Task.FromResult(callState);
         }
     }
 
-    public Task Remove(ActiveCallState callState)
+    public Task<bool> Remove(string resourceUrl)
     {
+        var callId = ActiveCallState.GetCallId(resourceUrl);
+        if (callId == null) return Task.FromResult(false);
+
         lock (this)
         {
-            _callStates.Remove(callState.ResourceUrl);
+            var r = _callStates.Remove(callId);
+            return Task.FromResult(r);
+        }
+    }
+
+    public Task Update(ActiveCallState callState)
+    {
+        if (callState is null || callState.CallId == null)
+        {
+            throw new ArgumentNullException(nameof(callState));
+        }
+
+        lock (this)
+        {
+            if (_callStates.ContainsKey(callState.CallId))
+            {
+                _callStates[callState.CallId] = callState;
+            }
         }
         return Task.CompletedTask;
     }
 
-    public Task UpdateByResourceId(ActiveCallState callState)
+    public int Count
     {
-        lock (this)
+        get
         {
-            if (_callStates.ContainsKey(callState.ResourceUrl))
+            lock (this)
             {
-                _callStates[callState.ResourceUrl] = callState;
+                return _callStates.Count;
             }
         }
-        return Task.CompletedTask;  
     }
 }

@@ -5,7 +5,7 @@ using SimpleCallingBotEngine.Models;
 namespace PstnBot;
 
 /// <summary>
-/// The core bot logic.
+/// A bot that calls you over the phone.
 /// </summary>
 public class PstnCallingBot : StatelessGraphCallingBot
 {
@@ -37,7 +37,7 @@ public class PstnCallingBot : StatelessGraphCallingBot
     /// </summary>
     public async Task<Call> StartP2PCall(string phoneNumber)
     {
-        var scenarioId = Guid.NewGuid();
+        // PSTN call
         var target = new IdentitySet();
         target.SetPhone(
             new Identity
@@ -69,6 +69,7 @@ public class PstnCallingBot : StatelessGraphCallingBot
             }
         };
 
+        // Set source as this bot
         newCall.Source.Identity.SetApplicationInstance(
             new Identity
             {
@@ -81,7 +82,14 @@ public class PstnCallingBot : StatelessGraphCallingBot
 
     protected override async Task CallConnected(ActiveCallState callState)
     {
-        await base.SubscribeToToneAsync(callState.CallId);
-        await base.PlayPromptAsync(callState.CallId, new List<MediaPrompt> { MediaMap[NotificationPromptName] });
+        if (callState.CallId != null)
+        {
+            await base.SubscribeToToneAsync(callState.CallId);
+            await base.PlayPromptAsync(callState.CallId, new List<MediaPrompt> { MediaMap[NotificationPromptName] });
+        }
+        else
+        {
+            _logger.LogWarning("CallConnected: callState.CallId is null");
+        }
     }
 }

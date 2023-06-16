@@ -18,7 +18,7 @@ public class CallNotification
     [JsonPropertyName("changeType")]
     public string? ChangeType { get; set; }
 
-    [JsonPropertyName("resource")]
+    [JsonPropertyName("resourceUrl")]
     public string ResourceUrl { get; set; } = string.Empty;
 
     [JsonPropertyName("resourceData")]

@@ -26,20 +26,45 @@ public class BotNotificationsHandler
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var updateCall = false;
-            var callState = await _callStateManager.GetByNotificationResourceId(callnotification.ResourceUrl);
+            var callState = await _callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
 
             if (callState != null && callState.HasValidCallId)
             {
                 // Is this notification for a call we're tracking?
-                if (callnotification.AssociatedCall?.CallChainId != null)
+                if (callnotification.AssociatedCall != null)
                 {
-                    // Update call state
-                    callState.State = callnotification.AssociatedCall.State;
-                    updateCall = true;
-                    await HandleCallNotificationAsync(callnotification, callState);
+                    if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED)
+                    {
+                        // Update call state
+                        updateCall = true;
+                        callState.State = callnotification.AssociatedCall.State;
 
+                        // An update happened to the call
+                        if (callnotification.AssociatedCall.State == CallState.Established)
+                        {
+                            if (callnotification.AssociatedCall.MediaState != null && callnotification.AssociatedCall.MediaState.Audio.HasValue && callnotification.AssociatedCall.MediaState.Audio.Value == MediaState.Active)
+                            {
+                                _logger.LogInformation($"Call {callState.CallId} connected with audio");
+                                if (_callbackInfo.CallConnectedWithAudio != null) await _callbackInfo.CallConnectedWithAudio(callState);
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"Call {callState.CallId} established");
+                            }
+                        }
+                    }
+                    
+                    else if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_DELETED && callnotification.AssociatedCall?.State == CallState.Terminated)
+                    {
+                        // Hang up
+                        _logger.LogInformation($"Call {callState.CallId} finished");
+                        await _callStateManager.Remove(callState.ResourceUrl);
+                        if (_callbackInfo.CallConnectedWithAudio != null) await _callbackInfo.CallConnectedWithAudio(callState);
+                    }
                 }
-                else if (callnotification.AssociatedCall?.ToneInfo != null)
+
+                // Is this notification for a tone on a call we're tracking?
+                if (callnotification.AssociatedCall?.ToneInfo != null)
                 {
                     updateCall = true;
                     await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState);
@@ -47,12 +72,24 @@ public class BotNotificationsHandler
 
                 if (updateCall)
                 {
-                    await _callStateManager.UpdateByResourceId(callState);
+                    await _callStateManager.Update(callState);
                 }
             }
             else
             {
-                _logger.LogWarning($"Received notification for unknown call {callnotification.ResourceUrl}");
+                // Is this notification for a new call?
+                if (callnotification.AssociatedCall != null && callnotification.AssociatedCall.State == CallState.Establishing)
+                {
+                    // Remember the call ID for later
+                    var newCallState = new ActiveCallState(callnotification);
+                    await _callStateManager.AddCallState(newCallState);
+
+                    _logger.LogWarning($"Call {newCallState.CallId} is connecting");
+                }
+                else
+                {
+                    _logger.LogWarning($"Received notification for unknown call {callnotification.ResourceUrl}");
+                }
             }
         }
     }
@@ -61,6 +98,7 @@ public class BotNotificationsHandler
     {
         if (toneInfo.Tone != null)
         {
+            _logger.LogTrace($"Received tone {toneInfo.Tone.Value} on call {callState.CallId}");
             callState.TonesPressed.Add(toneInfo.Tone.Value);
 
             if (_callbackInfo.NewTonePressed != null)
@@ -73,20 +111,10 @@ public class BotNotificationsHandler
             _logger.LogWarning($"Received notification for unknown tone on call {callState.CallId}");
         }
     }
-
-    async Task HandleCallNotificationAsync(CallNotification callnotification, ActiveCallState callState)
-    {
-        if (callnotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED && callnotification.AssociatedCall?.State == CallState.Established)
-        {
-            _logger.LogInformation($"Call {callState.CallId} connected");
-            if (_callbackInfo.CallConnected != null) await _callbackInfo.CallConnected(callState);
-        }
-    }
 }
-
 
 public class NotificationCallbackInfo
 {
-    public Func<ActiveCallState, Task>? CallConnected { get; set; }
+    public Func<ActiveCallState, Task>? CallConnectedWithAudio { get; set; }
     public Func<ActiveCallState, Tone, Task>? NewTonePressed { get; set; }
 }

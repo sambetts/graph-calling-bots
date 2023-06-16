@@ -37,7 +37,7 @@ public abstract class StatelessGraphCallingBot
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo
         {
-            CallConnected = CallConnected,
+            CallConnectedWithAudio = CallConnected,
             NewTonePressed = NewTonePressed,
         };
         _botNotificationsHandler = new BotNotificationsHandler(_callStateManager, callBacks, _logger);
@@ -81,11 +81,7 @@ public abstract class StatelessGraphCallingBot
     {
         var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
 
-        // Remember the call ID for later
-        var newCallState = new ActiveCallState(callCreated);
-        await _callStateManager.AddCallState(newCallState);
-
-        _logger.LogInformation($"Call {newCallState.CallId} created");
+        _logger.LogInformation($"Call {callCreated.Id} created");
         return callCreated;
     }
 
