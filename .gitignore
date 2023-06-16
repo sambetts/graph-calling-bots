@@ -12,3 +12,4 @@
 /src/lib/SimpleCallingBot/obj
 /src/tests/UnitTests/bin/Debug/net7.0
 /src/tests/UnitTests/obj
+/.vs
