@@ -149,3 +149,8 @@ POST this JSon to the bot endpoint /StartCall:
   "PhoneNumber": "+34682796XXX"
 }
 ```
+
+The result:
+![alt](imgs/calling.jpg)
+
+Rick calling!
