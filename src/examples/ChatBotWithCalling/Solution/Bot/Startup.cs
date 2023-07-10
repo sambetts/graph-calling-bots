@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Bot.Bots;
+using Bot.Dialogues;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
@@ -36,7 +38,7 @@ public class Startup
         services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
         // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-        services.AddTransient<IBot, TeamsBot>();
+        services.AddTransient<IBot, TeamsBot<MainDialog>>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
