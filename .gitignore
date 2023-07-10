@@ -14,3 +14,11 @@
 /src/tests/UnitTests/obj
 /.vs
 /src/.vs/ProjectEvaluation
+/src/examples/ChatBotWithCalling/Solution/.vs
+/src/examples/ChatBotWithCalling/Solution/Bot/bin/Debug
+/src/examples/ChatBotWithCalling/Solution/Bot/obj/Debug
+/src/examples/ChatBotWithCalling/Solution/Bot/obj
+/src/examples/ChatBotWithCalling/Solution/CommonUtils/bin/Debug
+/src/examples/ChatBotWithCalling/Solution/CommonUtils/obj/Debug
+/src/examples/ChatBotWithCalling/Solution/CommonUtils/obj
+/src/examples/ChatBotWithCalling/Teams App/manifest.json
