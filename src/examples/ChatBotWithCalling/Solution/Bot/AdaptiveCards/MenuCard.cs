@@ -23,7 +23,7 @@ public class MenuCard : BaseAdaptiveCard
         {
             Columns = new List<AdaptiveColumn>
             {
-                new AdaptiveColumn{ Items = numbers, Width="80px" },
+                new AdaptiveColumn{ Items = numbers},
                 new AdaptiveColumn{ Items = states }
             }
         };
