@@ -15,7 +15,7 @@ namespace SimpleCallingBotEngine.Bots;
 /// </summary>
 public abstract class BaseStatelessGraphCallingBot
 {
-    protected readonly RemoteMediaCallingBotConfiguration _botOptions;
+    protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     private readonly ICallStateManager _callStateManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
@@ -23,16 +23,17 @@ public abstract class BaseStatelessGraphCallingBot
     private readonly BotNotificationsHandler _botNotificationsHandler;
 
     public BotNotificationsHandler BotNotificationsHandler => _botNotificationsHandler;
+    public RemoteMediaCallingBotConfiguration BotConfig => _botConfig;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager callStateManager, ILogger logger)
     {
-        _botOptions = botOptions;
+        _botConfig = botConfig;
         _logger = logger;
         _callStateManager = callStateManager;
-        _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botOptions.AppId, _botOptions.AppSecret, _botOptions.TenantId, false, logger);
+        _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
-        _authenticationProvider = new AuthenticationProvider(name, _botOptions.AppId, _botOptions.AppSecret, _logger);
+        _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
 
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo
@@ -51,7 +52,7 @@ public abstract class BaseStatelessGraphCallingBot
             var results = await _authenticationProvider.ValidateInboundRequestAsync(httpRequest).ConfigureAwait(false);
 
             // Check tenant IDs match
-            return results.IsValid && results.TenantId == _botOptions.TenantId;
+            return results.IsValid && results.TenantId == _botConfig.TenantId;
         }
         catch (ServiceException e)
         {

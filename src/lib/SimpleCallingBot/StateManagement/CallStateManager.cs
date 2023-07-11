@@ -50,7 +50,11 @@ public class ActiveCallState
         return parts[2];
     }
 
+    /// <summary>
+    /// Connected, Establishing, etc
+    /// </summary>
     public CallState? State { get; set; } = null;
+
     public List<Tone> TonesPressed { get; set; } = new();
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
 }

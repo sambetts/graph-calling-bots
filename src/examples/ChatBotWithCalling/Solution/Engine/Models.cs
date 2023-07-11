@@ -8,6 +8,7 @@ public class MeetingState
 
     public bool IsMeetingCreated => !string.IsNullOrEmpty(MeetingUrl);
     public List<NumberCallState> Numbers { get; set; } = new();
+
 }
 
 public class NumberCallState

@@ -9,11 +9,8 @@ namespace SimpleCallingBotEngine.Bots;
 /// </summary>
 public abstract class PstnCallingBot : AudioPlaybackAndDTMFCallingBot
 {
-    private readonly string _callbackUrl;
-
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger logger, string callbackUrl) : base(botOptions, callStateManager, logger)
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager callStateManager, ILogger logger) : base(botConfig, callStateManager, logger)
     {
-        _callbackUrl = callbackUrl;
     }
 
     /// <summary>
@@ -37,14 +34,14 @@ public abstract class PstnCallingBot : AudioPlaybackAndDTMFCallingBot
             Targets = new List<InvitationParticipantInfo>() { new InvitationParticipantInfo { Identity = target }, },
             MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = mediaToPrefetch },
             RequestedModalities = new List<Modality> { Modality.Audio },
-            TenantId = _botOptions.TenantId,
-            CallbackUri = _callbackUrl,
+            TenantId = _botConfig.TenantId,
+            CallbackUri = _botConfig.CallingEndpoint,
             Direction = CallDirection.Outgoing,
             Source = new ParticipantInfo
             {
                 Identity = new IdentitySet
                 {
-                    Application = new Identity { Id = _botOptions.AppId },
+                    Application = new Identity { Id = _botConfig.AppId },
                 },
             }
         };
@@ -53,8 +50,8 @@ public abstract class PstnCallingBot : AudioPlaybackAndDTMFCallingBot
         newCall.Source.Identity.SetApplicationInstance(
             new Identity
             {
-                Id = _botOptions.AppInstanceObjectId,
-                DisplayName = _botOptions.AppInstanceObjectName,
+                Id = _botConfig.AppInstanceObjectId,
+                DisplayName = _botConfig.AppInstanceObjectName,
             });
 
         return await StartNewCall(newCall);

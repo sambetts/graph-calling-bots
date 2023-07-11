@@ -5,7 +5,6 @@ using System.Threading;
 using Bot.Dialogues.Utils;
 using Bot.AdaptiveCards;
 using System;
-using System.Collections.Generic;
 using Engine;
 
 namespace Bot.Dialogues;
@@ -16,8 +15,9 @@ namespace Bot.Dialogues;
 public class MainDialog : CancellableDialogue
 {
     private readonly UserState _userState;
+    private readonly ITeamsChatbotManager _teamsChatbotManager;
 
-    public MainDialog(UserState userState) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, ITeamsChatbotManager teamsChatbotManager) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {
@@ -28,6 +28,7 @@ public class MainDialog : CancellableDialogue
         AddDialog(new TextPrompt(nameof(TextPrompt)));
         InitialDialogId = nameof(WaterfallDialog);
         _userState = userState;
+        _teamsChatbotManager = teamsChatbotManager;
     }
 
 
@@ -51,9 +52,9 @@ public class MainDialog : CancellableDialogue
             {
                 if (!meetingState.IsMeetingCreated)
                 {
+
                     // Create meeting
-                    meetingState.Created = DateTime.Now;
-                    meetingState.MeetingUrl = "123";
+                    await meetingState.CreateMeeting(_teamsChatbotManager);
 
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                             $"Meeting created. Anything else?"
@@ -115,17 +116,12 @@ public class MainDialog : CancellableDialogue
 
         if (NumberCallState.IsValidNumber(number))
         {
-
             // Add number
-            meetingState.Numbers.Add(new NumberCallState()
-            {
-                Number = number
-            });
-
+            meetingState = await meetingState.AddNumber(number, _teamsChatbotManager);
+            
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                                 $"Number added"
                             ), cancellationToken);
-
 
             var introCardAttachment = new MenuCard(meetingState).GetCardAttachment();
             await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));

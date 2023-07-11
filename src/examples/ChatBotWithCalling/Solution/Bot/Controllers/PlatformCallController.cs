@@ -1,4 +1,4 @@
-﻿using Bot.Bots;
+﻿using Engine;
 using Microsoft.AspNetCore.Mvc;
 using SimpleCallingBotEngine.Models;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace Bot.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly ExternalCallingBot _callingBot;
+    private readonly CallAndRedirectBot _callingBot;
 
-    public PlatformCallController(ExternalCallingBot callingBot)
+    public PlatformCallController(CallAndRedirectBot callingBot)
     {
         _callingBot = callingBot;
     }

@@ -16,4 +16,6 @@ public class RemoteMediaCallingBotConfiguration
     public string AppInstanceObjectName { get; set; } = null!;
 
     public string BotBaseUrl { get; set; } = null!;
+
+    public string CallingEndpoint { get; set; } = null!;
 }

@@ -6,6 +6,7 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleCallingBotEngine.Models;
 using SimpleCallingBotEngine;
+using Engine;
 
 namespace Bot;
 
@@ -17,12 +18,12 @@ public static class BotBuilderExtensions
         var options = new RemoteMediaCallingBotConfiguration { AppId = config.MicrosoftAppId, }; 
         services.AddSingleton(options);
 
-        services.AddSingleton<ExternalCallingBot>();
+        services.AddSingleton<CallAndRedirectBot>();
 
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager, ConcurrentInMemoryCallStateManager>();
 
-        return services.AddSingleton<ExternalCallingBot>();
+        return services.AddSingleton<CallAndRedirectBot>();
     }
 
     public static IServiceCollection AddChatBot(this IServiceCollection services)
@@ -48,6 +49,10 @@ public static class BotBuilderExtensions
 
         // Create the Bot Adapter with error handling enabled.
         services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+
+        // Bot manager
+        services.AddSingleton<ITeamsChatbotManager, GraphTeamsChatbotManager>();
+
 
         // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
         return services.AddTransient<IBot, TeamsBot<MainDialog>>();
