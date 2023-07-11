@@ -25,8 +25,12 @@ public class BotNotificationsHandler
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
     /// <param name="notificationPayload"></param>
-    public async Task HandleNotificationsAsync(CommsNotificationsPayload notificationPayload)
+    public async Task HandleNotificationsAsync(CommsNotificationsPayload? notificationPayload)
     {
+        if (notificationPayload == null)
+        {
+            return;
+        }
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var updateCall = false;

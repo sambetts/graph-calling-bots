@@ -2,9 +2,9 @@
 
 namespace SimpleCallingBotEngine.Models;
 
-public class ModelWithClientContext
+public class EmptyModelWithClientContext
 {
-    public ModelWithClientContext()
+    public EmptyModelWithClientContext()
     {
         ClientContext = Guid.NewGuid().ToString();
     }

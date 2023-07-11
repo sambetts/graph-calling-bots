@@ -98,7 +98,35 @@ public abstract class BaseStatelessGraphCallingBot
     protected async Task SubscribeToToneAsync(string callId)
     {
         _logger.LogInformation($"Subscribing to tones for call {callId}");
-        await PostData($"/communications/calls/{callId}/subscribeToTone", new ModelWithClientContext());
+        await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
+    }
+
+
+    protected async Task TransferToCallAsync(string originalCallId, string newCallId)
+    {
+        _logger.LogInformation($"Subscribing replacing call {originalCallId} with {newCallId}");
+        var i = new TransferInfo
+        { 
+            transferTarget = new InvitationParticipantInfo 
+            {
+                Identity = new IdentitySet {
+                    AdditionalData = new Dictionary<string, object>
+                    {
+                        {
+                            "endpointType" , "default"
+                        },
+                    },
+                },
+                ReplacesCallId = originalCallId,
+            }
+        };
+
+        i.transferTarget.Identity.SetPhone(new Identity { Id = "+34682796913", DisplayName = "Phone" });
+        await PostData($"/communications/calls/{newCallId}/transfer", i);
+    }
+    class TransferInfo : EmptyModelWithClientContext
+    {
+        public InvitationParticipantInfo transferTarget { get; set; }
     }
 
     #endregion
@@ -118,6 +146,10 @@ public abstract class BaseStatelessGraphCallingBot
         if (!r.IsSuccessStatusCode)
         {
             _logger.LogError($"Error response {r.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
+        }
+        if (!r.IsSuccessStatusCode)
+        {
+            // Oops
         }
         r.EnsureSuccessStatusCode();
 

@@ -10,9 +10,6 @@ namespace PstnBot;
 /// </summary>
 public class RickrollPstnBot : PstnCallingBot
 {
-    /// <remarks>
-    /// message: "There is an incident occured. Press '1' to join the incident meeting. Press '0' to listen to the instruction again. ".
-    /// </remarks>
     public const string NotificationPromptName = "NotificationPrompt";
 
     /// <summary>

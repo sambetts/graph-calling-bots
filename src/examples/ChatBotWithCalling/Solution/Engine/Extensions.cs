@@ -19,9 +19,10 @@ public static class Extensions
 
     public static async Task CreateMeeting(this MeetingState meeting, ITeamsChatbotManager teamsChatbotManager)
     {
-        string url = await teamsChatbotManager.CreateNewMeeting();
-        meeting.MeetingUrl = url;
-        meeting.Created = DateTime.Now;
+        throw new NotImplementedException();
+        //var newMeeting = await teamsChatbotManager.CreateNewMeeting();
+        //meeting.MeetingUrl = newMeeting.OnlineMeeting.JoinWebUrl;
+        //meeting.Created = DateTime.Now;
 
     }
 }

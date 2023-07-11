@@ -15,10 +15,7 @@ public static class BotBuilderExtensions
 
     public static IServiceCollection AddCallingBot(this IServiceCollection services, Config config) 
     {
-        var options = new RemoteMediaCallingBotConfiguration { AppId = config.MicrosoftAppId, }; 
-        services.AddSingleton(options);
-
-        services.AddSingleton<CallAndRedirectBot>();
+        services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager, ConcurrentInMemoryCallStateManager>();

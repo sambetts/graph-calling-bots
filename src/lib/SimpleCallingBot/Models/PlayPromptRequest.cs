@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace SimpleCallingBotEngine.Models;
 
 
-public class PlayPromptRequest : ModelWithClientContext
+public class PlayPromptRequest : EmptyModelWithClientContext
 {
     [JsonPropertyName("prompts")]
     public IEnumerable<MediaPrompt>? Prompts { get; set; }

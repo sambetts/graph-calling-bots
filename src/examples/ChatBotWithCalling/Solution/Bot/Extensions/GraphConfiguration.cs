@@ -17,7 +17,7 @@ public static class GraphConfiguration
 
         var scopes = new[] { "https://graph.microsoft.com/.default" };
 
-        services.AddScoped(sp =>
+        services.AddSingleton(sp =>
         {
             return new GraphServiceClient(clientSecretCredential, scopes);
         });

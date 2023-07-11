@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using SimpleCallingBotEngine;
+using SimpleCallingBotEngine.Models;
 using UnitTests.FakeService;
 
 namespace UnitTests;
@@ -65,15 +66,17 @@ public class TeamsChatbotManagerTests
         var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
 
         var bot = new CallAndRedirectBot(new FakeTeamsChatbotManager(), 
-            new SimpleCallingBotEngine.Models.RemoteMediaCallingBotConfiguration { },
+            _config.ToRemoteMediaCallingBotConfiguration(),
             new ConcurrentInMemoryCallStateManager(), LoggerFactory.Create(config =>
         {
             config.AddConsole();
             config.SetMinimumLevel(LogLevel.Debug);
         }).CreateLogger< CallAndRedirectBot>());
 
-        var m = new GraphTeamsChatbotManager(graphClient, bot);
+        var manager = new GraphTeamsChatbotManager(graphClient, bot);
 
-        await m.Transfer(new ActiveCallState());
+        var meeting = await manager.CreateNewMeeting();
+        var call = await manager.GroupCall(meeting);
+
     }
 }

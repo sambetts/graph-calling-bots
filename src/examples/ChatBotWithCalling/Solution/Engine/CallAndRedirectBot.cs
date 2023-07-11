@@ -27,6 +27,23 @@ public class CallAndRedirectBot : PstnCallingBot
         _teamsChatbotManager = teamsChatbotManager;
     }
 
+    public async Task<Call> StartGroupCall(string phoneNumber)
+    {
+        var meeting = await _teamsChatbotManager.CreateNewMeeting(_botConfig);
+        var groupCall = await GroupCall(meeting);
+
+        var outsideCall = await base.StartPTSNCall(phoneNumber);
+
+        Thread.Sleep(10000);
+        await TransferToCallAsync(outsideCall.Id, groupCall.Id);
+
+        return outsideCall;
+    }
+    public async Task<Call> GroupCall(OnlineMeetingInfo meeting)
+    {
+        return await JoinMeeting(meeting.ChatInfo);
+    }
+
     protected override async Task NewTonePressed(ActiveCallState callState, Tone tone)
     {
         if (tone == Tone.Tone1)

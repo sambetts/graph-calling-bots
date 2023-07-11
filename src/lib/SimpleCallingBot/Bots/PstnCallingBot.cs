@@ -57,4 +57,40 @@ public abstract class PstnCallingBot : AudioPlaybackAndDTMFCallingBot
         return await StartNewCall(newCall);
     }
 
+    public async Task<Call> JoinMeeting(ChatInfo chatInfo)
+    {
+        // PSTN call
+        //var target = new IdentitySet();
+        //target.SetPhone(new Identity { Id = phoneNumber, DisplayName = phoneNumber });
+
+        //// Attach media list
+        var mediaToPrefetch = new List<MediaInfo>();
+        foreach (var m in this.MediaMap)
+        {
+            mediaToPrefetch.Add(m.Value.MediaInfo);
+        }
+
+        var newCall = new Call
+        {
+            MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = mediaToPrefetch },
+            RequestedModalities = new List<Modality> { Modality.Audio },
+            TenantId = _botConfig.TenantId,
+            CallbackUri = _botConfig.CallingEndpoint,
+            MeetingInfo = new OrganizerMeetingInfo
+            {
+                Organizer = new IdentitySet
+                {
+                    User = new Identity
+                    {
+                        Id = _botConfig.AppInstanceObjectId,
+                        DisplayName = _botConfig.AppInstanceObjectName,
+                        AdditionalData = new Dictionary<string, object> { { "tenantId", _botConfig.TenantId } },
+                    },
+                },
+            },
+            ChatInfo = chatInfo,
+        };
+
+        return await StartNewCall(newCall);
+    }
 }
