@@ -11,7 +11,7 @@ public abstract class PstnCallingBot : AudioPlaybackAndDTMFCallingBot
 {
     private readonly string _callbackUrl;
 
-    protected PstnCallingBot(BotOptions botOptions, ICallStateManager callStateManager, ILogger logger, string callbackUrl) : base(botOptions, callStateManager, logger)
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger logger, string callbackUrl) : base(botOptions, callStateManager, logger)
     {
         _callbackUrl = callbackUrl;
     }

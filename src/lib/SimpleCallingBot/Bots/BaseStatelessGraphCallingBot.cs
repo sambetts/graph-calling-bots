@@ -15,7 +15,7 @@ namespace SimpleCallingBotEngine.Bots;
 /// </summary>
 public abstract class BaseStatelessGraphCallingBot
 {
-    protected readonly BotOptions _botOptions;
+    protected readonly RemoteMediaCallingBotConfiguration _botOptions;
     protected readonly ILogger _logger;
     private readonly ICallStateManager _callStateManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
@@ -24,7 +24,7 @@ public abstract class BaseStatelessGraphCallingBot
 
     public BotNotificationsHandler BotNotificationsHandler => _botNotificationsHandler;
 
-    public BaseStatelessGraphCallingBot(BotOptions botOptions, ICallStateManager callStateManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger logger)
     {
         _botOptions = botOptions;
         _logger = logger;

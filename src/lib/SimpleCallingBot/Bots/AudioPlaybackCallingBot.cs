@@ -9,7 +9,7 @@ namespace SimpleCallingBotEngine.Bots;
 /// </summary>
 public abstract class AudioPlaybackAndDTMFCallingBot : BaseStatelessGraphCallingBot
 {
-    protected AudioPlaybackAndDTMFCallingBot(BotOptions botOptions, ICallStateManager callStateManager, ILogger logger) : base(botOptions, callStateManager, logger)
+    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger logger) : base(botOptions, callStateManager, logger)
     {
     }
 

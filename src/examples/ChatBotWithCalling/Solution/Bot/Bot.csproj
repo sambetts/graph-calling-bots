@@ -4,6 +4,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
+		<UserSecretsId>e691e9cd-a655-4472-bf34-67aeabc1c96c</UserSecretsId>
 
 	</PropertyGroup>
 
@@ -25,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\lib\SimpleCallingBot\SimpleCallingBotEngine.csproj" />
 		<ProjectReference Include="..\CommonUtils\CommonUtils.csproj" />
 	</ItemGroup>
 

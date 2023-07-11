@@ -6,7 +6,7 @@ using SimpleCallingBotEngine.Models;
 namespace SimpleCallingBotEngineEngine;
 
 /// <summary>
-/// Turns Graph notifications into callbacks
+/// Turns Graph call notifications into callbacks
 /// </summary>
 public class BotNotificationsHandler
 {
@@ -21,6 +21,10 @@ public class BotNotificationsHandler
         _callbackInfo = callbackInfo;
     }
 
+    /// <summary>
+    /// Handle notifications from Graph and raise events as appropriate
+    /// </summary>
+    /// <param name="notificationPayload"></param>
     public async Task HandleNotificationsAsync(CommsNotificationsPayload notificationPayload)
     {
         foreach (var callnotification in notificationPayload.CommsNotifications)

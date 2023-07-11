@@ -9,14 +9,14 @@ public class Config : PropertyBoundConfig
     {
     }
 
-    [ConfigValue(true)]
+    [ConfigValue]
     public string MicrosoftAppId { get; set; } = string.Empty;
 
-    [ConfigValue(true)]
+    [ConfigValue]
     public string MicrosoftAppPassword { get; set; } = string.Empty;
 
-    [ConfigValue(true)]
-    public string MicrosoftAppTenantId { get; set; } = string.Empty;
+    [ConfigValue]
+    public string TenantId { get; set; } = string.Empty;
 
     [ConfigValue(true)]
     public string AppInsightsInstrumentationKey { get; set; } = string.Empty;

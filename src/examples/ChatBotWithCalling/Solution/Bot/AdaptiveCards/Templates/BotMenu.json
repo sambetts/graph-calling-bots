@@ -1,44 +1,57 @@
 {
   "type": "AdaptiveCard",
-  "version": "1.3",
   "body": [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "Meeting coordinator Bot"
+    },
     {
       "type": "ColumnSet",
       "columns": [
         {
           "type": "Column",
-          "width": "auto",
-          "spacing": "None",
+          "items": [
+            {
+              "type": "Image",
+              "url": "${creator.profileImage}",
+              "size": "Small",
+              "style": "Person"
+            }
+          ],
+          "width": "auto"
+        },
+        {
+          "type": "Column",
           "items": [
             {
               "type": "TextBlock",
-              "wrap": true,
-              "text": "\"${BotName}\""
+              "weight": "Bolder",
+              "text": "Meeting Info",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "None",
+              "text": "${MeetingInfo}",
+              "isSubtle": true,
+              "wrap": true
             }
-          ]
+          ],
+          "width": "stretch"
         }
       ]
     },
+    /*meeting numbers and status*/,
     {
       "type": "TextBlock",
-      "text": "Hi, I'm the \"${BotName}\". You have been added to the training courses below. As part of this program, I will send you some messages to help you get started.",
-      "size": "Medium",
+      "text": "Create a meeting, then add external numbers to join",
       "wrap": true
-    },
-    {
-      "type": "TextBlock",
-      "text": "Questions, contact learning coordinator",
-      "wrap": true
-    },
-    {
-      "type": "ActionSet",
-      "actions": [
-        {
-          "type": "Action.Execute",
-          "title": "Contact Learning coordinator"
-        }
-      ]
     }
   ],
-  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+
+  "actions": [ /*actions*/ ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3"
 }

@@ -7,9 +7,9 @@ public static class BotBuilderExtensions
     public static IServiceCollection AddCallingBot(this IServiceCollection services)
         => services.AddCallingBot(_ => { });
 
-    public static IServiceCollection AddCallingBot(this IServiceCollection services, Action<BotOptions> botOptionsAction) 
+    public static IServiceCollection AddCallingBot(this IServiceCollection services, Action<RemoteMediaCallingBotConfiguration> botOptionsAction) 
     {
-        var options = new BotOptions();
+        var options = new RemoteMediaCallingBotConfiguration();
         botOptionsAction(options);
         services.AddSingleton(options);
 

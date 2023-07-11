@@ -1,6 +1,9 @@
 ﻿namespace SimpleCallingBotEngine.Models;
 
-public class BotOptions
+/// <summary>
+/// Config needed for a remote media calling bot.
+/// </summary>
+public class RemoteMediaCallingBotConfiguration
 {
     public string AppId { get; set; } = null!;
 

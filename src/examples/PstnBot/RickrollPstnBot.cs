@@ -18,7 +18,7 @@ public class RickrollPstnBot : PstnCallingBot
     /// <summary>
     /// Initializes a new instance of the <see cref="RickrollPstnBot" /> class.
     /// </summary>
-    public RickrollPstnBot(BotOptions botOptions, ILogger logger, ICallStateManager callStateManager) : base(botOptions, callStateManager, logger, botOptions.BotBaseUrl + HttpRouteConstants.OnIncomingRequestRoute)
+    public RickrollPstnBot(RemoteMediaCallingBotConfiguration botOptions, ILogger logger, ICallStateManager callStateManager) : base(botOptions, callStateManager, logger, botOptions.BotBaseUrl + HttpRouteConstants.OnIncomingRequestRoute)
     {
         // Generate media prompts. Used later in call & need to have consistent IDs.
         this.MediaMap[NotificationPromptName] = new MediaPrompt
