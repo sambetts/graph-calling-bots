@@ -24,3 +24,5 @@
 /src/examples/ChatBotWithCalling/Teams App/manifest.json
 /src/examples/ChatBotWithCalling/Solution/Engine/obj
 /src/examples/ChatBotWithCalling/Solution/Engine/bin/Debug/net7.0
+/src/examples/ChatBotWithCalling/Solution/UnitTests/bin/Debug/net7.0
+/src/examples/ChatBotWithCalling/Solution/UnitTests/obj
