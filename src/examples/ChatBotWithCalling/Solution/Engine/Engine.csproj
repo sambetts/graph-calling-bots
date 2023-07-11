@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\SimpleCallingBot\SimpleCallingBotEngine.csproj" />
+    <ProjectReference Include="..\CommonUtils\CommonUtils.csproj" />
   </ItemGroup>
 
 </Project>

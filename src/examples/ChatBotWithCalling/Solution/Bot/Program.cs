@@ -1,4 +1,6 @@
 ﻿using Bot;
+using Bot.Extensions;
+using Engine;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 var config = new Config(builder.Configuration);
 builder.Services.AddSingleton(config);
 builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Services.ConfigureGraphClient(config);
 
 builder.Services.AddCallingBot(config);
 builder.Services.AddChatBot();
