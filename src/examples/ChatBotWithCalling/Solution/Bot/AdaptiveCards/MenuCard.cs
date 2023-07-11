@@ -1,14 +1,15 @@
 ﻿using AdaptiveCards;
 using Bot.Dialogues;
+using Engine;
 using System.Collections.Generic;
 
 namespace Bot.AdaptiveCards;
 
 public class MenuCard : BaseAdaptiveCard
 {
-    private readonly MainDialog.MeetingState _meetingState;
+    private readonly MeetingState _meetingState;
 
-    public MenuCard(MainDialog.MeetingState meetingState)
+    public MenuCard(MeetingState meetingState)
     {
         _meetingState = meetingState;
     }

@@ -28,6 +28,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\lib\SimpleCallingBot\SimpleCallingBotEngine.csproj" />
 		<ProjectReference Include="..\CommonUtils\CommonUtils.csproj" />
+		<ProjectReference Include="..\Engine\Engine.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

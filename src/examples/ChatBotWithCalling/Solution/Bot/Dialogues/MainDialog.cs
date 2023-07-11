@@ -6,6 +6,7 @@ using Bot.Dialogues.Utils;
 using Bot.AdaptiveCards;
 using System;
 using System.Collections.Generic;
+using Engine;
 
 namespace Bot.Dialogues;
 
@@ -140,22 +141,4 @@ public class MainDialog : CancellableDialogue
 
     }
 
-    public class MeetingState
-    {
-        public DateTime Created { get; set; }
-        public string MeetingUrl { get; set; } = string.Empty;
-
-        public bool IsMeetingCreated => !string.IsNullOrEmpty(MeetingUrl);
-        public List<NumberCallState> Numbers { get; set; } = new();
-    }
-
-    public class NumberCallState
-    {
-        public string Number { get; set; } = null!;
-
-        internal static bool IsValidNumber(string number)
-        {
-            return !string.IsNullOrEmpty(number);
-        }
-    }
 }

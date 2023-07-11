@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "CommonUtils\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCallingBotEngine", "..\..\..\lib\SimpleCallingBot\SimpleCallingBotEngine.csproj", "{D1D96AF9-912A-4A7D-85F3-F84A4944B967}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{C8CF1132-0587-41F4-9F57-768F61E8491F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D1D96AF9-912A-4A7D-85F3-F84A4944B967}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1D96AF9-912A-4A7D-85F3-F84A4944B967}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1D96AF9-912A-4A7D-85F3-F84A4944B967}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8CF1132-0587-41F4-9F57-768F61E8491F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8CF1132-0587-41F4-9F57-768F61E8491F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8CF1132-0587-41F4-9F57-768F61E8491F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8CF1132-0587-41F4-9F57-768F61E8491F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
