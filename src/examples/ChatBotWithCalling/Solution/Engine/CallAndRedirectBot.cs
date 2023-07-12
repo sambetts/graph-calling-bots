@@ -30,7 +30,7 @@ public class CallAndRedirectBot : PstnCallingBot
     public async Task<Call> StartGroupCall(string phoneNumber)
     {
         var meeting = await _teamsChatbotManager.CreateNewMeeting(_botConfig);
-        var groupCall = await GroupCall(meeting);
+        var groupCall = await JoinGroupCall(meeting);
 
         var outsideCall = await base.StartPTSNCall(phoneNumber);
 
@@ -39,7 +39,7 @@ public class CallAndRedirectBot : PstnCallingBot
 
         return outsideCall;
     }
-    public async Task<Call> GroupCall(OnlineMeetingInfo meeting)
+    public async Task<Call> JoinGroupCall(OnlineMeetingInfo meeting)
     {
         return await JoinMeeting(meeting.ChatInfo);
     }

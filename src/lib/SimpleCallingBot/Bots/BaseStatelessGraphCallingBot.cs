@@ -101,32 +101,25 @@ public abstract class BaseStatelessGraphCallingBot
         await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
     }
 
-
+    // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-beta&tabs=csharp
     protected async Task TransferToCallAsync(string originalCallId, string newCallId)
     {
         _logger.LogInformation($"Subscribing replacing call {originalCallId} with {newCallId}");
-        var i = new TransferInfo
-        { 
-            transferTarget = new InvitationParticipantInfo 
-            {
-                Identity = new IdentitySet {
-                    AdditionalData = new Dictionary<string, object>
-                    {
-                        {
-                            "endpointType" , "default"
-                        },
-                    },
-                },
-                ReplacesCallId = originalCallId,
+        var i = new InviteInfo
+        {
+            participants = new List<InvitationParticipantInfo>() {
+                new InvitationParticipantInfo{
+                    Identity = new IdentitySet {},
+                }
             }
         };
 
-        i.transferTarget.Identity.SetPhone(new Identity { Id = "+34682796913", DisplayName = "Phone" });
-        await PostData($"/communications/calls/{newCallId}/transfer", i);
+        i.participants[0].Identity.SetPhone(new Identity { Id = "+34682796913" });
+        await PostData($"/communications/calls/{newCallId}/participants/invite", i);
     }
-    class TransferInfo : EmptyModelWithClientContext
+    class InviteInfo : EmptyModelWithClientContext
     {
-        public InvitationParticipantInfo transferTarget { get; set; }
+        public List<InvitationParticipantInfo> participants { get; set; } = new List<InvitationParticipantInfo>();
     }
 
     #endregion
