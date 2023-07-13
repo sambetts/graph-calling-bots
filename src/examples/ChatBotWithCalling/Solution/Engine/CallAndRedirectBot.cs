@@ -32,12 +32,12 @@ public class CallAndRedirectBot : PstnCallingBot
         var meeting = await _teamsChatbotManager.CreateNewMeeting(_botConfig);
         var groupCall = await JoinGroupCall(meeting);
 
-        var outsideCall = await base.StartPTSNCall(phoneNumber);
+        //var outsideCall = await base.StartPTSNCall(phoneNumber);
 
         Thread.Sleep(10000);
-        await TransferToCallAsync(outsideCall.Id, groupCall.Id);
+        await InviteToCallAsync(groupCall.Id, phoneNumber);
 
-        return outsideCall;
+        return groupCall;
     }
     public async Task<Call> JoinGroupCall(OnlineMeetingInfo meeting)
     {

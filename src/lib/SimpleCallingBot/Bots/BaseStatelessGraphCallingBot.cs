@@ -101,20 +101,19 @@ public abstract class BaseStatelessGraphCallingBot
         await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
     }
 
-    // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-beta&tabs=csharp
-    protected async Task TransferToCallAsync(string originalCallId, string newCallId)
+    // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0&tabs=http#example-4-invite-one-pstn-participant-to-an-existing-call
+    protected async Task InviteToCallAsync(string newCallId, string number)
     {
-        _logger.LogInformation($"Subscribing replacing call {originalCallId} with {newCallId}");
         var i = new InviteInfo
         {
             participants = new List<InvitationParticipantInfo>() {
                 new InvitationParticipantInfo{
-                    Identity = new IdentitySet {},
+                    Identity = new IdentitySet(),
                 }
             }
         };
+        i.participants[0].Identity.SetPhone(new Identity { Id = number });
 
-        i.participants[0].Identity.SetPhone(new Identity { Id = "+34682796913" });
         await PostData($"/communications/calls/{newCallId}/participants/invite", i);
     }
     class InviteInfo : EmptyModelWithClientContext
