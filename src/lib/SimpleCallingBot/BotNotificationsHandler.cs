@@ -31,16 +31,18 @@ public class BotNotificationsHandler
 
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
-            var updateCallState = false;
             var callState = await _callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
 
             if (callState != null && callState.HasValidCallId)
             {
+                var updateCallState = false;
+
                 // Is this notification for a call we're tracking?
                 updateCallState = await HandleCallObjectUpdate(callState, callnotification);
+
+                // If we're not updating the call state, check for other events
                 if (!updateCallState)
                 {
-
                     // More call events
                     if (callnotification.AssociatedCall?.ToneInfo != null)
                     {

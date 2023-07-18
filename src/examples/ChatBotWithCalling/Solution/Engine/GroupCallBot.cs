@@ -79,6 +79,12 @@ public class GroupCallBot : PstnCallingBot
         return await StartNewCall(newCall);
     }
 
+    protected override async Task UserJoined(ActiveCallState callState)
+    {
+        await base.PlayPromptAsync(callState.CallId!, MediaMap.Select(m => m.Value));
+        await base.UserJoined(callState);
+    }
+
     protected override async Task NewTonePressed(ActiveCallState callState, Tone tone)
     {
         if (tone == Tone.Tone1)

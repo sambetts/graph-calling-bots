@@ -40,6 +40,9 @@ public abstract class BaseStatelessGraphCallingBot
         {
             CallConnectedWithP2PAudio = CallConnectedWithAudio,
             NewTonePressed = NewTonePressed,
+            CallTerminated = CallTerminated,
+            PlayPromptFinished = PlayPromptFinished,
+            UserJoined = UserJoined
         };
         _botNotificationsHandler = new BotNotificationsHandler(_callStateManager, callBacks, _logger);
     }
@@ -68,85 +71,101 @@ public abstract class BaseStatelessGraphCallingBot
     }
 
 
-    protected abstract Task CallConnectedWithAudio(ActiveCallState callState);
-    protected virtual Task NewTonePressed(ActiveCallState callState, Tone tone)
+    protected virtual Task CallTerminated(string callId)
     {
-        _logger.LogInformation($"New tone pressed: {tone}");
+        return Task.CompletedTask;
+    }
+    protected virtual Task CallConnectedWithAudio(ActiveCallState callState)
+    {
+        return Task.CompletedTask;
+    }
+    protected virtual Task PlayPromptFinished(ActiveCallState callState)
+    {
+        return Task.CompletedTask;
+    }
+    protected virtual Task UserJoined(ActiveCallState callState)
+    {
         return Task.CompletedTask;
     }
 
+protected virtual Task NewTonePressed(ActiveCallState callState, Tone tone)
+{
+    _logger.LogInformation($"New tone pressed: {tone}");
+    return Task.CompletedTask;
+}
 
-    #region Bot Actions
 
-    protected async Task<Call> StartNewCall(Call newCall)
+#region Bot Actions
+
+protected async Task<Call> StartNewCall(Call newCall)
+{
+    var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
+
+    _logger.LogInformation($"Call {callCreated.Id} created");
+    return callCreated;
+}
+
+/// <summary>
+/// https://learn.microsoft.com/en-us/graph/api/call-playprompt
+/// </summary>
+protected async Task<PlayPromptOperation> PlayPromptAsync(string callId, IEnumerable<MediaPrompt> mediaPrompts)
+{
+    _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callId}");
+    return await PostDataAndReturnResult<PlayPromptOperation>($"/communications/calls/{callId}/playPrompt", new PlayPromptRequest { Prompts = mediaPrompts });
+}
+
+protected async Task SubscribeToToneAsync(string callId)
+{
+    _logger.LogInformation($"Subscribing to tones for call {callId}");
+    await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
+}
+
+// https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0&tabs=http#example-4-invite-one-pstn-participant-to-an-existing-call
+protected async Task InviteToCallAsync(string newCallId, string number)
+{
+    var i = new InviteInfo
     {
-        var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
-
-        _logger.LogInformation($"Call {callCreated.Id} created");
-        return callCreated;
-    }
-
-    /// <summary>
-    /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
-    /// </summary>
-    protected async Task<PlayPromptOperation> PlayPromptAsync(string callId, IEnumerable<MediaPrompt> mediaPrompts)
-    {
-        _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callId}");
-        return await PostDataAndReturnResult<PlayPromptOperation>($"/communications/calls/{callId}/playPrompt", new PlayPromptRequest { Prompts = mediaPrompts });
-    }
-
-    protected async Task SubscribeToToneAsync(string callId)
-    {
-        _logger.LogInformation($"Subscribing to tones for call {callId}");
-        await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
-    }
-
-    // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0&tabs=http#example-4-invite-one-pstn-participant-to-an-existing-call
-    protected async Task InviteToCallAsync(string newCallId, string number)
-    {
-        var i = new InviteInfo
-        {
-            participants = new List<InvitationParticipantInfo>() {
+        participants = new List<InvitationParticipantInfo>() {
                 new InvitationParticipantInfo{
                     Identity = new IdentitySet(),
                 }
             }
-        };
-        i.participants[0].Identity.SetPhone(new Identity { Id = number });
+    };
+    i.participants[0].Identity.SetPhone(new Identity { Id = number });
 
-        await PostData($"/communications/calls/{newCallId}/participants/invite", i);
-    }
-    class InviteInfo : EmptyModelWithClientContext
+    await PostData($"/communications/calls/{newCallId}/participants/invite", i);
+}
+class InviteInfo : EmptyModelWithClientContext
+{
+    public List<InvitationParticipantInfo> participants { get; set; } = new List<InvitationParticipantInfo>();
+}
+
+#endregion
+
+#region HTTP Calls
+
+async Task<T> PostDataAndReturnResult<T>(string urlMinusRoot, object payload)
+{
+    var content = await PostData(urlMinusRoot, payload);
+    return JsonSerializer.Deserialize<T>(content) ?? throw new Exception("Unexpected Graph response");
+}
+async Task<string> PostData(string urlMinusRoot, object payload)
+{
+    var r = await _httpClient.PostAsJsonAsync($"https://graph.microsoft.com/v1.0" + urlMinusRoot, payload);
+
+    var content = await r.Content.ReadAsStringAsync();
+    if (!r.IsSuccessStatusCode)
     {
-        public List<InvitationParticipantInfo> participants { get; set; } = new List<InvitationParticipantInfo>();
+        _logger.LogError($"Error response {r.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
     }
-
-    #endregion
-
-    #region HTTP Calls
-
-    async Task<T> PostDataAndReturnResult<T>(string urlMinusRoot, object payload)
+    if (!r.IsSuccessStatusCode)
     {
-        var content = await PostData(urlMinusRoot, payload);
-        return JsonSerializer.Deserialize<T>(content) ?? throw new Exception("Unexpected Graph response");
+        // Oops
     }
-    async Task<string> PostData(string urlMinusRoot, object payload)
-    {
-        var r = await _httpClient.PostAsJsonAsync($"https://graph.microsoft.com/v1.0" + urlMinusRoot, payload);
+    r.EnsureSuccessStatusCode();
 
-        var content = await r.Content.ReadAsStringAsync();
-        if (!r.IsSuccessStatusCode)
-        {
-            _logger.LogError($"Error response {r.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
-        }
-        if (!r.IsSuccessStatusCode)
-        {
-            // Oops
-        }
-        r.EnsureSuccessStatusCode();
-
-        return content ?? throw new Exception("Unexpected Graph response");
-    }
+    return content ?? throw new Exception("Unexpected Graph response");
+}
 
     #endregion
 }
