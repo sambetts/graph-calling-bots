@@ -25,7 +25,6 @@ public class CallNotification
     public JsonObject? NotificationResource { get; set; }
 
     public Call? AssociatedCall => GetTypedResource<Call>("#microsoft.graph.call");
-
     public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResource<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
 
     T? GetTypedResource<T>(string odataType) where T : class

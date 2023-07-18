@@ -43,7 +43,6 @@ public class StartCallController : Controller
             Type = Engine.AttendeeType.Teams
         });
 
-
         req.Attendees.Add(new AttendeeCallInfo
         {
             DisplayId = "Sam2",

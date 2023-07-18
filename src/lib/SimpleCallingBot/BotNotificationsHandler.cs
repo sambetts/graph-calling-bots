@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SimpleCallingBotEngine;
 using SimpleCallingBotEngine.Models;
+using System.Reflection;
 
 namespace SimpleCallingBotEngineEngine;
 
@@ -27,10 +28,8 @@ public class BotNotificationsHandler
     /// <param name="notificationPayload"></param>
     public async Task HandleNotificationsAsync(CommsNotificationsPayload? notificationPayload)
     {
-        if (notificationPayload == null)
-        {
-            return;
-        }
+        if (notificationPayload == null) return;
+
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var updateCall = false;
@@ -76,11 +75,16 @@ public class BotNotificationsHandler
                     }
                 }
 
-                // Is this notification for a tone on a call we're tracking?
+
                 if (callnotification.AssociatedCall?.ToneInfo != null)
                 {
+                    // Is this notification for a tone on a call we're tracking?
                     updateCall = true;
                     await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState);
+                }
+                else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
+                {
+                    if (_callbackInfo.PlayPromptFinished != null) await _callbackInfo.PlayPromptFinished(callState);
                 }
 
                 if (updateCall)
@@ -129,6 +133,7 @@ public class BotNotificationsHandler
 public class NotificationCallbackInfo
 {
     public Func<ActiveCallState, Task>? CallConnectedWithAudio { get; set; }
+    public Func<ActiveCallState, Task>? PlayPromptFinished { get; set; }
     public Func<string, Task>? CallTerminated { get; set; }
     public Func<ActiveCallState, Tone, Task>? NewTonePressed { get; set; }
 }

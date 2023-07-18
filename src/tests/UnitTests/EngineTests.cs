@@ -66,6 +66,7 @@ public class EngineTests
     public async Task BotNotificationsHandlerNormalFlowTests()
     {
         var callConnectedCount = 0;
+        var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
         var callStateManager = new ConcurrentInMemoryCallStateManager();
@@ -76,13 +77,17 @@ public class EngineTests
                 callConnectedCount++;
                 return Task.CompletedTask;
             },
-            NewTonePressed = (callState, tone) =>
+            PlayPromptFinished = (callState) =>
             {
-                toneList.Add(tone);
-                Console.WriteLine($"DEBUG: Tone pressed: {tone}");   
+                callPlayPromptFinished++;
                 return Task.CompletedTask;
             },
-            CallTerminated= (callState) =>
+            NewTonePressed = (callState, tone) =>
+            {
+                toneList.Add(tone);  
+                return Task.CompletedTask;
+            },
+            CallTerminated = (callState) =>
             {
                 callTerminatedCount++;
                 return Task.CompletedTask;
@@ -90,25 +95,29 @@ public class EngineTests
         };
         var notificationsManager = new BotNotificationsHandler(callStateManager, callbackInfo, _logger);
 
-        var callResourceUrl = NotificationsLibrary.CallEstablishing.CommsNotifications[0]!.ResourceUrl!;    
+        var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;    
 
         // Handle call establish for a call never seen before
-        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishing);
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishingP2P);
 
         // We should find the call in the call state manager
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
             CallState.Establishing);
 
         // Establish the call
-        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablished);
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedP2P);
 
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
             CallState.Established);
         Assert.IsTrue(callConnectedCount == 0);
 
         // Connect audio. Should trigger the callback
-        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedWithAudio);
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedWithAudioP2P);
         Assert.IsTrue(callConnectedCount == 1);
+
+        // Pretend we've finished playing a prompt
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.PlayPromptFinish);
+        Assert.IsTrue(callPlayPromptFinished == 1);
 
         // Press buttons. Should trigger the callback
         Assert.IsTrue(toneList.Count == 0);
