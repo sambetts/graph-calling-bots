@@ -38,7 +38,7 @@ public abstract class BaseStatelessGraphCallingBot
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo
         {
-            CallConnectedWithAudio = CallConnectedWithAudio,
+            CallConnectedWithP2PAudio = CallConnectedWithAudio,
             NewTonePressed = NewTonePressed,
         };
         _botNotificationsHandler = new BotNotificationsHandler(_callStateManager, callBacks, _logger);

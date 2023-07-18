@@ -1,0 +1,114 @@
+{
+    "@odata.type": "#microsoft.graph.commsNotifications",
+    "value": [
+        {
+            "@odata.type": "#microsoft.graph.commsNotification",
+            "changeType": "updated",
+            "resource": "/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19/participants",
+            "resourceUrl": "/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19/participants",
+            "resourceData": [
+                {
+                    "@odata.type": "#microsoft.graph.participant",
+                    "info": {
+                        "@odata.type": "#microsoft.graph.participantInfo",
+                        "identity": {
+                            "@odata.type": "#microsoft.graph.identitySet",
+                            "user": {
+                                "@odata.type": "#microsoft.graph.identity",
+                                "id": "6c9ebfbf-1ea8-4469-a54a-2b952b4bceb9",
+                                "displayName": "Sam2",
+                                "tenantId": "a9c42b85-c133-4aaf-a935-5b4685768b16",
+                                "identityProvider": "AAD"
+                            }
+                        },
+                        "endpointType": "default",
+                        "endpointId": "56185356-b574-4fbc-a790-2ee4b5271c61",
+                        "languageId": "en-US",
+                        "clientVersion": "SkypeSpaces/1415/1.0.0.2023071203/os=windows; osVer=10; deviceType=computer; browser=chrome; browserVer=114.0/TsCallingVersion=2023.21.01.16/Ovb=cf272a46654d157464c80bcc4b803887e7ab5d22",
+                        "participantId": "7066fba8-cc45-43dc-a4e8-2592a23f56e3",
+                        "replacementLink": "https://cc-euwe-03-prod-aks.cc.skype.com/cc/v1/callParticipant/28e657b8-31e3-47c9-a808-5604be33d506/262/k2/406/replacement?rt=7066fba8cc4543dca4e82592a23f56e3&rc=eyJydGlkIjoiODpvcmdpZDo2YzllYmZiZi0xZWE4LTQ0NjktYTU0YS0yYjk1MmI0YmNlYjkiLCJydGxpIjoiZW4tVVMiLCJydHJzIjoiRW50ZXJwcmlzZVByb3h5In0%253D&i=10-60-21-0&e=638248748353201345"
+                    },
+                    "mediaStreams": [
+                        {
+                            "@odata.type": "#microsoft.graph.mediaStream",
+                            "mediaType": "audio",
+                            "label": "main-audio",
+                            "sourceId": "402",
+                            "direction": "sendReceive",
+                            "serverMuted": false
+                        },
+                        {
+                            "@odata.type": "#microsoft.graph.mediaStream",
+                            "mediaType": "video",
+                            "label": "main-video",
+                            "sourceId": "403",
+                            "direction": "receiveOnly",
+                            "serverMuted": false
+                        },
+                        {
+                            "@odata.type": "#microsoft.graph.mediaStream",
+                            "mediaType": "videoBasedScreenSharing",
+                            "label": "applicationsharing-video",
+                            "sourceId": "413",
+                            "direction": "receiveOnly",
+                            "serverMuted": false
+                        },
+                        {
+                            "@odata.type": "#microsoft.graph.mediaStream",
+                            "mediaType": "data",
+                            "label": "data",
+                            "sourceId": "414",
+                            "direction": "sendReceive",
+                            "serverMuted": false
+                        }
+                    ],
+                    "isMuted": false,
+                    "isInLobby": false,
+                    "publishedStates": [],
+                    "meetingRole": "none",
+                    "replacementLink": "https://cc-euwe-03-prod-aks.cc.skype.com/cc/v1/callParticipant/28e657b8-31e3-47c9-a808-5604be33d506/262/k2/406/replacement?rt=7066fba8cc4543dca4e82592a23f56e3&rc=eyJydGlkIjoiODpvcmdpZDo2YzllYmZiZi0xZWE4LTQ0NjktYTU0YS0yYjk1MmI0YmNlYjkiLCJydGxpIjoiZW4tVVMiLCJydHJzIjoiRW50ZXJwcmlzZVByb3h5In0%253D&i=10-60-21-0&e=638248748353201345",
+                    "isIdentityAnonymized": false,
+                    "id": "7066fba8-cc45-43dc-a4e8-2592a23f56e3"
+                },
+                {
+                    "@odata.type": "#microsoft.graph.participant",
+                    "info": {
+                        "@odata.type": "#microsoft.graph.participantInfo",
+                        "identity": {
+                            "@odata.type": "#microsoft.graph.identitySet",
+                            "applicationInstance": {
+                                "@odata.type": "#microsoft.graph.identity",
+                                "id": "fe0cbe61-f578-4d3a-b795-571f3cbf0361",
+                                "displayName": "CallAndRedirectBot",
+                                "tenantId": "a9c42b85-c133-4aaf-a935-5b4685768b16",
+                                "identityProvider": "AAD"
+                            }
+                        },
+                        "endpointType": "default",
+                        "endpointId": "331e6593-78b1-4ff3-b694-5d63be926145",
+                        "clientVersion": "RandoBot2 (appid:d2a35726-10be-4092-8ea0-d70e7fd87cca)",
+                        "participantId": "681cc3ab-1601-4e1f-b89f-23cbd39eaca5",
+                        "replacementLink": "https://cc-euwe-03-prod-aks.cc.skype.com/cc/v1/callParticipant/28e657b8-31e3-47c9-a808-5604be33d506/13/k3/141/replacement?rt=681cc3ab16014e1fb89f23cbd39eaca5&rc=eyJydGlkIjoiMjg6b3JnaWQ6ZmUwY2JlNjEtZjU3OC00ZDNhLWI3OTUtNTcxZjNjYmYwMzYxIn0%253D&i=10-60-21-0&e=638248748353201345"
+                    },
+                    "mediaStreams": [
+                        {
+                            "@odata.type": "#microsoft.graph.mediaStream",
+                            "mediaType": "audio",
+                            "label": "main-audio",
+                            "sourceId": "201",
+                            "direction": "sendReceive",
+                            "serverMuted": false
+                        }
+                    ],
+                    "isMuted": false,
+                    "isInLobby": false,
+                    "publishedStates": [],
+                    "meetingRole": "none",
+                    "replacementLink": "https://cc-euwe-03-prod-aks.cc.skype.com/cc/v1/callParticipant/28e657b8-31e3-47c9-a808-5604be33d506/13/k3/141/replacement?rt=681cc3ab16014e1fb89f23cbd39eaca5&rc=eyJydGlkIjoiMjg6b3JnaWQ6ZmUwY2JlNjEtZjU3OC00ZDNhLWI3OTUtNTcxZjNjYmYwMzYxIn0%253D&i=10-60-21-0&e=638248748353201345",
+                    "isIdentityAnonymized": false,
+                    "id": "681cc3ab-1601-4e1f-b89f-23cbd39eaca5"
+                }
+            ]
+        }
+    ]
+}

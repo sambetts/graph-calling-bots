@@ -126,6 +126,106 @@ namespace UnitTests.Properties {
         ///    &quot;value&quot;: [
         ///        {
         ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///            &quot;changeType&quot;: &quot;updated&quot;,
+        ///            &quot;resource&quot;: &quot;/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19/participants&quot;,
+        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19/participants&quot;,
+        ///            &quot;resourceData&quot;: [
+        ///                {
+        ///                    &quot;@odata.type&quot;: &quot;#microsoft.graph.participant&quot;,
+        ///          [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GroupCallBotJoin {
+            get {
+                return ResourceManager.GetString("GroupCallBotJoin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///    &quot;value&quot;: [
+        ///        {
+        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///            &quot;changeType&quot;: &quot;deleted&quot;,
+        ///            &quot;resource&quot;: &quot;/app/calls/7b1f6100-b760-4dcf-bbb1-6cdfa1be13fb&quot;,
+        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/7b1f6100-b760-4dcf-bbb1-6cdfa1be13fb&quot;,
+        ///            &quot;resourceData&quot;: {
+        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///                &quot;state&quot;: &quot;terminated&quot;,
+        ///                &quot;resultIn [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GroupCallEnd {
+            get {
+                return ResourceManager.GetString("GroupCallEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///    &quot;value&quot;: [
+        ///        {
+        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///            &quot;changeType&quot;: &quot;updated&quot;,
+        ///            &quot;resource&quot;: &quot;/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19&quot;,
+        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19&quot;,
+        ///            &quot;resourceData&quot;: {
+        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///                &quot;state&quot;: &quot;established&quot;,
+        ///                &quot;directi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GroupCallEstablished {
+            get {
+                return ResourceManager.GetString("GroupCallEstablished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///    &quot;value&quot;: [
+        ///        {
+        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///            &quot;changeType&quot;: &quot;updated&quot;,
+        ///            &quot;resource&quot;: &quot;/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19&quot;,
+        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19&quot;,
+        ///            &quot;resourceData&quot;: {
+        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///                &quot;state&quot;: &quot;establishing&quot;,
+        ///                &quot;callCh [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GroupCallEstablishing {
+            get {
+                return ResourceManager.GetString("GroupCallEstablishing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///    &quot;value&quot;: [
+        ///        {
+        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///            &quot;changeType&quot;: &quot;updated&quot;,
+        ///            &quot;resource&quot;: &quot;/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19/participants&quot;,
+        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19/participants&quot;,
+        ///            &quot;resourceData&quot;: [
+        ///                {
+        ///                    &quot;@odata.type&quot;: &quot;#microsoft.graph.participant&quot;,
+        ///          [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GroupCallUserJoin {
+            get {
+                return ResourceManager.GetString("GroupCallUserJoin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///    &quot;value&quot;: [
+        ///        {
+        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
         ///            &quot;changeType&quot;: &quot;deleted&quot;,
         ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
         ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,

@@ -63,7 +63,7 @@ public class EngineTests
     }
 
     [TestMethod]
-    public async Task BotNotificationsHandlerNormalFlowTests()
+    public async Task BotNotificationsHandlerP2PFlowTests()
     {
         var callConnectedCount = 0;
         var callPlayPromptFinished = 0;
@@ -72,7 +72,7 @@ public class EngineTests
         var callStateManager = new ConcurrentInMemoryCallStateManager();
         var callbackInfo = new NotificationCallbackInfo 
         {
-            CallConnectedWithAudio = (callState) => 
+            CallConnectedWithP2PAudio = (callState) => 
             {
                 callConnectedCount++;
                 return Task.CompletedTask;
@@ -128,6 +128,69 @@ public class EngineTests
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.HangUp);
         Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
         Assert.IsTrue(callConnectedCount == 1);
+        Assert.IsTrue(callTerminatedCount == 1);
+
+        Assert.IsTrue(callStateManager.Count == 0);
+    }
+
+
+    [TestMethod]
+    public async Task BotNotificationsHandlerGroupFlowTests()
+    {
+        var userJoinedCount = 0;
+        var callPlayPromptFinished = 0;
+        var callTerminatedCount = 0;
+        var toneList = new List<Tone>();
+        var callStateManager = new ConcurrentInMemoryCallStateManager();
+        var callbackInfo = new NotificationCallbackInfo
+        {
+            UserJoined = (callState) =>
+            {
+                userJoinedCount++;
+                return Task.CompletedTask;
+            },
+            PlayPromptFinished = (callState) =>
+            {
+                callPlayPromptFinished++;
+                return Task.CompletedTask;
+            },
+            NewTonePressed = (callState, tone) =>
+            {
+                toneList.Add(tone);
+                return Task.CompletedTask;
+            },
+            CallTerminated = (callState) =>
+            {
+                callTerminatedCount++;
+                return Task.CompletedTask;
+            }
+        };
+        var notificationsManager = new BotNotificationsHandler(callStateManager, callbackInfo, _logger);
+
+        var callResourceUrl = NotificationsLibrary.GroupCallEstablished.CommsNotifications[0]!.ResourceUrl!;
+
+        // Handle call establish for a call never seen before
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.GroupCallEstablishing);
+
+        // We should find the call in the call state manager
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
+            CallState.Establishing);
+
+        // Establish the call
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.GroupCallEstablished);
+
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
+            CallState.Established);
+        Assert.IsTrue(userJoinedCount == 0);
+
+        // Add user. Should trigger the callback
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.GroupCallUserJoin);
+        Assert.IsTrue(userJoinedCount == 1, "Was expected a connected call");
+
+
+        // Terminate the call
+        await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.GroupCallEnd);
+        Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
         Assert.IsTrue(callTerminatedCount == 1);
 
         Assert.IsTrue(callStateManager.Count == 0);

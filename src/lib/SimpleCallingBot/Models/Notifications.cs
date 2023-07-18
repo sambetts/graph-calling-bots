@@ -22,16 +22,48 @@ public class CallNotification
     public string ResourceUrl { get; set; } = string.Empty;
 
     [JsonPropertyName("resourceData")]
-    public JsonObject? NotificationResource { get; set; }
+    public JsonElement? NotificationResource { get; set; }
 
-    public Call? AssociatedCall => GetTypedResource<Call>("#microsoft.graph.call");
-    public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResource<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
+    public Call? AssociatedCall => GetTypedResourceObject<Call>("#microsoft.graph.call");
+    public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResourceObject<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
 
-    T? GetTypedResource<T>(string odataType) where T : class
+    public List<Participant>? JoinedParticipants => GetTypedResourceArray<Participant>();
+
+
+    T? GetTypedResourceObject<T>(string odataType) where T : class
     {
-        if (NotificationResource != null && NotificationResource["@odata.type"]?.GetValue<string>() == odataType)
+        if (NotificationResource != null)
         {
-            return JsonSerializer.Deserialize<T>(NotificationResource.ToString());
+            var s = NotificationResource.ToString();
+
+            // Single object
+            if (s != null && this.NotificationResource.Value.ValueKind == JsonValueKind.Object)
+            {
+                var obj = JsonObject.Parse(s);
+                if (obj != null && obj["@odata.type"]?.GetValue<string>() == odataType)
+                {
+                    return JsonSerializer.Deserialize<T>(s);
+                }
+            }
+        }
+        return null;
+    }
+
+    List<T>? GetTypedResourceArray<T>() where T : class
+    {
+        if (NotificationResource != null)
+        {
+            var s = NotificationResource.ToString();
+
+            // Single object
+            if (s != null && this.NotificationResource.Value.ValueKind == JsonValueKind.Array)
+            {
+                var array = JsonArray.Parse(s);
+                if (array != null)
+                {
+                    return JsonSerializer.Deserialize<List<T>>(s);
+                }
+            }
         }
         return null;
     }

@@ -1,0 +1,30 @@
+{
+    "@odata.type": "#microsoft.graph.commsNotifications",
+    "value": [
+      {
+        "@odata.type": "#microsoft.graph.commsNotification",
+        "changeType": "deleted",
+        "resource": "/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19",
+        "resourceUrl": "/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19",
+        "resourceData": {
+          "@odata.type": "#microsoft.graph.call",
+          "state": "terminated",
+          "resultInfo": {
+            "@odata.type": "#microsoft.graph.resultInfo",
+            "code": 200,
+            "subcode": 5010,
+            "message": "This conversation has ended as only one participant was remaining in the conversation.. DiagCode: 0#5010.@"
+          },
+          "meetingInfo": {
+            "@odata.type": "#microsoft.graph.tokenMeetingInfo",
+            "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IlB1SGdMbkVNLU0xVmx4U3p5MTBCVDZoRl9hRSIsInR5cCI6IkpXVCIsIng1dCI6IlB1SGdMbkVNLU0xVmx4U3p5MTBCVDZoRl9hRSJ9.eyJhcHBJZCI6ImQyYTM1NzI2LTEwYmUtNDA5Mi04ZWEwLWQ3MGU3ZmQ4N2NjYSIsImNvbnZlcnNhdGlvbkNvbnRyb2xsZXIiOiJodHRwczovL2FwaS1lbWVhLmZsaWdodHByb3h5LnRlYW1zLm1pY3Jvc29mdC5jb20vYXBpL3YyL2VwL2NvbnYtZnJjZS0wOS5jb252LnNreXBlLmNvbS9jb252L1BEY0kyeGZ6dTBlNE9pWlU0NjlWaGc_aT0xOSZlPTYzODI0OTYwNzY2MzAwOTYyMSIsImFjdGl2aXR5SWQiOiJjYTliNDY0Yi0zNDRhLTQ0ZjktYTNlOC0yMzdmNDhlZDQ0YWIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRpZCI6ImE5YzQyYjg1LWMxMzMtNGFhZi1hOTM1LTViNDY4NTc2OGIxNiIsIm5iZiI6MTY4OTY4NjU0MSwiZXhwIjoxNjg5NzcyOTQxLCJpc3MiOiJodHRwczovL2FwaS5ib3RmcmFtZXdvcmsuY29tIiwiYXVkIjoiaHR0cHM6Ly9hcGkuYm90ZnJhbWV3b3JrLmNvbSJ9.Rpmpzqjvqt3QE0NDbZ8fso4syRmxYTT8_jelMLy79Q8zmkdckCezGV_JfboBjSBxPNCQ2dTpmAf9x6VcrZQAaeUTi8UMs6fuavDdZ323BI9VmFR65hmp94-4l-acZqPvnxDhX7A2JyXviaMkJrmBknynW8HfDiUKTjSY6E8TyV-hbzzdOINsNPfXxGyNRk7_hy_h9d2ucJPqvAotoSBtD-xarkuNFGHtwbWX3hBZuNAcUnFSRR3IVSeIVoi7g6l1mJz3e9gYYsefSojcxC-mFQ6mSnfC5eRXlpBysvDSsH184HoZdZ46zK81kPQxPAzeB5h16dU-HjjuVmYKXFN25Q"
+          },
+          "meetingCapability": {
+            "@odata.type": "#microsoft.graph.meetingCapability"
+          },
+          "coOrganizers": [],
+          "callChainId": "ca9b464b-344a-44f9-a3e8-237f48ed44ab"
+        }
+      }
+    ]
+}
