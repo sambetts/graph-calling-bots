@@ -21,7 +21,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot : BaseStatelessGraphCalling
         if (callState.CallId != null)
         {
             await base.SubscribeToToneAsync(callState.CallId);
-            await base.PlayPromptAsync(callState.CallId, MediaMap.Select(m=> m.Value) );
+            await base.PlayPromptAsync(callState, MediaMap.Select(m=> m.Value) );
         }
         else
         {

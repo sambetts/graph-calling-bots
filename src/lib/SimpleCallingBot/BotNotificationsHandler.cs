@@ -52,7 +52,14 @@ public class BotNotificationsHandler
                     }
                     else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
                     {
+                        // Tone finished playing
                         _logger.LogInformation($"Call {callState.CallId} finished playing tone");
+                        var playingTone = callState.MediaPromptsPlaying.Where(p=> p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
+                        if (playingTone.Any())
+                        {
+                            callState.MediaPromptsPlaying.Remove(playingTone.First());
+                            updateCallState = true;
+                        }
                         if (_callbackInfo.PlayPromptFinished != null) await _callbackInfo.PlayPromptFinished(callState);
                     }
                     else if (callnotification.JoinedParticipants != null)
@@ -90,12 +97,12 @@ public class BotNotificationsHandler
         if (callNotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED)
         {
             // An update happened to the call
-            if (callNotification.AssociatedCall != null && callState.State != callNotification.AssociatedCall.State && callNotification.AssociatedCall.State == CallState.Established)
+            if (callNotification.AssociatedCall != null && callState.StateEnum != callNotification.AssociatedCall.State && callNotification.AssociatedCall.State == CallState.Established)
             {
                 // Call state changed to established from previous state
                 _logger.LogInformation($"Call {callState.CallId} established");
 
-                callState.State = callNotification.AssociatedCall.State;
+                callState.StateEnum = callNotification.AssociatedCall.State;
 
                 // Update call state
                 return true;

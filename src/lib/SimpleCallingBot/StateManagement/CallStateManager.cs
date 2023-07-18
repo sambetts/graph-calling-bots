@@ -31,7 +31,7 @@ public class ActiveCallState
         if (fromNotification.ResourceUrl == null) throw new ArgumentNullException(nameof(fromNotification.ResourceUrl));
 
         ResourceUrl = fromNotification.ResourceUrl;
-        State = fromNotification.AssociatedCall?.State;
+        StateEnum = fromNotification.AssociatedCall?.State;
     }
 
     public string ResourceUrl { get; set; } = null!;
@@ -53,8 +53,9 @@ public class ActiveCallState
     /// <summary>
     /// Connected, Establishing, etc
     /// </summary>
-    public CallState? State { get; set; } = null;
+    public CallState? StateEnum { get; set; } = null;
 
     public List<Tone> TonesPressed { get; set; } = new();
+    public List<MediaPrompt> MediaPromptsPlaying { get; set; } = new();
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
 }

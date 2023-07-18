@@ -49,10 +49,10 @@ public class EngineTests
         Assert.IsTrue(callStateManager.Count == 1);
 
         // Update
-        callState2.State = CallState.Terminating;
+        callState2.StateEnum = CallState.Terminating;
         await callStateManager.Update(callState2);
         var callState3 = await callStateManager.GetByNotificationResourceUrl("/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85");
-        Assert.AreEqual(callState3!.State, CallState.Terminating);
+        Assert.AreEqual(callState3!.StateEnum, CallState.Terminating);
         Assert.IsTrue(callStateManager.Count == 1);
 
         // Delete a call
@@ -101,13 +101,13 @@ public class EngineTests
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishingP2P);
 
         // We should find the call in the call state manager
-        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
             CallState.Establishing);
 
         // Establish the call
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedP2P);
 
-        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
             CallState.Established);
         Assert.IsTrue(callConnectedCount == 0);
 
@@ -116,8 +116,15 @@ public class EngineTests
         Assert.IsTrue(callConnectedCount == 1);
 
         // Pretend we've finished playing a prompt
+        var callState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
+
+        // Add a media prompt to the call state
+        callState!.MediaPromptsPlaying.Add( new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.PlayPromptFinish);
         Assert.IsTrue(callPlayPromptFinished == 1);
+
+        // Make sure the media prompt was removed
+        Assert.IsTrue(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.MediaPromptsPlaying.Count == 0);
 
         // Press buttons. Should trigger the callback
         Assert.IsTrue(toneList.Count == 0);
@@ -173,13 +180,13 @@ public class EngineTests
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.GroupCallEstablishing);
 
         // We should find the call in the call state manager
-        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
             CallState.Establishing);
 
         // Establish the call
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.GroupCallEstablished);
 
-        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.State,
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
             CallState.Established);
         Assert.IsTrue(userJoinedCount == 0);
 

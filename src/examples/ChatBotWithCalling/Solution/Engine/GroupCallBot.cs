@@ -3,6 +3,7 @@ using Microsoft.Graph;
 using SimpleCallingBotEngine;
 using SimpleCallingBotEngine.Bots;
 using SimpleCallingBotEngine.Models;
+using System.Linq;
 
 namespace Engine;
 
@@ -81,7 +82,20 @@ public class GroupCallBot : PstnCallingBot
 
     protected override async Task UserJoined(ActiveCallState callState)
     {
-        await base.PlayPromptAsync(callState.CallId!, MediaMap.Select(m => m.Value));
+        var alreadyPlaying = false;
+        foreach (var itemToPlay in MediaMap.Values)
+        {
+            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo.ResourceId).Contains(itemToPlay.MediaInfo.ResourceId))
+            {
+                alreadyPlaying = true;
+                break;
+            }
+        }
+
+        if (!alreadyPlaying)
+        {
+            await base.PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
+        }
         await base.UserJoined(callState);
     }
 
