@@ -9,9 +9,9 @@ namespace Bot.Controllers;
 [Route("[controller]")]
 public class StartCallController : Controller
 {
-    private readonly CallAndRedirectBot _callingBot;
+    private readonly GroupCallBot _callingBot;
 
-    public StartCallController(CallAndRedirectBot callingBot)
+    public StartCallController(GroupCallBot callingBot)
     {
         _callingBot = callingBot;
     }
@@ -27,7 +27,31 @@ public class StartCallController : Controller
             throw new ArgumentNullException(nameof(startCallData));
         }
 
-        var call = await this._callingBot.StartGroupCall(startCallData.PhoneNumber).ConfigureAwait(false);
+        var req = new MeetingRequest();
+
+        //req.Attendees.Add(new AttendeeCallInfo
+        //{
+        //    DisplayId = startCallData.PhoneNumber,
+        //    Id = startCallData.PhoneNumber,
+        //    Type = Engine.AttendeeType.Phone
+        //});
+
+        req.Attendees.Add(new AttendeeCallInfo
+        {
+            DisplayId = "Sam Teams",
+            Id = "3b10aa94-739a-472c-a68a-c2e3d480ed6b",
+            Type = Engine.AttendeeType.Teams
+        });
+
+
+        req.Attendees.Add(new AttendeeCallInfo
+        {
+            DisplayId = "Sam2",
+            Id = "6c9ebfbf-1ea8-4469-a54a-2b952b4bceb9",
+            Type = Engine.AttendeeType.Teams
+        });
+
+        var call = await this._callingBot.StartGroupCall(req).ConfigureAwait(false);
 
         return call;
     }

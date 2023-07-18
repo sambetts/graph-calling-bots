@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using SimpleCallingBotEngine;
 using SimpleCallingBotEngine.Models;
@@ -7,65 +8,56 @@ namespace Engine;
 
 public interface ITeamsChatbotManager
 {
-    Task AddCall(string number, MeetingState meeting);
-    Task<OnlineMeetingInfo> CreateNewMeeting(RemoteMediaCallingBotConfiguration configuration);
+    Task AddCall(string number, MeetingRequest meeting);
+    Task<Call> StartNewCall(RemoteMediaCallingBotConfiguration configuration, MeetingRequest meetingRequest);
     Task Transfer(ActiveCallState callState);
     Task<Call> GroupCall(OnlineMeetingInfo meeting);
+    Task<string?> GetUserIdByEmailAsync(string contactId);
 }
 
 public class OnlineMeetingInfo
 {
-    public OnlineMeeting OnlineMeeting { get; set; }
-    public ChatInfo ChatInfo { get; set; }
-    public MeetingInfo MeetingInfo { get; set; }
-    
+    public OnlineMeeting OnlineMeeting { get; set; } = null!;
+    public ChatInfo ChatInfo { get; set; } = null!;
+    public MeetingInfo MeetingInfo { get; set; } = null!;
 }
 
+[Obsolete]
 public class GraphTeamsChatbotManager : ITeamsChatbotManager
 {
     private readonly GraphServiceClient _graphServiceClient;
+    private readonly ILogger _logger;
 
-    public GraphTeamsChatbotManager(GraphServiceClient graphServiceClient)
+    public GraphTeamsChatbotManager(GraphServiceClient graphServiceClient, ILogger<GraphTeamsChatbotManager> logger)
     {
         _graphServiceClient = graphServiceClient;
+        _logger = logger;
     }
 
-    public Task AddCall(string number, MeetingState meeting)
+    public Task AddCall(string number, MeetingRequest meeting)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<OnlineMeetingInfo> CreateNewMeeting(RemoteMediaCallingBotConfiguration configuration)
+    public async Task<Call> StartNewCall(RemoteMediaCallingBotConfiguration configuration, MeetingRequest meetingRequest)
     {
-        var newMeetingDetails = new OnlineMeeting
+        throw new NotImplementedException();
+    }
+
+    public async Task<string?> GetUserIdByEmailAsync(string email)
+    {
+        _logger.LogInformation($"Looking up user {email}"); 
+        User? user = null;  
+        try
         {
-            StartDateTime = DateTimeOffset.UtcNow,
-            EndDateTime = DateTimeOffset.UtcNow.AddHours(1),
-            Subject = "Test Meeting",
-            Participants = new MeetingParticipants
-            {
-                Organizer = new MeetingParticipantInfo
-                {
-                    Identity = new IdentitySet
-                    {
-                        User = new Identity
-                        {
-                            Id = configuration.AppInstanceObjectId,
-                        },
-                    },
-                },
-            },
-        };
-
-        var m = await _graphServiceClient.Users[configuration.AppInstanceObjectId].OnlineMeetings.Request().AddAsync(newMeetingDetails);
-
-        var i = JoinInfo.ParseJoinURL(m.JoinWebUrl);
-        return new OnlineMeetingInfo 
-        { 
-            ChatInfo = i.Item1,
-            MeetingInfo = i.Item2,
-            OnlineMeeting = m
-        };
+            user = await _graphServiceClient.Users[email].Request().GetAsync();
+        }
+        catch (ServiceException ex)
+        {
+            _logger.LogError($"Couldn't lookup user - {ex.Message}");
+            throw;
+        }
+        return user?.Id;
     }
 
     public Task<Call> GroupCall(OnlineMeetingInfo meeting)

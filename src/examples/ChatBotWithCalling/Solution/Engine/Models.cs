@@ -5,26 +5,24 @@ using SimpleCallingBotEngine.Models;
 namespace Engine;
 
 
-public class MeetingState
+public class MeetingRequest
 {
-    public DateTime Created { get; set; }
-    public string MeetingUrl { get; set; } = null!;
-
-    public bool IsMeetingCreated => !string.IsNullOrEmpty(MeetingUrl);
-    public List<NumberCallState> Numbers { get; set; } = new();
+    public List<AttendeeCallInfo> Attendees { get; set; } = new();
 
 }
 
-public class NumberCallState
+public class AttendeeCallInfo
 {
-    public string Number { get; set; } = null!;
-
-    public static bool IsValidNumber(string number)
-    {
-        return !string.IsNullOrEmpty(number);
-    }
+    public string Id { get; set; } = null!;
+    public string DisplayId { get; set; } = null!;
+    public AttendeeType Type { get; set; }
 }
-
+public enum AttendeeType
+{
+    Unknown,
+    Phone,
+    Teams
+}
 
 public class Config : PropertyBoundConfig
 {

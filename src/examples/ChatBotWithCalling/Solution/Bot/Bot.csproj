@@ -9,10 +9,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="AdaptiveCards\Templates\AddContact.json" />
 	  <Content Remove="AdaptiveCards\Templates\BotMenu.json" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="AdaptiveCards\Templates\AddContact.json" />
 	  <EmbeddedResource Include="AdaptiveCards\Templates\BotMenu.json" />
 	</ItemGroup>
 

@@ -10,9 +10,9 @@ namespace Bot.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly CallAndRedirectBot _callingBot;
+    private readonly GroupCallBot _callingBot;
 
-    public PlatformCallController(CallAndRedirectBot callingBot)
+    public PlatformCallController(GroupCallBot callingBot)
     {
         _callingBot = callingBot;
     }

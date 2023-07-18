@@ -13,7 +13,7 @@ namespace UnitTests;
 public class TeamsChatbotManagerTests
 {
     protected Config _config = null!;
-    protected ILogger _tracer = null!;
+    protected ILoggerFactory _loggerFactory = null!;
 
     [TestInitialize]
     public void Init()
@@ -24,11 +24,11 @@ public class TeamsChatbotManagerTests
         var config = builder.Build();
 
 
-        _tracer = LoggerFactory.Create(config =>
+        _loggerFactory = LoggerFactory.Create(config =>
         {
             config.AddConsole();
             config.SetMinimumLevel(LogLevel.Debug);
-        }).CreateLogger("Unit tests");
+        });
 
         config = builder.Build();
         _config = new Config(config);
@@ -40,17 +40,15 @@ public class TeamsChatbotManagerTests
     public async Task FakeTests()
     {
         var fakeTeamsChatbotManager = new FakeTeamsChatbotManager();    
-        var url = await fakeTeamsChatbotManager.CreateNewMeeting();
+        var url = await fakeTeamsChatbotManager.CreateNewMeeting(_config.ToRemoteMediaCallingBotConfiguration(""));
         Assert.AreEqual("123", url);
 
-        var meeting = new MeetingState();
-        Assert.IsFalse(meeting.IsMeetingCreated);
+        var meeting = new MeetingRequest();
 
         await meeting.CreateMeeting(fakeTeamsChatbotManager);
-        Assert.IsTrue(meeting.IsMeetingCreated);
 
         await meeting.AddNumber("555", fakeTeamsChatbotManager);
-        Assert.IsTrue(meeting.Numbers.Any());
+        Assert.IsTrue(meeting.Attendees.Any());
     }
 
     [TestMethod]
@@ -65,18 +63,17 @@ public class TeamsChatbotManagerTests
         var scopes = new[] { "https://graph.microsoft.com/.default" };
         var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
 
-        var bot = new CallAndRedirectBot(new FakeTeamsChatbotManager(), 
-            _config.ToRemoteMediaCallingBotConfiguration(),
+        var bot = new GroupCallBot(new FakeTeamsChatbotManager(), 
+            _config.ToRemoteMediaCallingBotConfiguration(""),
             new ConcurrentInMemoryCallStateManager(), LoggerFactory.Create(config =>
         {
             config.AddConsole();
             config.SetMinimumLevel(LogLevel.Debug);
-        }).CreateLogger< CallAndRedirectBot>());
+        }).CreateLogger< GroupCallBot>());
 
-        var manager = new GraphTeamsChatbotManager(graphClient, bot);
+        var manager = new GraphTeamsChatbotManager(graphClient, _loggerFactory.CreateLogger<GraphTeamsChatbotManager>());
 
-        var meeting = await manager.CreateNewMeeting();
-        var call = await manager.GroupCall(meeting);
+        //var call = await manager.GroupCall(meeting);
 
     }
 }

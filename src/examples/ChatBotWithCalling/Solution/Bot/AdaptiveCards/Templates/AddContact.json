@@ -1,0 +1,65 @@
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "Add Contact to Call"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "Input.ChoiceSet",
+              "choices": [
+                {
+                  "title": "Teams",
+                  "value": "Teams"
+                },
+                {
+                  "title": "Phone",
+                  "value": "Phone"
+                }
+              ],
+              "placeholder": "Pick",
+              "label": "Type",
+              "isRequired": true,
+              "errorMessage": "Select contact type - internal or phone-number",
+              "id": "txtContactType"
+            }
+          ],
+          "width": "auto"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "Input.Text",
+              "placeholder": "Placeholder text",
+              "label": "Email/phone",
+              "isRequired": true,
+              "id": "txtContactId",
+              "errorMessage": "Add a valid email/phone number"
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Add Contact",
+      "data": {
+        "Action": "AddAttendee"
+      }
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3"
+}

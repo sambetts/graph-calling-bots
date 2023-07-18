@@ -19,8 +19,8 @@ public class TeamsBot<T> : DialogBot<T> where T : Dialog
 
     protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
     {
-        var userStateAccessors = _userState.CreateProperty<MeetingState>(nameof(MeetingState));
-        var meetingState = await userStateAccessors.GetAsync(turnContext, () => new MeetingState());
+        var userStateAccessors = _userState.CreateProperty<MeetingRequest>(nameof(MeetingRequest));
+        var meetingState = await userStateAccessors.GetAsync(turnContext, () => new MeetingRequest());
 
         var welcomeText = "Hello and welcome!";
         foreach (var member in membersAdded)

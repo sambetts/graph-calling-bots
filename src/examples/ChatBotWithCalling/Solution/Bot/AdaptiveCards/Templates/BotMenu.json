@@ -21,37 +21,18 @@
             }
           ],
           "width": "auto"
-        },
-        {
-          "type": "Column",
-          "items": [
-            {
-              "type": "TextBlock",
-              "weight": "Bolder",
-              "text": "Meeting Info",
-              "wrap": true
-            },
-            {
-              "type": "TextBlock",
-              "spacing": "None",
-              "text": "${MeetingInfo}",
-              "isSubtle": true,
-              "wrap": true
-            }
-          ],
-          "width": "stretch"
         }
       ]
     },
     /*meeting numbers and status*/,
     {
       "type": "TextBlock",
-      "text": "Create a meeting, then add external numbers to join",
+      "text": "Create meeting for these people",
       "wrap": true
     }
   ],
 
-  "actions": [ /*actions*/ ],
+  "actions": /*actions*/,
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "version": "1.3"
 }

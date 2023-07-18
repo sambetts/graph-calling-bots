@@ -3,12 +3,11 @@ using System;
 
 namespace Bot.Dialogues.Utils;
 
-
 public class AdaptiveCardUtils
 {
-    public static ActionResponse? GetAdaptiveCardAction(string? submitJson, string fromAadObjectId)
+    public static AdaptiveCardActionResponse? GetAdaptiveCardAction(string? submitJson)
     {
-        ActionResponse? r = null;
+        AdaptiveCardActionResponse? r = null;
         if (string.IsNullOrEmpty(submitJson))
         {
             return r;   
@@ -16,11 +15,16 @@ public class AdaptiveCardUtils
 
         try
         {
-            r = JsonConvert.DeserializeObject<ActionResponse>(submitJson);
+            r = JsonConvert.DeserializeObject<AdaptiveCardActionResponse>(submitJson);
         }
         catch (Exception)
         {
             // Nothing
+        }
+
+        if (r != null && r.Action == CardConstants.CardActionValAddAttendee)
+        {
+            r = JsonConvert.DeserializeObject<AddContactAdaptiveCardActionResponse>(submitJson);
         }
 
         return r;

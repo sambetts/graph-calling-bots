@@ -1,5 +1,4 @@
 ﻿using AdaptiveCards;
-using Bot.Dialogues;
 using Engine;
 using System.Collections.Generic;
 
@@ -7,9 +6,9 @@ namespace Bot.AdaptiveCards;
 
 public class MenuCard : BaseAdaptiveCard
 {
-    private readonly MeetingState _meetingState;
+    private readonly MeetingRequest _meetingState;
 
-    public MenuCard(MeetingState meetingState)
+    public MenuCard(MeetingRequest meetingState)
     {
         _meetingState = meetingState;
     }
@@ -30,52 +29,47 @@ public class MenuCard : BaseAdaptiveCard
         };
 
         // Add attendees to card
-        foreach (var item in _meetingState.Numbers)
+        foreach (var item in _meetingState.Attendees)
         {
             numbers.Add(new AdaptiveTextBlock
             {
-                Text = item.Number,
+                Text = item.Id,
                 Size = AdaptiveTextSize.Small,
                 Weight = AdaptiveTextWeight.Bolder
             });
 
             states.Add(new AdaptiveTextBlock
             {
-                Text = "Calling",
+                Text = item.Type == AttendeeType.Phone ? "Calling" : "Teams",
                 Size = AdaptiveTextSize.Small,
                 Weight = AdaptiveTextWeight.Bolder
             });
         }
 
-        AdaptiveAction? action = null;
-        var meetingInfoDesc = "No meeting created";
-        if (!_meetingState.IsMeetingCreated)
-        {
-            action = new AdaptiveSubmitAction
+        var actions = new List<AdaptiveSubmitAction> {
+            new AdaptiveSubmitAction
             {
-                Title = "Create Meeting",
-                Data = new ActionResponse
+                Title = "Add Contact",
+                Data = new AdaptiveCardActionResponse
                 {
-                    Action = CardConstants.CardActionValCreateMeeting
+                    Action = CardConstants.CardActionValStartAddAttendee
                 }
-            };
-        }
-        else
+            }
+        };
+        if (_meetingState.Attendees.Count > 0)
         {
-            meetingInfoDesc = $"Meeting created at {_meetingState.Created} with url {_meetingState.MeetingUrl}";
-            action = new AdaptiveSubmitAction
+            actions.Add(new AdaptiveSubmitAction
             {
-                Title = "Add Number",
-                Data = new ActionResponse
+                Title = "Start Meeting",
+                Data = new AdaptiveCardActionResponse
                 {
-                    Action = CardConstants.CardActionValAddNumber
+                    Action = CardConstants.CardActionValStartMeeting
                 }
-            };
+            });
         }
 
         json = ReplaceVal(json, CardConstants.CardContentVarBotMenu, Newtonsoft.Json.JsonConvert.SerializeObject(cols));
-        json = ReplaceVal(json, CardConstants.CardContentActions, Newtonsoft.Json.JsonConvert.SerializeObject(action));
-        json = ReplaceVal(json, CardConstants.CardContentMeetingInfo, meetingInfoDesc);
+        json = ReplaceVal(json, CardConstants.CardContentActions, Newtonsoft.Json.JsonConvert.SerializeObject(actions));
 
         return json;
     }

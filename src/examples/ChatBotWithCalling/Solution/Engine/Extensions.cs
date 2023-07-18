@@ -2,12 +2,12 @@
 
 public static class Extensions
 {
-    public async static Task<MeetingState> AddNumber(this MeetingState meeting, string number, ITeamsChatbotManager teamsChatbotManager)
+    public async static Task<MeetingRequest> AddNumber(this MeetingRequest meeting, string number, ITeamsChatbotManager teamsChatbotManager)
     {
         // Add number
-        meeting.Numbers.Add(new NumberCallState()
+        meeting.Attendees.Add(new AttendeeCallInfo()
         {
-            Number = number
+            Id = number
         });
 
         // Start call
@@ -17,7 +17,7 @@ public static class Extensions
     }
 
 
-    public static async Task CreateMeeting(this MeetingState meeting, ITeamsChatbotManager teamsChatbotManager)
+    public static async Task CreateMeeting(this MeetingRequest meeting, ITeamsChatbotManager teamsChatbotManager)
     {
         throw new NotImplementedException();
         //var newMeeting = await teamsChatbotManager.CreateNewMeeting();

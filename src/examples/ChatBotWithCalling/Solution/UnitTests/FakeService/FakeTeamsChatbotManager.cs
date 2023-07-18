@@ -13,7 +13,7 @@ namespace UnitTests.FakeService;
 
 public class FakeTeamsChatbotManager : ITeamsChatbotManager
 {
-    public Task AddCall(string number, MeetingState meeting)
+    public Task AddCall(string number, MeetingRequest meeting)
     {
         return Task.CompletedTask;
     }
@@ -23,7 +23,17 @@ public class FakeTeamsChatbotManager : ITeamsChatbotManager
         return Task.FromResult("123");
     }
 
+    public Task<string?> GetUserIdByEmailAsync(string contactId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Call> GroupCall(Engine.OnlineMeetingInfo meeting)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Call> StartNewCall(RemoteMediaCallingBotConfiguration configuration, MeetingRequest meetingRequest)
     {
         throw new NotImplementedException();
     }
@@ -31,10 +41,5 @@ public class FakeTeamsChatbotManager : ITeamsChatbotManager
     public Task Transfer(ActiveCallState callState)
     {
         return Task.CompletedTask;  
-    }
-
-    Task<Engine.OnlineMeetingInfo> ITeamsChatbotManager.CreateNewMeeting(RemoteMediaCallingBotConfiguration configuration)
-    {
-        throw new NotImplementedException();
     }
 }
