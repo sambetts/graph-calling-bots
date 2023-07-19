@@ -29,12 +29,12 @@ public class StartCallController : Controller
 
         var req = new MeetingRequest();
 
-        //req.Attendees.Add(new AttendeeCallInfo
-        //{
-        //    DisplayId = startCallData.PhoneNumber,
-        //    Id = startCallData.PhoneNumber,
-        //    Type = Engine.AttendeeType.Phone
-        //});
+        req.Attendees.Add(new AttendeeCallInfo
+        {
+            DisplayId = startCallData.PhoneNumber,
+            Id = startCallData.PhoneNumber,
+            Type = Engine.AttendeeType.Phone
+        });
 
         req.Attendees.Add(new AttendeeCallInfo
         {
@@ -43,12 +43,12 @@ public class StartCallController : Controller
             Type = Engine.AttendeeType.Teams
         });
 
-        req.Attendees.Add(new AttendeeCallInfo
-        {
-            DisplayId = "Sam2",
-            Id = "6c9ebfbf-1ea8-4469-a54a-2b952b4bceb9",
-            Type = Engine.AttendeeType.Teams
-        });
+        //req.Attendees.Add(new AttendeeCallInfo
+        //{
+        //    DisplayId = "Sam2",
+        //    Id = "6c9ebfbf-1ea8-4469-a54a-2b952b4bceb9",
+        //    Type = Engine.AttendeeType.Teams
+        //});
 
         var call = await this._callingBot.StartGroupCall(req).ConfigureAwait(false);
 

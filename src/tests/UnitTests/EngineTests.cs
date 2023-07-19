@@ -65,6 +65,7 @@ public class EngineTests
     [TestMethod]
     public async Task BotNotificationsHandlerP2PFlowTests()
     {
+        var callConnectedWithP2PAudioCount = 0;
         var callConnectedCount = 0;
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
@@ -72,9 +73,14 @@ public class EngineTests
         var callStateManager = new ConcurrentInMemoryCallStateManager();
         var callbackInfo = new NotificationCallbackInfo 
         {
-            CallConnectedWithP2PAudio = (callState) => 
+            CallEstablished = (callState) =>
             {
                 callConnectedCount++;
+                return Task.CompletedTask;
+            },
+            CallConnectedWithP2PAudio = (callState) => 
+            {
+                callConnectedWithP2PAudioCount++;
                 return Task.CompletedTask;
             },
             PlayPromptFinished = (callState) =>
@@ -101,19 +107,20 @@ public class EngineTests
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishingP2P);
 
         // We should find the call in the call state manager
-        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
-            CallState.Establishing);
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum, CallState.Establishing);
 
         // Establish the call
+        Assert.IsTrue(callConnectedCount == 0);
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedP2P);
+        Assert.IsTrue(callConnectedCount == 1);
 
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
             CallState.Established);
-        Assert.IsTrue(callConnectedCount == 0);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 0);
 
         // Connect audio. Should trigger the callback
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishedWithAudioP2P);
-        Assert.IsTrue(callConnectedCount == 1);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
 
         // Pretend we've finished playing a prompt
         var callState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
@@ -134,7 +141,7 @@ public class EngineTests
         // Terminate the call
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.HangUp);
         Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
-        Assert.IsTrue(callConnectedCount == 1);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
         Assert.IsTrue(callTerminatedCount == 1);
 
         Assert.IsTrue(callStateManager.Count == 0);

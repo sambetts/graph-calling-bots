@@ -38,7 +38,7 @@ public abstract class BaseStatelessGraphCallingBot
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo
         {
-            CallConnectedWithP2PAudio = CallConnectedWithAudio,
+            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
             NewTonePressed = NewTonePressed,
             CallTerminated = CallTerminated,
             PlayPromptFinished = PlayPromptFinished,
@@ -70,12 +70,13 @@ public abstract class BaseStatelessGraphCallingBot
         return false;
     }
 
+    #region Bot Events
 
     protected virtual Task CallTerminated(string callId)
     {
         return Task.CompletedTask;
     }
-    protected virtual Task CallConnectedWithAudio(ActiveCallState callState)
+    protected virtual Task CallConnectedWithP2PAudio(ActiveCallState callState)
     {
         return Task.CompletedTask;
     }
@@ -94,6 +95,7 @@ public abstract class BaseStatelessGraphCallingBot
         return Task.CompletedTask;
     }
 
+    #endregion
 
     #region Bot Actions
 
@@ -124,7 +126,7 @@ public abstract class BaseStatelessGraphCallingBot
     }
 
     // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0&tabs=http#example-4-invite-one-pstn-participant-to-an-existing-call
-    protected async Task InviteToCallAsync(ActiveCallState callState, string number)
+    protected async Task InvitePstnNumberToCallAsync(string callId, string number)
     {
         var i = new InviteInfo
         {
@@ -136,7 +138,7 @@ public abstract class BaseStatelessGraphCallingBot
         };
         i.participants[0].Identity.SetPhone(new Identity { Id = number });
 
-        await PostData($"/communications/calls/{callState.CallId}/participants/invite", i);
+        await PostData($"/communications/calls/{callId}/participants/invite", i);
     }
 
     class InviteInfo : EmptyModelWithClientContext

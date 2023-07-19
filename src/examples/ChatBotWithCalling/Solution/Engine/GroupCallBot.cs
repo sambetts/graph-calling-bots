@@ -3,7 +3,6 @@ using Microsoft.Graph;
 using SimpleCallingBotEngine;
 using SimpleCallingBotEngine.Bots;
 using SimpleCallingBotEngine.Models;
-using System.Linq;
 
 namespace Engine;
 
@@ -53,21 +52,8 @@ public class GroupCallBot : PstnCallingBot
             }
         };
 
-        var targetsList = new List<InvitationParticipantInfo>();
-        foreach (var attendee in meetingRequest.Attendees)
-        {
-            var newTarget = new InvitationParticipantInfo { Identity = new IdentitySet() };
-            if (attendee.Type == AttendeeType.Phone)
-            {
-                newTarget.Identity.SetPhone(new Identity { Id = attendee.Id, DisplayName = attendee.Id });
-            }
-            else if (attendee.Type == AttendeeType.Teams)
-            {
-                newTarget.Identity.User = new Identity { Id = attendee.Id, DisplayName = attendee.DisplayId };
-            }
-            targetsList.Add(newTarget);
-        }
-        newCall.Targets = targetsList;
+        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
+        newCall.Targets = initialAddList;
 
         // Set source as this bot
         newCall.Source.Identity.SetApplicationInstance(
@@ -77,8 +63,17 @@ public class GroupCallBot : PstnCallingBot
                 DisplayName = _botConfig.AppInstanceObjectName,
             });
 
-        return await StartNewCall(newCall);
+        var call = await StartNewCall(newCall);
+
+        // Invite everyone else
+        foreach (var invite in inviteNumberList)
+        {
+            await InvitePstnNumberToCallAsync(call.Id, invite);
+        }
+
+        return call;
     }
+
 
     protected override async Task UserJoined(ActiveCallState callState)
     {

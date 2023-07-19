@@ -16,7 +16,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot : BaseStatelessGraphCalling
     // Supported media: https://learn.microsoft.com/en-us/graph/api/resources/mediainfo?view=graph-rest-1.0
     protected Dictionary<string, MediaPrompt> MediaMap { get; } = new();
 
-    protected override async Task CallConnectedWithAudio(ActiveCallState callState)
+    protected override async Task CallConnectedWithP2PAudio(ActiveCallState callState)
     {
         if (callState.CallId != null)
         {

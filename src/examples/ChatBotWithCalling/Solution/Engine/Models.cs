@@ -1,5 +1,6 @@
 ﻿using CommonUtils.Config;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Graph;
 using SimpleCallingBotEngine.Models;
 
 namespace Engine;
@@ -9,6 +10,47 @@ public class MeetingRequest
 {
     public List<AttendeeCallInfo> Attendees { get; set; } = new();
 
+    public (List<InvitationParticipantInfo>, List<string>) GetInitialParticipantsAndInvites()
+    {
+        var initialAddList = new List<InvitationParticipantInfo>();
+        var inviteNumberList = new List<string>();
+
+        // To start a group call, we can't add Teams + PSTN users at once. We have to add all Teams users first, then add PSTN users.
+        foreach (var attendee in Attendees.Where(a => a.Type == AttendeeType.Teams))
+        {
+            var newTarget = new InvitationParticipantInfo { Identity = new IdentitySet { User = new Identity { Id = attendee.Id, DisplayName = attendee.DisplayId } } };
+            initialAddList.Add(newTarget);
+        }
+
+        string? initialPhoneNumberAdded = null;
+        if (initialAddList.Count == 0)
+        {
+            // If no Teams users, start call with single PSTN user and each the rest as invitations
+            var phoneUsers = Attendees.Where(attendees => attendees.Type == AttendeeType.Phone).ToList();
+            if (phoneUsers.Count == 0)
+            {
+                throw new Exception("No attendees provided");
+            }
+
+            // Start call with 1st PSTN user and invite the rest
+            var firstPhoneUser = new InvitationParticipantInfo { Identity = new IdentitySet() };
+            firstPhoneUser.Identity.SetPhone(new Identity { Id = phoneUsers[0].Id, DisplayName = phoneUsers[0].DisplayId });
+            initialAddList.Add(firstPhoneUser);
+            initialPhoneNumberAdded = phoneUsers[0].Id;
+        }
+
+        // Add anyone left to invites
+        foreach (var attendee in Attendees.Where(a => a.Type == AttendeeType.Phone))
+        {
+            // If this call starts with a PSTN number, don't add it to the invite list
+            if (attendee.Id != initialPhoneNumberAdded)
+            {
+                inviteNumberList.Add(attendee.Id);
+            }
+        }
+
+        return (initialAddList, inviteNumberList);
+    }
 }
 
 public class AttendeeCallInfo

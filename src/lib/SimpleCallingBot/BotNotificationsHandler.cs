@@ -24,7 +24,6 @@ public class BotNotificationsHandler
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    /// <param name="notificationPayload"></param>
     public async Task HandleNotificationsAsync(CommsNotificationsPayload? notificationPayload)
     {
         if (notificationPayload == null) return;
@@ -103,6 +102,7 @@ public class BotNotificationsHandler
                 _logger.LogInformation($"Call {callState.CallId} established");
 
                 callState.StateEnum = callNotification.AssociatedCall.State;
+                if (_callbackInfo.CallEstablished != null) await _callbackInfo.CallEstablished(callState);
 
                 // Update call state
                 return true;
@@ -154,6 +154,7 @@ public class BotNotificationsHandler
 public class NotificationCallbackInfo
 {
     public Func<ActiveCallState, Task>? CallConnectedWithP2PAudio { get; set; }
+    public Func<ActiveCallState, Task>? CallEstablished { get; set; }
     public Func<ActiveCallState, Task>? PlayPromptFinished { get; set; }
     public Func<string, Task>? CallTerminated { get; set; }
     public Func<ActiveCallState, Tone, Task>? NewTonePressed { get; set; }
