@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{272C9B11
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "examples\ChatBotWithCalling\Solution\CommonUtils\CommonUtils.csproj", "{FA145292-2B9A-4107-9F5B-1307C26D628C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupCallingChatBot.FunctionApp", "GroupCallingChatBot.FunctionApp\GroupCallingChatBot.FunctionApp.csproj", "{0E7E1FEA-BCF3-4434-8C07-748BA7EACA60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{FA145292-2B9A-4107-9F5B-1307C26D628C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA145292-2B9A-4107-9F5B-1307C26D628C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA145292-2B9A-4107-9F5B-1307C26D628C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E7E1FEA-BCF3-4434-8C07-748BA7EACA60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E7E1FEA-BCF3-4434-8C07-748BA7EACA60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E7E1FEA-BCF3-4434-8C07-748BA7EACA60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E7E1FEA-BCF3-4434-8C07-748BA7EACA60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{9DD7FAF6-60E5-41B8-BCCA-62F144532F39} = {272C9B11-A001-4726-9D65-AA3281148F25}
 		{02176A33-D9F8-4F80-B67E-21F73E649E0E} = {3897B9CF-F021-4E78-9984-B3B67F377AD0}
 		{FA145292-2B9A-4107-9F5B-1307C26D628C} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
+		{0E7E1FEA-BCF3-4434-8C07-748BA7EACA60} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE9A9A1A-CC56-45F3-8647-06996C708164}
