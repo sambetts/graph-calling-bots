@@ -26,3 +26,6 @@
 /src/examples/ChatBotWithCalling/Solution/Engine/bin/Debug/net7.0
 /src/examples/ChatBotWithCalling/Solution/UnitTests/bin/Debug/net7.0
 /src/examples/ChatBotWithCalling/Solution/UnitTests/obj
+/src/lib/ServiceHostedMediaCallingBot.Engine/.vs/SimpleCallingBot
+/src/lib/ServiceHostedMediaCallingBot.Engine/bin/Debug/net7.0
+/src/lib/ServiceHostedMediaCallingBot.Engine/obj
