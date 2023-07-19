@@ -1,9 +1,9 @@
 ﻿using Azure.Identity;
-using Bot.Models;
+using GroupCallingChatBot.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 
-namespace Bot.Extensions;
+namespace GroupCallingChatBot.Extensions;
 
 public static class GraphConfiguration
 {

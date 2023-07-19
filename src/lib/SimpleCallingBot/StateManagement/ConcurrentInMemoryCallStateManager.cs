@@ -1,4 +1,4 @@
-﻿namespace SimpleCallingBotEngine;
+﻿namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where T : BaseActiveCallState
 {

@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Graph;
 using System.Net.Http.Json;
 using System.Text.Json;
-using SimpleCallingBotEngine.Models;
-using SimpleCallingBotEngine.Http;
-using SimpleCallingBotEngineEngine;
+using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using ServiceHostedMediaCallingBot.Engine.Http;
 
-namespace SimpleCallingBotEngine.Bots;
+namespace ServiceHostedMediaCallingBot.Engine.Bots;
 
 /// <summary>
 /// A simple, stateless bot that can make outbound calls and play prompts.

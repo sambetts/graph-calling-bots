@@ -1,5 +1,5 @@
-using Bot.AdaptiveCards;
-using Bot.Models;
+using GroupCallingChatBot.AdaptiveCards;
+using GroupCallingChatBot.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bot.Bots;
+namespace GroupCallingChatBot.Bots;
 
 public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
 {

@@ -1,26 +1,26 @@
-﻿using Bot.Models;
+﻿using GroupCallingChatBot.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using SimpleCallingBotEngine;
-using SimpleCallingBotEngine.Bots;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Bots;
+using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Bot.Bots;
+namespace GroupCallingChatBot.Bots;
 
 public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
 
-    public GroupCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallingBot> logger) 
+    public GroupCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallingBot> logger)
         : base(botOptions, callStateManager, logger)
     {
 
         // Generate media prompts. Used later in call & need to have consistent IDs.
-        this.MediaMap[NotificationPromptName] = new MediaPrompt
+        MediaMap[NotificationPromptName] = new MediaPrompt
         {
             MediaInfo = new MediaInfo
             {
@@ -34,7 +34,7 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
     {
         // Attach media list
         var mediaToPrefetch = new List<MediaInfo>();
-        foreach (var m in this.MediaMap)
+        foreach (var m in MediaMap)
         {
             mediaToPrefetch.Add(m.Value.MediaInfo);
         }
@@ -107,7 +107,7 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 
         if (!alreadyPlaying)
         {
-            await base.PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
+            await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
         }
         await base.UserJoined(callState);
     }

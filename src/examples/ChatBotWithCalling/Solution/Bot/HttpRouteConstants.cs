@@ -1,5 +1,4 @@
-﻿
-namespace Bot;
+﻿namespace GroupCallingChatBot;
 
 /// <summary>
 /// HTTP route constants for routing requests to controller methods.

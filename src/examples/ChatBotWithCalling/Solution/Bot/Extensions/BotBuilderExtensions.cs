@@ -1,18 +1,18 @@
-﻿using Bot.Bots;
-using Bot.Dialogues;
-using Microsoft.Bot.Builder.Integration.AspNet.Core;
+﻿using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleCallingBotEngine;
-using Bot.Models;
+using GroupCallingChatBot.Dialogues;
+using GroupCallingChatBot.Bots;
+using GroupCallingChatBot.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace Bot;
+namespace GroupCallingChatBot.Extensions;
 
 public static class BotBuilderExtensions
 {
 
-    public static IServiceCollection AddCallingBot(this IServiceCollection services, BotConfig config) 
+    public static IServiceCollection AddCallingBot(this IServiceCollection services, BotConfig config)
     {
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 

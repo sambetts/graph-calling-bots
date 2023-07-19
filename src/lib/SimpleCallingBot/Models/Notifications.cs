@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace SimpleCallingBotEngine.Models;
+namespace ServiceHostedMediaCallingBot.Engine.Models;
 
 
 public class CommsNotificationsPayload
@@ -37,9 +37,9 @@ public class CallNotification
             var s = NotificationResource.ToString();
 
             // Single object
-            if (s != null && this.NotificationResource.Value.ValueKind == JsonValueKind.Object)
+            if (s != null && NotificationResource.Value.ValueKind == JsonValueKind.Object)
             {
-                var obj = JsonObject.Parse(s);
+                var obj = JsonNode.Parse(s);
                 if (obj != null && obj["@odata.type"]?.GetValue<string>() == odataType)
                 {
                     return JsonSerializer.Deserialize<T>(s);
@@ -56,9 +56,9 @@ public class CallNotification
             var s = NotificationResource.ToString();
 
             // Single object
-            if (s != null && this.NotificationResource.Value.ValueKind == JsonValueKind.Array)
+            if (s != null && NotificationResource.Value.ValueKind == JsonValueKind.Array)
             {
-                var array = JsonArray.Parse(s);
+                var array = JsonNode.Parse(s);
                 if (array != null)
                 {
                     return JsonSerializer.Deserialize<List<T>>(s);

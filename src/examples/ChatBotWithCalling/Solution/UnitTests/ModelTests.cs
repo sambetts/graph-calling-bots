@@ -1,7 +1,7 @@
-using Bot.Models;
+using GroupCallingChatBot.Models;
 using Microsoft.Extensions.Logging;
 
-namespace UnitTests;
+namespace ServiceHostedMediaCallingBot.UnitTests;
 
 [TestClass]
 public class ModelTests
@@ -13,14 +13,14 @@ public class ModelTests
     [TestMethod]
     public void MeetingRequestInvites()
     {
-        var twoTeamsPlusOnePhoneUserMeeting = new MeetingRequest() 
-        { 
+        var twoTeamsPlusOnePhoneUserMeeting = new MeetingRequest()
+        {
             Attendees = new List<AttendeeCallInfo>
             {
                 new AttendeeCallInfo{ Type = MeetingAttendeeType.Teams, Id = "t1" },
                 new AttendeeCallInfo{ Type = MeetingAttendeeType.Teams, Id = "t2" },
                 new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p1" }
-            } 
+            }
         };
 
         var (initialAddList, inviteNumberList) = twoTeamsPlusOnePhoneUserMeeting.GetInitialParticipantsAndInvites(string.Empty);

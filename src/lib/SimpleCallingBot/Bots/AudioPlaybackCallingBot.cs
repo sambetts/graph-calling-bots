@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace SimpleCallingBotEngine.Bots;
+namespace ServiceHostedMediaCallingBot.Engine.Bots;
 
 /// <summary>
 /// A bot that plays service-hosted audio and responds to DTMF input. Can be used for Teams calls or PSTN calls.
@@ -20,8 +21,8 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
     {
         if (callState.CallId != null)
         {
-            await base.SubscribeToToneAsync(callState.CallId);
-            await base.PlayPromptAsync(callState, MediaMap.Select(m=> m.Value) );
+            await SubscribeToToneAsync(callState.CallId);
+            await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
         }
         else
         {

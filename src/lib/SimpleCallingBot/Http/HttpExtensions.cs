@@ -1,4 +1,4 @@
-﻿namespace SimpleCallingBotEngine.Http;
+﻿namespace ServiceHostedMediaCallingBot.Engine.Http;
 
 using System;
 using System.Net.Http;

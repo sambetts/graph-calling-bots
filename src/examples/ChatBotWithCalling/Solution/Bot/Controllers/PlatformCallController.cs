@@ -1,9 +1,10 @@
-﻿using Bot.Bots;
+﻿using GroupCallingChatBot;
+using GroupCallingChatBot.Bots;
 using Microsoft.AspNetCore.Mvc;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Threading.Tasks;
 
-namespace Bot.Controllers;
+namespace GroupCallingChatBot.Controllers;
 
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.
@@ -24,7 +25,7 @@ public class PlatformCallController : ControllerBase
     [Route(HttpRouteConstants.CallNotificationsRoute)]
     public async Task<IActionResult> OnIncomingRequestAsync([FromBody] CommsNotificationsPayload notifications)
     {
-        var validRequest = await _callingBot.ValidateNotificationRequestAsync(this.Request);
+        var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
             await _callingBot.BotNotificationsHandler.HandleNotificationsAsync(notifications);

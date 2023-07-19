@@ -1,8 +1,8 @@
 ﻿using CommonUtils.Config;
 using Microsoft.Extensions.Configuration;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace Bot.Models;
+namespace GroupCallingChatBot.Models;
 
 
 public class BotConfig : PropertyBoundConfig

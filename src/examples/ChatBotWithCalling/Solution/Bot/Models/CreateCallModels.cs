@@ -1,10 +1,10 @@
 ﻿using Microsoft.Graph;
-using SimpleCallingBotEngine;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Bot.Models;
+namespace GroupCallingChatBot.Models;
 
 public class MeetingRequest
 {

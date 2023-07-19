@@ -1,4 +1,4 @@
-﻿namespace SimpleCallingBotEngine.Models;
+﻿namespace ServiceHostedMediaCallingBot.Engine.Models;
 
 /// <summary>
 /// Config needed for a remote media calling bot.

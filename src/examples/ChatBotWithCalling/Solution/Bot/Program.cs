@@ -1,6 +1,5 @@
-﻿using Bot;
-using Bot.Extensions;
-using Bot.Models;
+﻿using GroupCallingChatBot.Extensions;
+using GroupCallingChatBot.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 

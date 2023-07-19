@@ -4,9 +4,9 @@ using Microsoft.Bot.Schema;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace Bot.Dialogues;
+namespace GroupCallingChatBot.Dialogues;
 
-public abstract class CancellableDialogue: ComponentDialog
+public abstract class CancellableDialogue : ComponentDialog
 {
     private const string CancelMsgText = "Ok then; I was bored of this conversation anyway.";
 

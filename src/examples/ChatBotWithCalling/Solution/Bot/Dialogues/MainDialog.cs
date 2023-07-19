@@ -2,18 +2,17 @@
 using Microsoft.Bot.Builder;
 using System.Threading.Tasks;
 using System.Threading;
-using Bot.Dialogues.Utils;
-using Bot.AdaptiveCards;
-using System;
 using CommonUtils;
 using Microsoft.Bot.Schema;
 using System.Collections.Generic;
 using Microsoft.Graph;
 using Attachment = Microsoft.Bot.Schema.Attachment;
-using Bot.Models;
-using Bot.Bots;
+using GroupCallingChatBot.Bots;
+using GroupCallingChatBot.Models;
+using GroupCallingChatBot.Dialogues.Utils;
+using GroupCallingChatBot.AdaptiveCards;
 
-namespace Bot.Dialogues;
+namespace GroupCallingChatBot.Dialogues;
 
 /// <summary>
 /// Entrypoint to all new conversations
@@ -137,11 +136,11 @@ public class MainDialog : CancellableDialogue
                     // Have we got a user id?   
                     if (validInput)
                     {
-                        meetingState.Attendees.Add(new AttendeeCallInfo 
-                        { 
-                            Id = userId, 
-                            DisplayId = addContactActionInfo.ContactId, 
-                            Type = MeetingAttendeeType.Teams 
+                        meetingState.Attendees.Add(new AttendeeCallInfo
+                        {
+                            Id = userId,
+                            DisplayId = addContactActionInfo.ContactId,
+                            Type = MeetingAttendeeType.Teams
                         });
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Teams user added"), cancellationToken);
                     }

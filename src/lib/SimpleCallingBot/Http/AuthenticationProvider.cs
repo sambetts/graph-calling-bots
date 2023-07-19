@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace SimpleCallingBotEngine.Http;
+namespace ServiceHostedMediaCallingBot.Engine.Http;
 
 public class AuthenticationProvider : IRequestAuthenticationProvider
 {
@@ -26,9 +26,9 @@ public class AuthenticationProvider : IRequestAuthenticationProvider
 
     public AuthenticationProvider(string appName, string appId, string appSecret, ILogger logger)
     {
-        this._appName = appName.NotNullOrWhitespace(nameof(appName));
-        this._appId = appId.NotNullOrWhitespace(nameof(appId));
-        this._appSecret = appSecret.NotNullOrWhitespace(nameof(appSecret));
+        _appName = appName.NotNullOrWhitespace(nameof(appName));
+        _appId = appId.NotNullOrWhitespace(nameof(appId));
+        _appSecret = appSecret.NotNullOrWhitespace(nameof(appSecret));
         _logger = logger;
     }
 
@@ -41,8 +41,8 @@ public class AuthenticationProvider : IRequestAuthenticationProvider
 
         _logger.LogTrace($"{nameof(AuthenticationProvider)}: Generating OAuth token.");
 
-        var app = ConfidentialClientApplicationBuilder.Create(this._appId)
-                              .WithClientSecret(this._appSecret)
+        var app = ConfidentialClientApplicationBuilder.Create(_appId)
+                              .WithClientSecret(_appSecret)
                               .WithAuthority($"https://login.microsoftonline.com/{tenant}")
                               .Build();
 
@@ -66,7 +66,7 @@ public class AuthenticationProvider : IRequestAuthenticationProvider
         }
 
         const string authDomain = "https://api.aps.skype.com/v1/.well-known/OpenIdConfiguration";
-        if(this.openIdConnectConfiguration == null || DateTime.Now > this._prevOpenIdConfigUpdateTimestamp.Add(this._openIdConfigRefreshInterval))
+        if (openIdConnectConfiguration == null || DateTime.Now > _prevOpenIdConfigUpdateTimestamp.Add(_openIdConfigRefreshInterval))
         {
             _logger.LogTrace("Updating OpenID configuration");
 
@@ -75,9 +75,9 @@ public class AuthenticationProvider : IRequestAuthenticationProvider
 
                     authDomain,
                     new OpenIdConnectConfigurationRetriever());
-            this.openIdConnectConfiguration = await configurationManager.GetConfigurationAsync(CancellationToken.None).ConfigureAwait(false);
+            openIdConnectConfiguration = await configurationManager.GetConfigurationAsync(CancellationToken.None).ConfigureAwait(false);
 
-            this._prevOpenIdConfigUpdateTimestamp = DateTime.Now;
+            _prevOpenIdConfigUpdateTimestamp = DateTime.Now;
         }
 
         var authIssuers = new[]
@@ -89,8 +89,8 @@ public class AuthenticationProvider : IRequestAuthenticationProvider
         TokenValidationParameters validationParameters = new TokenValidationParameters
         {
             ValidIssuers = authIssuers,
-            ValidAudience = this._appId,
-            IssuerSigningKeys = this.openIdConnectConfiguration.SigningKeys,
+            ValidAudience = _appId,
+            IssuerSigningKeys = openIdConnectConfiguration.SigningKeys,
         };
 
         ClaimsPrincipal claimsPrincipal;
@@ -99,15 +99,15 @@ public class AuthenticationProvider : IRequestAuthenticationProvider
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             claimsPrincipal = handler.ValidateToken(token, validationParameters, out _);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to validate token for client: {this._appId}.");
+            _logger.LogError(ex, $"Failed to validate token for client: {_appId}.");
             return new RequestValidationResult() { IsValid = false };
         }
 
         const string ClaimType = "http://schemas.microsoft.com/identity/claims/tenantid";
         var tenantClaim = claimsPrincipal.FindFirst(claim => claim.Type.Equals(ClaimType, StringComparison.Ordinal));
-        
+
         if (string.IsNullOrEmpty(tenantClaim?.Value))
         {
             return new RequestValidationResult { IsValid = false };

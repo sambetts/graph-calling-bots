@@ -1,4 +1,4 @@
-﻿namespace Bot.AdaptiveCards;
+﻿namespace GroupCallingChatBot.AdaptiveCards;
 
 public class AddContact : BaseAdaptiveCard
 {

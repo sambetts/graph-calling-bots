@@ -1,9 +1,9 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Extensions.Logging;
-using SimpleCallingBotEngine;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace SimpleCallingBotEngineEngine;
+namespace ServiceHostedMediaCallingBot.Engine;
 
 /// <summary>
 /// Turns Graph call notifications into callbacks
@@ -53,7 +53,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     {
                         // Tone finished playing
                         _logger.LogInformation($"Call {callState.CallId} finished playing tone");
-                        var playingTone = callState.MediaPromptsPlaying.Where(p=> p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
+                        var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
                         if (playingTone.Any())
                         {
                             callState.MediaPromptsPlaying.Remove(playingTone.First());
@@ -80,7 +80,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     // Remember the call ID for later
                     var newCallState = new T();
                     newCallState.PopulateFromCallNotification(callnotification);
-                    
+
                     await _callStateManager.AddCallState(newCallState);
 
                     _logger.LogWarning($"Call {newCallState.CallId} is connecting");

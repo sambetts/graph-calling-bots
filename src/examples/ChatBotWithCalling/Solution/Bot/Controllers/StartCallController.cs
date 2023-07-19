@@ -2,10 +2,10 @@
 using Microsoft.Graph;
 using System.Threading.Tasks;
 using System;
-using Bot.Models;
-using Bot.Bots;
+using GroupCallingChatBot.Bots;
+using GroupCallingChatBot.Models;
 
-namespace Bot.Controllers;
+namespace GroupCallingChatBot.Controllers;
 
 [Route("[controller]")]
 public class StartCallController : Controller
@@ -51,7 +51,7 @@ public class StartCallController : Controller
         //    Type = Engine.AttendeeType.Teams
         //});
 
-        var call = await this._callingBot.StartGroupCall(req).ConfigureAwait(false);
+        var call = await _callingBot.StartGroupCall(req).ConfigureAwait(false);
 
         return call;
     }

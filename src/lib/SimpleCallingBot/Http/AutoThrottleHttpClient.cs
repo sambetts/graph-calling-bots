@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace SimpleCallingBotEngine.Http;
+namespace ServiceHostedMediaCallingBot.Engine.Http;
 
 public class AutoThrottleHttpClient : HttpClient
 {
@@ -18,15 +18,15 @@ public class AutoThrottleHttpClient : HttpClient
 
     public AutoThrottleHttpClient(bool ignoreRetryHeader, ILogger ILogger)
     {
-        this.Timeout = TimeSpan.FromHours(1);
+        Timeout = TimeSpan.FromHours(1);
         this.ignoreRetryHeader = ignoreRetryHeader;
-        this._debugTracer = ILogger;
+        _debugTracer = ILogger;
     }
     public AutoThrottleHttpClient(bool ignoreRetryHeader, ILogger ILogger, DelegatingHandler handler) : base(handler)
     {
-        this.Timeout = TimeSpan.FromHours(1);
+        Timeout = TimeSpan.FromHours(1);
         this.ignoreRetryHeader = ignoreRetryHeader;
-        this._debugTracer = ILogger;
+        _debugTracer = ILogger;
     }
 
     public AutoThrottleHttpClient(HttpMessageHandler handler, ILogger ILogger) : base(handler)

@@ -5,7 +5,7 @@ using System;
 using Microsoft.Bot.Schema;
 using AdaptiveCards;
 
-namespace Bot.AdaptiveCards;
+namespace GroupCallingChatBot.AdaptiveCards;
 
 
 /// <summary>
@@ -46,7 +46,7 @@ public abstract class BaseAdaptiveCard
     }
     public Attachment GetCardAttachment()
     {
-        dynamic? cardJson = JsonConvert.DeserializeObject(this.GetCardContent());
+        dynamic? cardJson = JsonConvert.DeserializeObject(GetCardContent());
 
         return new Attachment
         {

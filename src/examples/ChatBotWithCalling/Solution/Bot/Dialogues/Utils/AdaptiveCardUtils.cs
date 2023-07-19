@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using GroupCallingChatBot;
+using Newtonsoft.Json;
 using System;
 
-namespace Bot.Dialogues.Utils;
+namespace GroupCallingChatBot.Dialogues.Utils;
 
 public class AdaptiveCardUtils
 {
@@ -10,7 +11,7 @@ public class AdaptiveCardUtils
         AdaptiveCardActionResponse? r = null;
         if (string.IsNullOrEmpty(submitJson))
         {
-            return r;   
+            return r;
         }
 
         try

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Bot.Builder.Dialogs;
 
-namespace Bot.Bots;
+namespace GroupCallingChatBot.Bots;
 
 public abstract class DialogBot<T> : TeamsActivityHandler where T : Dialog
 {
@@ -23,7 +23,7 @@ public abstract class DialogBot<T> : TeamsActivityHandler where T : Dialog
         _logger = logger;
     }
 
-    public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
+    public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(turnContext.Activity.Text) && turnContext.Activity.Value != null)
         {

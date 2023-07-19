@@ -1,7 +1,7 @@
 ﻿using Microsoft.Graph;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace SimpleCallingBotEngine;
+namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 /// <summary>
 /// Manages the state of calls made by the bot in Graph.

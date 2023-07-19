@@ -1,5 +1,4 @@
-﻿
-namespace SimpleCallingBotEngine;
+﻿namespace ServiceHostedMediaCallingBot.Engine;
 
 internal class CallConstants
 {

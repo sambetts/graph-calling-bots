@@ -1,15 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace SimpleCallingBotEngine.Bots;
+namespace ServiceHostedMediaCallingBot.Engine.Bots;
 
 /// <summary>
 /// A bot that calls you over the phone.
 /// </summary>
 public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T> where T : BaseActiveCallState, new()
 {
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ILogger logger) 
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ILogger logger)
         : base(botConfig, callStateManager, logger)
     {
     }
@@ -25,7 +26,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T> wher
 
         // Attach media list
         var mediaToPrefetch = new List<MediaInfo>();
-        foreach (var m in this.MediaMap)
+        foreach (var m in MediaMap)
         {
             mediaToPrefetch.Add(m.Value.MediaInfo);
         }

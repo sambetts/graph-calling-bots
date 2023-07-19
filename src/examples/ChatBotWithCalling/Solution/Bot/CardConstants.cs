@@ -1,4 +1,4 @@
-﻿namespace Bot;
+﻿namespace GroupCallingChatBot;
 
 public class CardConstants
 {
