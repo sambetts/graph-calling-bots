@@ -20,11 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bot\GroupCallingChatBot.Web.csproj" />
+    <Folder Include="FakeService\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="FakeService\" />
+    <ProjectReference Include="..\GroupCallingChatBot.Web\GroupCallingChatBot.Web.csproj" />
   </ItemGroup>
 
 </Project>
