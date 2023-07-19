@@ -1,8 +1,8 @@
-﻿using GroupCallingChatBot;
+﻿using GroupCallingChatBot.Web;
 using Newtonsoft.Json;
 using System;
 
-namespace GroupCallingChatBot.Dialogues.Utils;
+namespace GroupCallingChatBot.Web.Dialogues.Utils;
 
 public class AdaptiveCardUtils
 {

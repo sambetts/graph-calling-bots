@@ -1,4 +1,4 @@
-﻿using GroupCallingChatBot.Models;
+﻿using GroupCallingChatBot.Web.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Bots;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GroupCallingChatBot.Bots;
+namespace GroupCallingChatBot.Web.Bots;
 
 public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 {

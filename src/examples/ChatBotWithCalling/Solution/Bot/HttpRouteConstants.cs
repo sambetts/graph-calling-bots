@@ -1,4 +1,4 @@
-﻿namespace GroupCallingChatBot;
+﻿namespace GroupCallingChatBot.Web;
 
 /// <summary>
 /// HTTP route constants for routing requests to controller methods.

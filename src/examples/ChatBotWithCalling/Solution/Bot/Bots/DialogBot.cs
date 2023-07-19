@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Bot.Builder.Dialogs;
 
-namespace GroupCallingChatBot.Bots;
+namespace GroupCallingChatBot.Web.Bots;
 
 public abstract class DialogBot<T> : TeamsActivityHandler where T : Dialog
 {

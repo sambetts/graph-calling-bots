@@ -1,9 +1,9 @@
 ﻿using Microsoft.Graph;
-using SimpleCallingBotEngine;
-using SimpleCallingBotEngine.Bots;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Bots;
+using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace PstnBot;
+namespace RickrollP2PPstnBot;
 
 /// <summary>
 /// A bot that calls you over the phone.
@@ -18,7 +18,7 @@ public class RickrollPstnBot : PstnCallingBot<BaseActiveCallState>
     public RickrollPstnBot(RemoteMediaCallingBotConfiguration botOptions, ILogger logger, ICallStateManager<BaseActiveCallState> callStateManager) : base(botOptions, callStateManager, logger)
     {
         // Generate media prompts. Used later in call & need to have consistent IDs.
-        this.MediaMap[NotificationPromptName] = new MediaPrompt
+        MediaMap[NotificationPromptName] = new MediaPrompt
         {
             MediaInfo = new MediaInfo
             {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SimpleCallingBotEngine.Models;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace PstnBot;
+namespace RickrollP2PPstnBot.Controllers;
 
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.
@@ -22,7 +22,7 @@ public class PlatformCallController : ControllerBase
     [Route(HttpRouteConstants.OnIncomingRequestRoute)]
     public async Task<IActionResult> OnIncomingRequestAsync([FromBody] CommsNotificationsPayload notifications)
     {
-        var validRequest = await _callingBot.ValidateNotificationRequestAsync(this.Request);
+        var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
             await _callingBot.BotNotificationsHandler.HandleNotificationsAsync(notifications);
@@ -31,6 +31,6 @@ public class PlatformCallController : ControllerBase
         else
         {
             return BadRequest();
-        }   
+        }
     }
 }

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bot\GroupCallingChatBot.csproj" />
+    <ProjectReference Include="..\Bot\GroupCallingChatBot.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

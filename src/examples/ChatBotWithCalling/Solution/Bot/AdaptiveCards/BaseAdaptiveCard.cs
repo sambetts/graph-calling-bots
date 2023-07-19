@@ -5,7 +5,7 @@ using System;
 using Microsoft.Bot.Schema;
 using AdaptiveCards;
 
-namespace GroupCallingChatBot.AdaptiveCards;
+namespace GroupCallingChatBot.Web.AdaptiveCards;
 
 
 /// <summary>

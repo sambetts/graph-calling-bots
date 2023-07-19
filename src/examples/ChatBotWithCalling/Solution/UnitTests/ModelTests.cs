@@ -1,7 +1,7 @@
-using GroupCallingChatBot.Models;
+using GroupCallingChatBot.Web.Models;
 using Microsoft.Extensions.Logging;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GroupCallingChatBot.UnitTests;
 
 [TestClass]
 public class ModelTests

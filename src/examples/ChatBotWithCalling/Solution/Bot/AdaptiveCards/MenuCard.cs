@@ -1,8 +1,9 @@
 ﻿using AdaptiveCards;
-using GroupCallingChatBot.Models;
+using GroupCallingChatBot.Web;
+using GroupCallingChatBot.Web.Models;
 using System.Collections.Generic;
 
-namespace GroupCallingChatBot.AdaptiveCards;
+namespace GroupCallingChatBot.Web.AdaptiveCards;
 
 public class MenuCard : BaseAdaptiveCard
 {

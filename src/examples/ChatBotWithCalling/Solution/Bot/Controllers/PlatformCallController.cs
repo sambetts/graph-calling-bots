@@ -1,10 +1,10 @@
-﻿using GroupCallingChatBot;
-using GroupCallingChatBot.Bots;
+﻿using GroupCallingChatBot.Web;
+using GroupCallingChatBot.Web.Bots;
 using Microsoft.AspNetCore.Mvc;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Threading.Tasks;
 
-namespace GroupCallingChatBot.Controllers;
+namespace GroupCallingChatBot.Web.Controllers;
 
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.

@@ -1,4 +1,4 @@
-﻿namespace GroupCallingChatBot;
+﻿namespace GroupCallingChatBot.Web;
 
 public class CardConstants
 {

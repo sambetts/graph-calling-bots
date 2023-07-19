@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UnitTests.Properties {
+namespace ServiceHostedMediaCallingBot.UnitTests.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace UnitTests.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UnitTests.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ServiceHostedMediaCallingBot.UnitTests.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -144,15 +144,16 @@ namespace UnitTests.Properties {
         ///   Looks up a localized string similar to {
         ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
         ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;deleted&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/7b1f6100-b760-4dcf-bbb1-6cdfa1be13fb&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/7b1f6100-b760-4dcf-bbb1-6cdfa1be13fb&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
-        ///                &quot;state&quot;: &quot;terminated&quot;,
-        ///                &quot;resultIn [rest of string was truncated]&quot;;.
+        ///      {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///        &quot;changeType&quot;: &quot;deleted&quot;,
+        ///        &quot;resource&quot;: &quot;/app/calls/631f6000-766a-4c6f-9da3-8755ebe44d19&quot;,
+        ///        &quot;resourceUrl&quot;: &quot;/communications/calls/631f6000-766a-4c6f-9da3-8755ebe44d19&quot;,
+        ///        &quot;resourceData&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///          &quot;state&quot;: &quot;terminated&quot;,
+        ///          &quot;resultInfo&quot;: {
+        ///            &quot;@odata.type&quot;: &quot;#mic [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GroupCallEnd {
             get {

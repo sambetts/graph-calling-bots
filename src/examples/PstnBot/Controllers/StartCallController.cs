@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Graph;
+using RickrollP2PPstnBot;
 
-namespace PstnBot;
+namespace RickrollP2PPstnBot.Controllers;
 
 [Route("[controller]")]
 public class StartCallController : Controller
@@ -24,7 +25,7 @@ public class StartCallController : Controller
             throw new ArgumentNullException(nameof(startCallData));
         }
 
-        var call = await this._callingBot.StartPTSNCall(startCallData.PhoneNumber).ConfigureAwait(false);
+        var call = await _callingBot.StartPTSNCall(startCallData.PhoneNumber).ConfigureAwait(false);
 
         return call;
     }

@@ -29,7 +29,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\lib\SimpleCallingBot\ServiceHostedMediaCallingBot.Engine.csproj" />
+		<ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
 		<ProjectReference Include="..\CommonUtils\CommonUtils.csproj" />
 	</ItemGroup>
 

@@ -2,10 +2,10 @@
 using Microsoft.Graph;
 using System.Threading.Tasks;
 using System;
-using GroupCallingChatBot.Bots;
-using GroupCallingChatBot.Models;
+using GroupCallingChatBot.Web.Bots;
+using GroupCallingChatBot.Web.Models;
 
-namespace GroupCallingChatBot.Controllers;
+namespace GroupCallingChatBot.Web.Controllers;
 
 [Route("[controller]")]
 public class StartCallController : Controller

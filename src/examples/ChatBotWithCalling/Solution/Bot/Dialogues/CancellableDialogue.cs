@@ -4,7 +4,7 @@ using Microsoft.Bot.Schema;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace GroupCallingChatBot.Dialogues;
+namespace GroupCallingChatBot.Web.Dialogues;
 
 public abstract class CancellableDialogue : ComponentDialog
 {

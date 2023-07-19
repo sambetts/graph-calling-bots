@@ -2,12 +2,12 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using GroupCallingChatBot.Dialogues;
-using GroupCallingChatBot.Bots;
-using GroupCallingChatBot.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using GroupCallingChatBot.Web.Bots;
+using GroupCallingChatBot.Web.Dialogues;
+using GroupCallingChatBot.Web.Models;
 
-namespace GroupCallingChatBot.Extensions;
+namespace GroupCallingChatBot.Web.Extensions;
 
 public static class BotBuilderExtensions
 {

@@ -7,12 +7,12 @@ using Microsoft.Bot.Schema;
 using System.Collections.Generic;
 using Microsoft.Graph;
 using Attachment = Microsoft.Bot.Schema.Attachment;
-using GroupCallingChatBot.Bots;
-using GroupCallingChatBot.Models;
-using GroupCallingChatBot.Dialogues.Utils;
-using GroupCallingChatBot.AdaptiveCards;
+using GroupCallingChatBot.Web.Dialogues.Utils;
+using GroupCallingChatBot.Web.Bots;
+using GroupCallingChatBot.Web.Models;
+using GroupCallingChatBot.Web.AdaptiveCards;
 
-namespace GroupCallingChatBot.Dialogues;
+namespace GroupCallingChatBot.Web.Dialogues;
 
 /// <summary>
 /// Entrypoint to all new conversations

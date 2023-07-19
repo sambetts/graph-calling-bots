@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace GroupCallingChatBot.Models;
+namespace GroupCallingChatBot.Web.Models;
 
 
 public class BotConfig : PropertyBoundConfig

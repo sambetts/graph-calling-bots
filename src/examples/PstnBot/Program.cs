@@ -1,5 +1,5 @@
-using PstnBot;
-using SimpleCallingBotEngine;
+using RickrollP2PPstnBot.Extensions;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ICallStateManager<ActiveCallState>, ConcurrentInMemoryCallStateManager<ActiveCallState>>();
+builder.Services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
 
 var app = builder.Build();
 

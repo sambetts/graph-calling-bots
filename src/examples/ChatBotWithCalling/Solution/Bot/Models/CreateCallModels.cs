@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GroupCallingChatBot.Models;
+namespace GroupCallingChatBot.Web.Models;
 
 public class MeetingRequest
 {

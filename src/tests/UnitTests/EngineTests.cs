@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using Microsoft.Graph.Communications.Common;
-using SimpleCallingBotEngine;
-using SimpleCallingBotEngineEngine;
+using ServiceHostedMediaCallingBot.Engine;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace UnitTests;
+namespace ServiceHostedMediaCallingBot.UnitTests;
 
 [TestClass]
 public class EngineTests
@@ -22,24 +21,24 @@ public class EngineTests
     [TestMethod]
     public void ModelTests()
     {
-        Assert.IsNull(new ActiveCallState().CallId);
-        Assert.IsNull(new ActiveCallState { ResourceUrl = "/communications/calls/" }.CallId);
-        Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new ActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9" }.CallId);
-        Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new ActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/" }.CallId);
-        Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new ActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85" }.CallId);
+        Assert.IsNull(new BaseActiveCallState().CallId);
+        Assert.IsNull(new BaseActiveCallState { ResourceUrl = "/communications/calls/" }.CallId);
+        Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9" }.CallId);
+        Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/" }.CallId);
+        Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85" }.CallId);
     }
 
 
     [TestMethod]
     public async Task ConcurrentInMemoryCallStateManager()
     {
-        var callStateManager = new ConcurrentInMemoryCallStateManager<ActiveCallState>();
+        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
         var nonExistent = await callStateManager.GetByNotificationResourceUrl("whatever");
         Assert.IsNull(nonExistent);
         Assert.IsTrue(callStateManager.Count == 0);
 
         // Insert a call
-        var callState = new ActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85" };
+        var callState = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85" };
         await callStateManager.AddCallState(callState);
 
         // Get by notification resource url
@@ -70,15 +69,15 @@ public class EngineTests
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
-        var callStateManager = new ConcurrentInMemoryCallStateManager<ActiveCallState>();
-        var callbackInfo = new NotificationCallbackInfo<ActiveCallState>
+        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
         {
             CallEstablished = (callState) =>
             {
                 callConnectedCount++;
                 return Task.CompletedTask;
             },
-            CallConnectedWithP2PAudio = (callState) => 
+            CallConnectedWithP2PAudio = (callState) =>
             {
                 callConnectedWithP2PAudioCount++;
                 return Task.CompletedTask;
@@ -90,7 +89,7 @@ public class EngineTests
             },
             NewTonePressed = (callState, tone) =>
             {
-                toneList.Add(tone);  
+                toneList.Add(tone);
                 return Task.CompletedTask;
             },
             CallTerminated = (callState) =>
@@ -99,9 +98,9 @@ public class EngineTests
                 return Task.CompletedTask;
             }
         };
-        var notificationsManager = new BotNotificationsHandler<ActiveCallState>(callStateManager, callbackInfo, _logger);
+        var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
 
-        var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;    
+        var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
 
         // Handle call establish for a call never seen before
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.CallEstablishingP2P);
@@ -126,7 +125,7 @@ public class EngineTests
         var callState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
 
         // Add a media prompt to the call state
-        callState!.MediaPromptsPlaying.Add( new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
+        callState!.MediaPromptsPlaying.Add(new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
         await notificationsManager.HandleNotificationsAsync(NotificationsLibrary.PlayPromptFinish);
         Assert.IsTrue(callPlayPromptFinished == 1);
 
@@ -155,8 +154,8 @@ public class EngineTests
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
-        var callStateManager = new ConcurrentInMemoryCallStateManager<ActiveCallState>();
-        var callbackInfo = new NotificationCallbackInfo<ActiveCallState>
+        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
         {
             UserJoined = (callState) =>
             {
@@ -179,7 +178,7 @@ public class EngineTests
                 return Task.CompletedTask;
             }
         };
-        var notificationsManager = new BotNotificationsHandler<ActiveCallState>(callStateManager, callbackInfo, _logger);
+        var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
 
         var callResourceUrl = NotificationsLibrary.GroupCallEstablished.CommsNotifications[0]!.ResourceUrl!;
 

@@ -1,5 +1,4 @@
-﻿
-namespace PstnBot;
+﻿namespace RickrollP2PPstnBot;
 
 /// <summary>
 /// HTTP route constants for routing requests to CallController methods.

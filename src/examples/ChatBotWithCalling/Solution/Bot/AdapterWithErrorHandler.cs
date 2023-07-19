@@ -3,7 +3,7 @@ using Microsoft.Bot.Builder.TraceExtensions;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Logging;
 
-namespace GroupCallingChatBot;
+namespace GroupCallingChatBot.Web;
 
 public class AdapterWithErrorHandler : CloudAdapter
 {

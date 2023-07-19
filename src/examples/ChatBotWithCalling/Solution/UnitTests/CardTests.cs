@@ -1,9 +1,9 @@
 using AdaptiveCards;
-using GroupCallingChatBot.AdaptiveCards;
-using GroupCallingChatBot.Models;
+using GroupCallingChatBot.Web.AdaptiveCards;
+using GroupCallingChatBot.Web.Models;
 using Microsoft.Extensions.Logging;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GroupCallingChatBot.UnitTests;
 
 [TestClass]
 public class CardTests
