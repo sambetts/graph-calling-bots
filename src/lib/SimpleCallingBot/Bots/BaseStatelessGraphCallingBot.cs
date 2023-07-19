@@ -13,19 +13,19 @@ namespace SimpleCallingBotEngine.Bots;
 /// <summary>
 /// A simple, stateless bot that can make outbound calls and play prompts.
 /// </summary>
-public abstract class BaseStatelessGraphCallingBot<T> where T : ActiveCallState, new()
+public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> where CALLSTATETYPE : BaseActiveCallState, new()
 {
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
-    protected readonly ICallStateManager<T> _callStateManager;
+    protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
-    private readonly BotNotificationsHandler<T> _botNotificationsHandler;
+    private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
-    public BotNotificationsHandler<T> BotNotificationsHandler => _botNotificationsHandler;
+    public BotNotificationsHandler<CALLSTATETYPE> BotNotificationsHandler => _botNotificationsHandler;
     public RemoteMediaCallingBotConfiguration BotConfig => _botConfig;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
@@ -36,7 +36,7 @@ public abstract class BaseStatelessGraphCallingBot<T> where T : ActiveCallState,
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
 
         // Create a callback handler for notifications. Do so on each request as no state is held.
-        var callBacks = new NotificationCallbackInfo<T>
+        var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
         {
             CallEstablished = CallEstablished,
             CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
@@ -45,7 +45,7 @@ public abstract class BaseStatelessGraphCallingBot<T> where T : ActiveCallState,
             PlayPromptFinished = PlayPromptFinished,
             UserJoined = UserJoined
         };
-        _botNotificationsHandler = new BotNotificationsHandler<T>(_callStateManager, callBacks, _logger);
+        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, callBacks, _logger);
     }
 
     public async Task<bool> ValidateNotificationRequestAsync(HttpRequest request)
@@ -77,24 +77,24 @@ public abstract class BaseStatelessGraphCallingBot<T> where T : ActiveCallState,
     {
         return Task.CompletedTask;
     }
-    protected virtual Task CallEstablished(T callState)
+    protected virtual Task CallEstablished(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }
-    protected virtual Task CallConnectedWithP2PAudio(T callState)
+    protected virtual Task CallConnectedWithP2PAudio(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }
-    protected virtual Task PlayPromptFinished(T callState)
+    protected virtual Task PlayPromptFinished(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }
-    protected virtual Task UserJoined(T callState)
+    protected virtual Task UserJoined(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }
 
-    protected virtual Task NewTonePressed(T callState, Tone tone)
+    protected virtual Task NewTonePressed(CALLSTATETYPE callState, Tone tone)
     {
         _logger.LogInformation($"New tone pressed: {tone}");
         return Task.CompletedTask;
@@ -115,7 +115,7 @@ public abstract class BaseStatelessGraphCallingBot<T> where T : ActiveCallState,
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    protected async Task<PlayPromptOperation> PlayPromptAsync(ActiveCallState callState, IEnumerable<MediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<MediaPrompt> mediaPrompts)
     {
         _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
 

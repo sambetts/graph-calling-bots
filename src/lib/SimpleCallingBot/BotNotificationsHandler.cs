@@ -8,7 +8,7 @@ namespace SimpleCallingBotEngineEngine;
 /// <summary>
 /// Turns Graph call notifications into callbacks
 /// </summary>
-public class BotNotificationsHandler<T> where T : ActiveCallState, new()
+public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
 {
     private readonly ILogger _logger;
     private readonly ICallStateManager<T> _callStateManager;
@@ -153,7 +153,7 @@ public class BotNotificationsHandler<T> where T : ActiveCallState, new()
     }
 }
 
-public class NotificationCallbackInfo<T> where T : ActiveCallState, new()
+public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
 {
     public Func<T, Task>? CallConnectedWithP2PAudio { get; set; }
     public Func<T, Task>? CallEstablished { get; set; }

@@ -9,9 +9,8 @@ namespace Engine;
 public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
-    private readonly ITeamsChatbotManager _teamsChatbotManager;
 
-    public GroupCallBot(ITeamsChatbotManager teamsChatbotManager, RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallBot> logger) 
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallBot> logger) 
         : base(botOptions, callStateManager, logger)
     {
 
@@ -24,7 +23,6 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
                 ResourceId = Guid.NewGuid().ToString(),
             },
         };
-        _teamsChatbotManager = teamsChatbotManager;
     }
 
     public async Task<Call> StartGroupCall(MeetingRequest meetingRequest)
@@ -52,7 +50,7 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
             }
         };
 
-        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
+        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites(_botConfig.TenantId);
         newCall.Targets = initialAddList;
 
         // Set source as this bot
@@ -109,12 +107,4 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         await base.UserJoined(callState);
     }
 
-    protected override async Task NewTonePressed(GroupCallActiveCallState callState, Tone tone)
-    {
-        if (tone == Tone.Tone1)
-        {
-            await _teamsChatbotManager.Transfer(callState);
-        }
-        await base.NewTonePressed(callState, tone);
-    }
 }

@@ -17,13 +17,13 @@ public class ModelTests
         { 
             Attendees = new List<AttendeeCallInfo>
             {
-                new AttendeeCallInfo{ Type = AttendeeType.Teams, Id = "t1" },
-                new AttendeeCallInfo{ Type = AttendeeType.Teams, Id = "t2" },
-                new AttendeeCallInfo{ Type = AttendeeType.Phone, Id = "p1" }
+                new AttendeeCallInfo{ Type = MeetingAttendeeType.Teams, Id = "t1" },
+                new AttendeeCallInfo{ Type = MeetingAttendeeType.Teams, Id = "t2" },
+                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p1" }
             } 
         };
 
-        var (initialAddList, inviteNumberList) = twoTeamsPlusOnePhoneUserMeeting.GetInitialParticipantsAndInvites();
+        var (initialAddList, inviteNumberList) = twoTeamsPlusOnePhoneUserMeeting.GetInitialParticipantsAndInvites(string.Empty);
         Assert.AreEqual(2, initialAddList.Count);
         Assert.AreEqual(1, inviteNumberList.Count);
 
@@ -32,13 +32,13 @@ public class ModelTests
         {
             Attendees = new List<AttendeeCallInfo>
             {
-                new AttendeeCallInfo{ Type = AttendeeType.Phone, Id = "p1" },
-                new AttendeeCallInfo{ Type = AttendeeType.Phone, Id = "p2" },
-                new AttendeeCallInfo{ Type = AttendeeType.Phone, Id = "p3" },
+                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p1" },
+                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p2" },
+                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p3" },
             }
         };
 
-        (initialAddList, inviteNumberList) = threePhoneUsersMeeting.GetInitialParticipantsAndInvites();
+        (initialAddList, inviteNumberList) = threePhoneUsersMeeting.GetInitialParticipantsAndInvites(string.Empty);
         Assert.AreEqual(1, initialAddList.Count);
         Assert.AreEqual(2, inviteNumberList.Count);
     }

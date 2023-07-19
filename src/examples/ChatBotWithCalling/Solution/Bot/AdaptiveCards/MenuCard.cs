@@ -33,14 +33,14 @@ public class MenuCard : BaseAdaptiveCard
         {
             numbers.Add(new AdaptiveTextBlock
             {
-                Text = item.Id,
+                Text = item.DisplayId,
                 Size = AdaptiveTextSize.Small,
                 Weight = AdaptiveTextWeight.Bolder
             });
 
             states.Add(new AdaptiveTextBlock
             {
-                Text = item.Type == AttendeeType.Phone ? "Calling" : "Teams",
+                Text = item.Type == MeetingAttendeeType.Phone ? "Calling" : "Teams",
                 Size = AdaptiveTextSize.Small,
                 Weight = AdaptiveTextWeight.Bolder
             });

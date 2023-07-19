@@ -9,6 +9,8 @@ using Engine;
 using CommonUtils;
 using Microsoft.Bot.Schema;
 using System.Collections.Generic;
+using Microsoft.Graph;
+using Attachment = Microsoft.Bot.Schema.Attachment;
 
 namespace Bot.Dialogues;
 
@@ -20,9 +22,9 @@ public class MainDialog : CancellableDialogue
     private readonly UserState _userState;
     private readonly Config _config;
     private readonly GroupCallBot _groupCallBot;
-    private readonly ITeamsChatbotManager _teamsChatbotManager;
+    private readonly GraphServiceClient _graphServiceClient;
 
-    public MainDialog(UserState userState, Config config, GroupCallBot groupCallBot, ITeamsChatbotManager teamsChatbotManager) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, Config config, GroupCallBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {
@@ -35,7 +37,7 @@ public class MainDialog : CancellableDialogue
         _userState = userState;
         _config = config;
         _groupCallBot = groupCallBot;
-        _teamsChatbotManager = teamsChatbotManager;
+        _graphServiceClient = graphServiceClient;
     }
 
 
@@ -122,9 +124,10 @@ public class MainDialog : CancellableDialogue
                     var userId = string.Empty;
                     try
                     {
-                        userId = await _teamsChatbotManager.GetUserIdByEmailAsync(addContactActionInfo.ContactId);
+                        var user = await _graphServiceClient.Users[addContactActionInfo.ContactId].Request().GetAsync();
+                        userId = user.Id;
                     }
-                    catch (Microsoft.Graph.ServiceException ex)
+                    catch (ServiceException ex)
                     {
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(ex.Message), cancellationToken);
                         validInput = false;
@@ -133,7 +136,12 @@ public class MainDialog : CancellableDialogue
                     // Have we got a user id?   
                     if (validInput)
                     {
-                        meetingState.Attendees.Add(new AttendeeCallInfo { Id = addContactActionInfo.ContactId, DisplayId = addContactActionInfo.ContactId, Type = AttendeeType.Teams });
+                        meetingState.Attendees.Add(new AttendeeCallInfo 
+                        { 
+                            Id = userId, 
+                            DisplayId = addContactActionInfo.ContactId, 
+                            Type = MeetingAttendeeType.Teams 
+                        });
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Teams user added"), cancellationToken);
                     }
                 }
@@ -148,7 +156,7 @@ public class MainDialog : CancellableDialogue
                 if (!validInput)
                 {
                     validInput = DataValidation.IsValidNumber(addContactActionInfo.ContactId);
-                    meetingState.Attendees.Add(new AttendeeCallInfo { Id = addContactActionInfo.ContactId, Type = AttendeeType.Phone });
+                    meetingState.Attendees.Add(new AttendeeCallInfo { Id = addContactActionInfo.ContactId, Type = MeetingAttendeeType.Phone });
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Number added"), cancellationToken);
                 }
                 else

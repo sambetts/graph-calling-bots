@@ -1,13 +1,8 @@
 using AdaptiveCards;
-using Azure.Identity;
 using Bot.AdaptiveCards;
 using Engine;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
-using SimpleCallingBotEngine;
-using SimpleCallingBotEngine.Models;
-using UnitTests.FakeService;
 
 namespace UnitTests;
 

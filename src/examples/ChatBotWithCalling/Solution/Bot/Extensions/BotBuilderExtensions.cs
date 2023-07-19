@@ -46,10 +46,6 @@ public static class BotBuilderExtensions
         // Create the Bot Adapter with error handling enabled.
         services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
-        // Bot manager
-        services.AddSingleton<ITeamsChatbotManager, GraphTeamsChatbotManager>();
-
-
         // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
         return services.AddTransient<IBot, TeamsBot<MainDialog>>();
     }

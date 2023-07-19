@@ -33,14 +33,14 @@ public class StartCallController : Controller
         {
             DisplayId = startCallData.PhoneNumber,
             Id = startCallData.PhoneNumber,
-            Type = Engine.AttendeeType.Phone
+            Type = Engine.MeetingAttendeeType.Phone
         });
 
         req.Attendees.Add(new AttendeeCallInfo
         {
             DisplayId = "Sam Teams",
             Id = "3b10aa94-739a-472c-a68a-c2e3d480ed6b",
-            Type = Engine.AttendeeType.Teams
+            Type = Engine.MeetingAttendeeType.Teams
         });
 
         //req.Attendees.Add(new AttendeeCallInfo

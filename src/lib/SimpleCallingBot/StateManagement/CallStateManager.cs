@@ -6,7 +6,7 @@ namespace SimpleCallingBotEngine;
 /// <summary>
 /// Manages the state of calls made by the bot in Graph.
 /// </summary>
-public interface ICallStateManager<T> where T : ActiveCallState
+public interface ICallStateManager<T> where T : BaseActiveCallState
 {
     /// <param name="resourceId">Example: "/app/calls/4d1f5d00-1a60-4db8-bed0-706b16a6cf67"</param>
     Task<T?> GetByNotificationResourceUrl(string resourceId);
@@ -17,14 +17,10 @@ public interface ICallStateManager<T> where T : ActiveCallState
 
 
 /// <summary>
-/// State of a call made by the bot.
+/// State of a call made by the bot. Base implementation.
 /// </summary>
-public class ActiveCallState
+public class BaseActiveCallState
 {
-    public ActiveCallState()
-    {
-    }
-
     public string ResourceUrl { get; set; } = null!;
 
     /// <summary>
