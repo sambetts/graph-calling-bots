@@ -3,7 +3,7 @@ using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace ServiceHostedMediaCallingBot.Engine.Bots;
+namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 /// <summary>
 /// A bot that calls you over the phone.

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Graph;
-using ServiceHostedMediaCallingBot.Engine.Bots;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 

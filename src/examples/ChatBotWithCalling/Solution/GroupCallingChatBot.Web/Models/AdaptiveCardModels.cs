@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
-using Newtonsoft.Json;
-namespace GroupCallingChatBot.Web;
+﻿using Newtonsoft.Json;
+namespace GroupCallingChatBot.Web.Models;
 
 public class AdaptiveCardActionResponse
 {

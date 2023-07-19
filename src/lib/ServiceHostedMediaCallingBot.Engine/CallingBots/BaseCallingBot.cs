@@ -8,7 +8,7 @@ using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.Engine.Http;
 
-namespace ServiceHostedMediaCallingBot.Engine.Bots;
+namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 /// <summary>
 /// A simple, stateless bot that can make outbound calls and play prompts.
