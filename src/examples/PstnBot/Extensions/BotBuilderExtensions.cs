@@ -11,6 +11,7 @@ public static class BotBuilderExtensions
     {
         var options = new RemoteMediaCallingBotConfiguration();
         botOptionsAction(options);
+        options.CallingEndpoint = options.BotBaseUrl + HttpRouteConstants.OnIncomingRequestRoute;
         services.AddSingleton(options);
 
         return services.AddSingleton<RickrollPstnBot>();

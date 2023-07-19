@@ -1,10 +1,10 @@
 ﻿namespace SimpleCallingBotEngine;
 
-public class ConcurrentInMemoryCallStateManager : ICallStateManager
+public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where T : ActiveCallState
 {
-    private readonly Dictionary<string, ActiveCallState> _callStates = new();
+    private readonly Dictionary<string, T> _callStates = new();
 
-    public Task AddCallState(ActiveCallState callState)
+    public Task AddCallState(T callState)
     {
         if (callState is null || callState.CallId == null)
         {
@@ -17,13 +17,13 @@ public class ConcurrentInMemoryCallStateManager : ICallStateManager
         return Task.CompletedTask;
     }
 
-    public Task<ActiveCallState?> GetByNotificationResourceUrl(string resourceUrl)
+    public Task<T?> GetByNotificationResourceUrl(string resourceUrl)
     {
         var callId = ActiveCallState.GetCallId(resourceUrl);
-        if (callId == null) return Task.FromResult<ActiveCallState?>(null);
+        if (callId == null) return Task.FromResult<T?>(null);
         lock (this)
         {
-            ActiveCallState? callState = null;
+            T? callState = null;
 
             _callStates.TryGetValue(callId, out callState);
             return Task.FromResult(callState);
@@ -42,7 +42,7 @@ public class ConcurrentInMemoryCallStateManager : ICallStateManager
         }
     }
 
-    public Task Update(ActiveCallState callState)
+    public Task Update(T callState)
     {
         if (callState is null || callState.CallId == null)
         {

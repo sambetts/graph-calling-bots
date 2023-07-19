@@ -7,16 +7,16 @@ namespace SimpleCallingBotEngine.Bots;
 /// <summary>
 /// A bot that plays service-hosted audio and responds to DTMF input. Can be used for Teams calls or PSTN calls.
 /// </summary>
-public abstract class AudioPlaybackAndDTMFCallingBot : BaseStatelessGraphCallingBot
+public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCallingBot<T> where T : ActiveCallState, new()
 {
-    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger logger) : base(botOptions, callStateManager, logger)
+    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ILogger logger) : base(botOptions, callStateManager, logger)
     {
     }
 
     // Supported media: https://learn.microsoft.com/en-us/graph/api/resources/mediainfo?view=graph-rest-1.0
     protected Dictionary<string, MediaPrompt> MediaMap { get; } = new();
 
-    protected override async Task CallConnectedWithP2PAudio(ActiveCallState callState)
+    protected override async Task CallConnectedWithP2PAudio(T callState)
     {
         if (callState.CallId != null)
         {

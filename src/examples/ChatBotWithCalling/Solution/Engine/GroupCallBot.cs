@@ -6,12 +6,12 @@ using SimpleCallingBotEngine.Models;
 
 namespace Engine;
 
-public class GroupCallBot : PstnCallingBot
+public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
     private readonly ITeamsChatbotManager _teamsChatbotManager;
 
-    public GroupCallBot(ITeamsChatbotManager teamsChatbotManager, RemoteMediaCallingBotConfiguration botOptions, ICallStateManager callStateManager, ILogger<GroupCallBot> logger) 
+    public GroupCallBot(ITeamsChatbotManager teamsChatbotManager, RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallBot> logger) 
         : base(botOptions, callStateManager, logger)
     {
 
@@ -65,17 +65,32 @@ public class GroupCallBot : PstnCallingBot
 
         var call = await StartNewCall(newCall);
 
-        // Invite everyone else
-        foreach (var invite in inviteNumberList)
+        // Wait 2 seconds for call to be created and notification to be recieved (so we get a call state)
+        await Task.Delay(2000);
+
+        // Get state and save invite list for when call is established
+        var callState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{call.Id}");
+        if (callState != null)
         {
-            await InvitePstnNumberToCallAsync(call.Id, invite);
+            callState.Invites = inviteNumberList;
         }
 
         return call;
     }
 
+    protected async override Task CallEstablished(GroupCallActiveCallState callState)
+    {
+        if (!string.IsNullOrEmpty(callState?.CallId))
+        {
+            // Invite everyone else
+            foreach (var invite in callState.Invites)
+            {
+                await InvitePstnNumberToCallAsync(callState.CallId, invite);
+            }
+        }
+    }
 
-    protected override async Task UserJoined(ActiveCallState callState)
+    protected override async Task UserJoined(GroupCallActiveCallState callState)
     {
         var alreadyPlaying = false;
         foreach (var itemToPlay in MediaMap.Values)
@@ -94,7 +109,7 @@ public class GroupCallBot : PstnCallingBot
         await base.UserJoined(callState);
     }
 
-    protected override async Task NewTonePressed(ActiveCallState callState, Tone tone)
+    protected override async Task NewTonePressed(GroupCallActiveCallState callState, Tone tone)
     {
         if (tone == Tone.Tone1)
         {

@@ -8,13 +8,13 @@ namespace SimpleCallingBotEngineEngine;
 /// <summary>
 /// Turns Graph call notifications into callbacks
 /// </summary>
-public class BotNotificationsHandler
+public class BotNotificationsHandler<T> where T : ActiveCallState, new()
 {
     private readonly ILogger _logger;
-    private readonly ICallStateManager _callStateManager;
-    private readonly NotificationCallbackInfo _callbackInfo;
+    private readonly ICallStateManager<T> _callStateManager;
+    private readonly NotificationCallbackInfo<T> _callbackInfo;
 
-    public BotNotificationsHandler(ICallStateManager callStateManager, NotificationCallbackInfo callbackInfo, ILogger logger)
+    public BotNotificationsHandler(ICallStateManager<T> callStateManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
     {
         _logger = logger;
         _callStateManager = callStateManager;
@@ -78,7 +78,9 @@ public class BotNotificationsHandler
                 if (callnotification.AssociatedCall != null && callnotification.AssociatedCall.State == CallState.Establishing)
                 {
                     // Remember the call ID for later
-                    var newCallState = new ActiveCallState(callnotification);
+                    var newCallState = new T();
+                    newCallState.PopulateFromCallNotification(callnotification);
+                    
                     await _callStateManager.AddCallState(newCallState);
 
                     _logger.LogWarning($"Call {newCallState.CallId} is connecting");
@@ -91,7 +93,7 @@ public class BotNotificationsHandler
         }
     }
 
-    private async Task<bool> HandleCallObjectUpdate(ActiveCallState callState, CallNotification callNotification)
+    private async Task<bool> HandleCallObjectUpdate(T callState, CallNotification callNotification)
     {
         if (callNotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED)
         {
@@ -132,7 +134,7 @@ public class BotNotificationsHandler
         return false;
     }
 
-    async Task HandleToneNotificationAsync(ToneInfo toneInfo, ActiveCallState callState)
+    async Task HandleToneNotificationAsync(ToneInfo toneInfo, T callState)
     {
         if (toneInfo.Tone != null)
         {
@@ -151,13 +153,13 @@ public class BotNotificationsHandler
     }
 }
 
-public class NotificationCallbackInfo
+public class NotificationCallbackInfo<T> where T : ActiveCallState, new()
 {
-    public Func<ActiveCallState, Task>? CallConnectedWithP2PAudio { get; set; }
-    public Func<ActiveCallState, Task>? CallEstablished { get; set; }
-    public Func<ActiveCallState, Task>? PlayPromptFinished { get; set; }
+    public Func<T, Task>? CallConnectedWithP2PAudio { get; set; }
+    public Func<T, Task>? CallEstablished { get; set; }
+    public Func<T, Task>? PlayPromptFinished { get; set; }
     public Func<string, Task>? CallTerminated { get; set; }
-    public Func<ActiveCallState, Tone, Task>? NewTonePressed { get; set; }
+    public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
-    public Func<ActiveCallState, Task>? UserJoined { get; set; }
+    public Func<T, Task>? UserJoined { get; set; }
 }

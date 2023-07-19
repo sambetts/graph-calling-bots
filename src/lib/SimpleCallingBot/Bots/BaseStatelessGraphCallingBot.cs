@@ -13,19 +13,19 @@ namespace SimpleCallingBotEngine.Bots;
 /// <summary>
 /// A simple, stateless bot that can make outbound calls and play prompts.
 /// </summary>
-public abstract class BaseStatelessGraphCallingBot
+public abstract class BaseStatelessGraphCallingBot<T> where T : ActiveCallState, new()
 {
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
-    private readonly ICallStateManager _callStateManager;
+    protected readonly ICallStateManager<T> _callStateManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
-    private readonly BotNotificationsHandler _botNotificationsHandler;
+    private readonly BotNotificationsHandler<T> _botNotificationsHandler;
 
-    public BotNotificationsHandler BotNotificationsHandler => _botNotificationsHandler;
+    public BotNotificationsHandler<T> BotNotificationsHandler => _botNotificationsHandler;
     public RemoteMediaCallingBotConfiguration BotConfig => _botConfig;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager callStateManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
@@ -36,15 +36,16 @@ public abstract class BaseStatelessGraphCallingBot
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
 
         // Create a callback handler for notifications. Do so on each request as no state is held.
-        var callBacks = new NotificationCallbackInfo
+        var callBacks = new NotificationCallbackInfo<T>
         {
+            CallEstablished = CallEstablished,
             CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
             NewTonePressed = NewTonePressed,
             CallTerminated = CallTerminated,
             PlayPromptFinished = PlayPromptFinished,
             UserJoined = UserJoined
         };
-        _botNotificationsHandler = new BotNotificationsHandler(_callStateManager, callBacks, _logger);
+        _botNotificationsHandler = new BotNotificationsHandler<T>(_callStateManager, callBacks, _logger);
     }
 
     public async Task<bool> ValidateNotificationRequestAsync(HttpRequest request)
@@ -76,20 +77,24 @@ public abstract class BaseStatelessGraphCallingBot
     {
         return Task.CompletedTask;
     }
-    protected virtual Task CallConnectedWithP2PAudio(ActiveCallState callState)
+    protected virtual Task CallEstablished(T callState)
     {
         return Task.CompletedTask;
     }
-    protected virtual Task PlayPromptFinished(ActiveCallState callState)
+    protected virtual Task CallConnectedWithP2PAudio(T callState)
     {
         return Task.CompletedTask;
     }
-    protected virtual Task UserJoined(ActiveCallState callState)
+    protected virtual Task PlayPromptFinished(T callState)
+    {
+        return Task.CompletedTask;
+    }
+    protected virtual Task UserJoined(T callState)
     {
         return Task.CompletedTask;
     }
 
-    protected virtual Task NewTonePressed(ActiveCallState callState, Tone tone)
+    protected virtual Task NewTonePressed(T callState, Tone tone)
     {
         _logger.LogInformation($"New tone pressed: {tone}");
         return Task.CompletedTask;

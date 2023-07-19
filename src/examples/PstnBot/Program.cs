@@ -18,7 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ICallStateManager, ConcurrentInMemoryCallStateManager>();
+builder.Services.AddSingleton<ICallStateManager<ActiveCallState>, ConcurrentInMemoryCallStateManager<ActiveCallState>>();
 
 var app = builder.Build();
 

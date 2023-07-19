@@ -17,7 +17,7 @@ public static class BotBuilderExtensions
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 
         // Use in-memory storage for the call state for now
-        services.AddSingleton<ICallStateManager, ConcurrentInMemoryCallStateManager>();
+        services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
 
         return services.AddSingleton<GroupCallBot>();
     }

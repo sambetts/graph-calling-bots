@@ -33,7 +33,7 @@ public class EngineTests
     [TestMethod]
     public async Task ConcurrentInMemoryCallStateManager()
     {
-        var callStateManager = new ConcurrentInMemoryCallStateManager();
+        var callStateManager = new ConcurrentInMemoryCallStateManager<ActiveCallState>();
         var nonExistent = await callStateManager.GetByNotificationResourceUrl("whatever");
         Assert.IsNull(nonExistent);
         Assert.IsTrue(callStateManager.Count == 0);
@@ -70,8 +70,8 @@ public class EngineTests
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
-        var callStateManager = new ConcurrentInMemoryCallStateManager();
-        var callbackInfo = new NotificationCallbackInfo 
+        var callStateManager = new ConcurrentInMemoryCallStateManager<ActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<ActiveCallState>
         {
             CallEstablished = (callState) =>
             {
@@ -99,7 +99,7 @@ public class EngineTests
                 return Task.CompletedTask;
             }
         };
-        var notificationsManager = new BotNotificationsHandler(callStateManager, callbackInfo, _logger);
+        var notificationsManager = new BotNotificationsHandler<ActiveCallState>(callStateManager, callbackInfo, _logger);
 
         var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;    
 
@@ -155,8 +155,8 @@ public class EngineTests
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
-        var callStateManager = new ConcurrentInMemoryCallStateManager();
-        var callbackInfo = new NotificationCallbackInfo
+        var callStateManager = new ConcurrentInMemoryCallStateManager<ActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<ActiveCallState>
         {
             UserJoined = (callState) =>
             {
@@ -179,7 +179,7 @@ public class EngineTests
                 return Task.CompletedTask;
             }
         };
-        var notificationsManager = new BotNotificationsHandler(callStateManager, callbackInfo, _logger);
+        var notificationsManager = new BotNotificationsHandler<ActiveCallState>(callStateManager, callbackInfo, _logger);
 
         var callResourceUrl = NotificationsLibrary.GroupCallEstablished.CommsNotifications[0]!.ResourceUrl!;
 

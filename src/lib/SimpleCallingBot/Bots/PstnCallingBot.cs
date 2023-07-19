@@ -7,9 +7,10 @@ namespace SimpleCallingBotEngine.Bots;
 /// <summary>
 /// A bot that calls you over the phone.
 /// </summary>
-public abstract class PstnCallingBot : AudioPlaybackAndDTMFCallingBot
+public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T> where T : ActiveCallState, new()
 {
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager callStateManager, ILogger logger) : base(botConfig, callStateManager, logger)
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ILogger logger) 
+        : base(botConfig, callStateManager, logger)
     {
     }
 

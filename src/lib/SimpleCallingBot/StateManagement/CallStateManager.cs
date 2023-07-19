@@ -6,14 +6,13 @@ namespace SimpleCallingBotEngine;
 /// <summary>
 /// Manages the state of calls made by the bot in Graph.
 /// </summary>
-public interface ICallStateManager
+public interface ICallStateManager<T> where T : ActiveCallState
 {
     /// <param name="resourceId">Example: "/app/calls/4d1f5d00-1a60-4db8-bed0-706b16a6cf67"</param>
-    /// <returns></returns>
-    Task<ActiveCallState?> GetByNotificationResourceUrl(string resourceId);
-    Task AddCallState(ActiveCallState callState);
+    Task<T?> GetByNotificationResourceUrl(string resourceId);
+    Task AddCallState(T callState);
     Task<bool> Remove(string resourceUrl);
-    Task Update(ActiveCallState callState);
+    Task Update(T callState);
 }
 
 
@@ -24,14 +23,6 @@ public class ActiveCallState
 {
     public ActiveCallState()
     {
-    }
-    public ActiveCallState(CallNotification fromNotification) : this()
-    {
-        if (fromNotification == null) throw new ArgumentNullException(nameof(fromNotification));
-        if (fromNotification.ResourceUrl == null) throw new ArgumentNullException(nameof(fromNotification.ResourceUrl));
-
-        ResourceUrl = fromNotification.ResourceUrl;
-        StateEnum = fromNotification.AssociatedCall?.State;
     }
 
     public string ResourceUrl { get; set; } = null!;
@@ -48,6 +39,15 @@ public class ActiveCallState
         if (parts.Length < 3) return null;
         if (parts[0].ToLower() != "communications" || parts[1].ToLower() != "calls") return null;
         return parts[2];
+    }
+
+    public void PopulateFromCallNotification(CallNotification fromNotification)
+    {
+        if (fromNotification == null) throw new ArgumentNullException(nameof(fromNotification));
+        if (fromNotification.ResourceUrl == null) throw new ArgumentNullException(nameof(fromNotification.ResourceUrl));
+
+        ResourceUrl = fromNotification.ResourceUrl;
+        StateEnum = fromNotification.AssociatedCall?.State;
     }
 
     /// <summary>

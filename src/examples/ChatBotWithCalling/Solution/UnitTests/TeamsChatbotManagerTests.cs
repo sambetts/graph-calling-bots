@@ -65,7 +65,7 @@ public class TeamsChatbotManagerTests
 
         var bot = new GroupCallBot(new FakeTeamsChatbotManager(), 
             _config.ToRemoteMediaCallingBotConfiguration(""),
-            new ConcurrentInMemoryCallStateManager(), LoggerFactory.Create(config =>
+            new ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>(), LoggerFactory.Create(config =>
         {
             config.AddConsole();
             config.SetMinimumLevel(LogLevel.Debug);
