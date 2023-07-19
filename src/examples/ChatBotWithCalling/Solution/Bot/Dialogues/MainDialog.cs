@@ -5,12 +5,13 @@ using System.Threading;
 using Bot.Dialogues.Utils;
 using Bot.AdaptiveCards;
 using System;
-using Engine;
 using CommonUtils;
 using Microsoft.Bot.Schema;
 using System.Collections.Generic;
 using Microsoft.Graph;
 using Attachment = Microsoft.Bot.Schema.Attachment;
+using Bot.Models;
+using Bot.Bots;
 
 namespace Bot.Dialogues;
 
@@ -20,11 +21,11 @@ namespace Bot.Dialogues;
 public class MainDialog : CancellableDialogue
 {
     private readonly UserState _userState;
-    private readonly Config _config;
-    private readonly GroupCallBot _groupCallBot;
+    private readonly BotConfig _config;
+    private readonly GroupCallingBot _groupCallBot;
     private readonly GraphServiceClient _graphServiceClient;
 
-    public MainDialog(UserState userState, Config config, GroupCallBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, BotConfig config, GroupCallingBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {

@@ -1,16 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Bot.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using SimpleCallingBotEngine;
 using SimpleCallingBotEngine.Bots;
 using SimpleCallingBotEngine.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Engine;
+namespace Bot.Bots;
 
-public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
+public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
 
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallBot> logger) 
+    public GroupCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallingBot> logger) 
         : base(botOptions, callStateManager, logger)
     {
 

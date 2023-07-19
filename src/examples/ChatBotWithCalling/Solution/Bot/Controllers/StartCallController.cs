@@ -2,16 +2,17 @@
 using Microsoft.Graph;
 using System.Threading.Tasks;
 using System;
-using Engine;
+using Bot.Models;
+using Bot.Bots;
 
 namespace Bot.Controllers;
 
 [Route("[controller]")]
 public class StartCallController : Controller
 {
-    private readonly GroupCallBot _callingBot;
+    private readonly GroupCallingBot _callingBot;
 
-    public StartCallController(GroupCallBot callingBot)
+    public StartCallController(GroupCallingBot callingBot)
     {
         _callingBot = callingBot;
     }
@@ -33,14 +34,14 @@ public class StartCallController : Controller
         {
             DisplayId = startCallData.PhoneNumber,
             Id = startCallData.PhoneNumber,
-            Type = Engine.MeetingAttendeeType.Phone
+            Type = MeetingAttendeeType.Phone
         });
 
         req.Attendees.Add(new AttendeeCallInfo
         {
             DisplayId = "Sam Teams",
             Id = "3b10aa94-739a-472c-a68a-c2e3d480ed6b",
-            Type = Engine.MeetingAttendeeType.Teams
+            Type = MeetingAttendeeType.Teams
         });
 
         //req.Attendees.Add(new AttendeeCallInfo

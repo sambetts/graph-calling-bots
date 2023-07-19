@@ -1,4 +1,4 @@
-using Engine;
+using Bot.Models;
 using Microsoft.Extensions.Logging;
 
 namespace UnitTests;
@@ -6,7 +6,7 @@ namespace UnitTests;
 [TestClass]
 public class ModelTests
 {
-    protected Config _config = null!;
+    protected BotConfig _config = null!;
     protected ILogger _tracer = null!;
 
 

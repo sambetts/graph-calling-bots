@@ -1,6 +1,6 @@
 ﻿using Bot;
 using Bot.Extensions;
-using Engine;
+using Bot.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-var config = new Config(builder.Configuration);
+var config = new BotConfig(builder.Configuration);
 builder.Services.AddSingleton(config);
 builder.Services.AddApplicationInsightsTelemetry();
 

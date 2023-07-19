@@ -1,4 +1,4 @@
-﻿using Engine;
+﻿using Bot.Bots;
 using Microsoft.AspNetCore.Mvc;
 using SimpleCallingBotEngine.Models;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace Bot.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly GroupCallBot _callingBot;
+    private readonly GroupCallingBot _callingBot;
 
-    public PlatformCallController(GroupCallBot callingBot)
+    public PlatformCallController(GroupCallingBot callingBot)
     {
         _callingBot = callingBot;
     }

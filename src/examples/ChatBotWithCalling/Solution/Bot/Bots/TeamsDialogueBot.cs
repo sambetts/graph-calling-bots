@@ -1,5 +1,5 @@
 using Bot.AdaptiveCards;
-using Engine;
+using Bot.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Bot.Bots;
 
-public class TeamsBot<T> : DialogBot<T> where T : Dialog
+public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
 {
-    public TeamsBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
+    public TeamsDialogueBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
         : base(conversationState, userState, dialog, logger)
     {
     }

@@ -1,5 +1,5 @@
 ﻿using Azure.Identity;
-using Engine;
+using Bot.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 
@@ -7,7 +7,7 @@ namespace Bot.Extensions;
 
 public static class GraphConfiguration
 {
-    public static IServiceCollection ConfigureGraphClient(this IServiceCollection services, Config config)
+    public static IServiceCollection ConfigureGraphClient(this IServiceCollection services, BotConfig config)
     {
         var options = new ClientSecretCredentialOptions
         {

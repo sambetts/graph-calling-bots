@@ -5,21 +5,21 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleCallingBotEngine;
-using Engine;
+using Bot.Models;
 
 namespace Bot;
 
 public static class BotBuilderExtensions
 {
 
-    public static IServiceCollection AddCallingBot(this IServiceCollection services, Config config) 
+    public static IServiceCollection AddCallingBot(this IServiceCollection services, BotConfig config) 
     {
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
 
-        return services.AddSingleton<GroupCallBot>();
+        return services.AddSingleton<GroupCallingBot>();
     }
 
     public static IServiceCollection AddChatBot(this IServiceCollection services)
@@ -47,6 +47,6 @@ public static class BotBuilderExtensions
         services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
         // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-        return services.AddTransient<IBot, TeamsBot<MainDialog>>();
+        return services.AddTransient<IBot, TeamsDialogueBot<MainDialog>>();
     }
 }

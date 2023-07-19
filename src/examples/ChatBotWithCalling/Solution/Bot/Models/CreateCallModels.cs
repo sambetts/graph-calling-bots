@@ -1,10 +1,10 @@
-﻿using CommonUtils.Config;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Graph;
-using SimpleCallingBotEngine.Models;
+﻿using Microsoft.Graph;
+using SimpleCallingBotEngine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Engine;
-
+namespace Bot.Models;
 
 public class MeetingRequest
 {
@@ -18,9 +18,9 @@ public class MeetingRequest
         // To start a group call, we can't add Teams + PSTN users at once. We have to add all Teams users first, then add PSTN users.
         foreach (var attendee in Attendees.Where(a => a.Type == MeetingAttendeeType.Teams))
         {
-            var newTarget = new InvitationParticipantInfo 
-            { 
-                Identity = new IdentitySet { User = new Identity { Id = attendee.Id, DisplayName = attendee.DisplayId } } 
+            var newTarget = new InvitationParticipantInfo
+            {
+                Identity = new IdentitySet { User = new Identity { Id = attendee.Id, DisplayName = attendee.DisplayId } }
             };
             newTarget.SetInAdditionalData("tenantId", tenantId);
             initialAddList.Add(newTarget);
@@ -69,46 +69,10 @@ public enum MeetingAttendeeType
     Phone,
     Teams
 }
-
-public class Config : PropertyBoundConfig
+public class GroupCallActiveCallState : BaseActiveCallState
 {
-    public Config(IConfiguration config) : base(config)
-    {
-    }
-
-    [ConfigValue]
-    public string MicrosoftAppId { get; set; } = null!;
-
-    [ConfigValue]
-    public string MicrosoftAppPassword { get; set; } = null!;
-
-    [ConfigValue]
-    public string TenantId { get; set; } = null!;
-
-    [ConfigValue(true)]
-    public string AppInsightsInstrumentationKey { get; set; } = null!;
-
-    [ConfigValue(true)]
-    public string Storage { get; set; } = null!;
-
-    [ConfigValue]
-    public string AppInstanceObjectId { get; set; } = null!;
-
-    [ConfigValue]
-    public string BotBaseUrl { get; set; } = null!;
-
-    public RemoteMediaCallingBotConfiguration ToRemoteMediaCallingBotConfiguration(string relativeUrlCallingEndPoint)
-    {
-        return new RemoteMediaCallingBotConfiguration 
-        {
-            AppId = MicrosoftAppId,
-            AppInstanceObjectId = AppInstanceObjectId,
-            AppSecret = MicrosoftAppPassword,
-            AppInstanceObjectName = "CallAndRedirectBot",
-            BotBaseUrl = BotBaseUrl,
-            CallingEndpoint = BotBaseUrl + relativeUrlCallingEndPoint,
-            TenantId = TenantId
-        };
-    }
+    /// <summary>
+    /// List of invitees to the call once call is established.
+    /// </summary>
+    public List<string> Invites { get; set; } = new();
 }
-

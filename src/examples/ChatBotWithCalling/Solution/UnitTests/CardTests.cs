@@ -1,6 +1,6 @@
 using AdaptiveCards;
 using Bot.AdaptiveCards;
-using Engine;
+using Bot.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -9,26 +9,17 @@ namespace UnitTests;
 [TestClass]
 public class CardTests
 {
-    protected Config _config = null!;
     protected ILogger _tracer = null!;
 
     [TestInitialize]
     public void Init()
     {
-        var builder = new ConfigurationBuilder()
-            .AddUserSecrets<TeamsChatbotManagerTests>();
-
-        var config = builder.Build();
-
-
         _tracer = LoggerFactory.Create(config =>
         {
             config.AddConsole();
             config.SetMinimumLevel(LogLevel.Debug);
         }).CreateLogger("Unit tests");
 
-        config = builder.Build();
-        _config = new Config(config);
     }
 
     [TestMethod]

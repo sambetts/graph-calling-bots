@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Bot.Builder.Dialogs;
-using static Bot.Dialogues.MainDialog;
 
 namespace Bot.Bots;
 
