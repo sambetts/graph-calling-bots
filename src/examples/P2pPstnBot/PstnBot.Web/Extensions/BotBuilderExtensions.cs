@@ -1,7 +1,7 @@
-﻿using RickrollP2PPstnBot;
+﻿using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace RickrollP2PPstnBot.Extensions;
+namespace PstnBot.Web.Extensions;
 
 public static class BotBuilderExtensions
 {

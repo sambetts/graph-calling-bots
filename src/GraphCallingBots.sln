@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RickrollP2PPstnBot", "examples\PstnBot\RickrollP2PPstnBot.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RickrollP2PPstnBot", "examples\P2pPstnBot\PstnBot.Web\PstnBot.Web.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceHostedMediaCallingBot.UnitTests", "tests\UnitTests\ServiceHostedMediaCallingBot.UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
 EndProject
@@ -22,6 +22,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "examples\ChatBotWithCalling\Solution\CommonUtils\CommonUtils.csproj", "{FA145292-2B9A-4107-9F5B-1307C26D628C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingChatBot.Web", "examples\ChatBotWithCalling\Solution\GroupCallingChatBot.Web\GroupCallingChatBot.Web.csproj", "{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RickrollPstnBot.FunctionApp", "examples\P2pPstnBot\PstnBot.FunctionApp\PstnBot.FunctionApp.csproj", "{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PstnBot.Shared", "examples\P2pPstnBot\PstnBot.Shared\PstnBot.Shared.csproj", "{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,14 @@ Global
 		{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +77,8 @@ Global
 		{02176A33-D9F8-4F80-B67E-21F73E649E0E} = {3897B9CF-F021-4E78-9984-B3B67F377AD0}
 		{FA145292-2B9A-4107-9F5B-1307C26D628C} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
 		{D600A3D2-D87D-4E0F-B680-DD99E8507D4F} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
+		{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
+		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE9A9A1A-CC56-45F3-8647-06996C708164}

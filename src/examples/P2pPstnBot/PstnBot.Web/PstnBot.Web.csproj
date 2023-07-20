@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
+    <ProjectReference Include="..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
+    <ProjectReference Include="..\PstnBot.Shared\PstnBot.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

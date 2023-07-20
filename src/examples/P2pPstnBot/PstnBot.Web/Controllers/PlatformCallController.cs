@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace RickrollP2PPstnBot.Controllers;
+namespace PstnBot.Web.Controllers;
 
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.

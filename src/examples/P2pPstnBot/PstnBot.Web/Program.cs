@@ -1,4 +1,4 @@
-using RickrollP2PPstnBot.Extensions;
+using PstnBot.Web.Extensions;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 var builder = WebApplication.CreateBuilder(args);

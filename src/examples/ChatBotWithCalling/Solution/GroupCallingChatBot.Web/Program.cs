@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-var config = new BotConfig(builder.Configuration);
+var config = new TeamsChatbotBotConfig(builder.Configuration);
 builder.Services.AddSingleton(config);
 builder.Services.AddApplicationInsightsTelemetry();
 

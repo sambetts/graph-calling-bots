@@ -6,7 +6,7 @@ namespace GroupCallingChatBot.UnitTests;
 [TestClass]
 public class ModelTests
 {
-    protected BotConfig _config = null!;
+    protected TeamsChatbotBotConfig _config = null!;
     protected ILogger _tracer = null!;
 
 

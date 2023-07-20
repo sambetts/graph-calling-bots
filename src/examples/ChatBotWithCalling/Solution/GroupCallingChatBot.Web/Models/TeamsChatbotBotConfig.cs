@@ -4,10 +4,12 @@ using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace GroupCallingChatBot.Web.Models;
 
-
-public class BotConfig : PropertyBoundConfig
+/// <summary>
+/// Config in default Bot Framework SDK format that's also used for the calling bot.
+/// </summary>
+public class TeamsChatbotBotConfig : PropertyBoundConfig
 {
-    public BotConfig(IConfiguration config) : base(config)
+    public TeamsChatbotBotConfig(IConfiguration config) : base(config)
     {
     }
 

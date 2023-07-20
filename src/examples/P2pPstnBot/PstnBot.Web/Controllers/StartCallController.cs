@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Graph;
-using RickrollP2PPstnBot;
+using PstnBot.Shared;
+using PstnBot.Web;
 
-namespace RickrollP2PPstnBot.Controllers;
+namespace PstnBot.Web.Controllers;
 
 [Route("[controller]")]
 public class StartCallController : Controller

@@ -1,4 +1,4 @@
-﻿namespace RickrollP2PPstnBot;
+﻿namespace PstnBot.Web;
 
 public class StartCallData
 {

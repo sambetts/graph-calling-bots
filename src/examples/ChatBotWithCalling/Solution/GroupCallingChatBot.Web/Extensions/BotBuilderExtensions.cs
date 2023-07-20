@@ -12,7 +12,7 @@ namespace GroupCallingChatBot.Web.Extensions;
 public static class BotBuilderExtensions
 {
 
-    public static IServiceCollection AddCallingBot(this IServiceCollection services, BotConfig config)
+    public static IServiceCollection AddCallingBot(this IServiceCollection services, TeamsChatbotBotConfig config)
     {
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 

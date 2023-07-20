@@ -7,7 +7,7 @@ namespace GroupCallingChatBot.Web.Extensions;
 
 public static class GraphConfiguration
 {
-    public static IServiceCollection ConfigureGraphClient(this IServiceCollection services, BotConfig config)
+    public static IServiceCollection ConfigureGraphClient(this IServiceCollection services, TeamsChatbotBotConfig config)
     {
         var options = new ClientSecretCredentialOptions
         {

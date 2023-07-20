@@ -1,7 +1,7 @@
-﻿namespace RickrollP2PPstnBot;
+﻿namespace PstnBot.FunctionApp;
 
 /// <summary>
-/// HTTP route constants for routing requests to CallController methods.
+/// HTTP route constants for routing requests to controller methods.
 /// </summary>
 public static class HttpRouteConstants
 {
@@ -13,6 +13,10 @@ public static class HttpRouteConstants
     /// <summary>
     /// Route for incoming requests including notifications, callbacks and incoming call.
     /// </summary>
-    public const string OnIncomingRequestRoute = CallbackPrefix + "/calling";
+    public const string CallNotificationsRoute = CallbackPrefix + "/calling";
 
+    /// <summary>
+    /// Bot Framework route for incoming requests.
+    /// </summary>
+    public const string MessageNotificationsRoute = "api/messages";
 }

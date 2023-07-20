@@ -1,9 +1,10 @@
-﻿using Microsoft.Graph;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace RickrollP2PPstnBot;
+namespace PstnBot.Shared;
 
 /// <summary>
 /// A bot that calls you over the phone.
