@@ -1,4 +1,5 @@
 ﻿using PstnBot.Shared;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace PstnBot.Web.Extensions;
@@ -15,6 +16,6 @@ public static class BotBuilderExtensions
         options.CallingEndpoint = options.BotBaseUrl + HttpRouteConstants.OnIncomingRequestRoute;
         services.AddSingleton(options);
 
-        return services.AddSingleton<RickrollPstnBot>();
+        return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();
     }
 }

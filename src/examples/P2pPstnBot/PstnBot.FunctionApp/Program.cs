@@ -1,5 +1,5 @@
-using GroupCallingChatBot.Web.Models;
 using Microsoft.Extensions.Hosting;
+using PstnBot.FunctionApp;
 using PstnBot.FunctionApp.Extensions;
 
 var host = new HostBuilder()

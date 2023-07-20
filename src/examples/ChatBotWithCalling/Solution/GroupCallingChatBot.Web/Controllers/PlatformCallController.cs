@@ -1,6 +1,5 @@
-﻿using GroupCallingChatBot.Web;
-using GroupCallingChatBot.Web.Bots;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Threading.Tasks;
 
@@ -11,9 +10,9 @@ namespace GroupCallingChatBot.Web.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly GroupCallingBot _callingBot;
+    private readonly IGraphCallingBot _callingBot;
 
-    public PlatformCallController(GroupCallingBot callingBot)
+    public PlatformCallController(IGraphCallingBot callingBot)
     {
         _callingBot = callingBot;
     }
@@ -28,7 +27,7 @@ public class PlatformCallController : ControllerBase
         var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
-            await _callingBot.BotNotificationsHandler.HandleNotificationsAsync(notifications);
+            await _callingBot.HandleNotificationsAsync(notifications);
             return Accepted();
         }
         else

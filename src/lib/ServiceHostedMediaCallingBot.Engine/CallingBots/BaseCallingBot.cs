@@ -13,7 +13,7 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// <summary>
 /// A simple, stateless bot that can make outbound calls and play prompts.
 /// </summary>
-public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> where CALLSTATETYPE : BaseActiveCallState, new()
+public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot where CALLSTATETYPE : BaseActiveCallState, new()
 {
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
@@ -21,9 +21,6 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> where CALLSTAT
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
-
-    public BotNotificationsHandler<CALLSTATETYPE> BotNotificationsHandler => _botNotificationsHandler;
-    public RemoteMediaCallingBotConfiguration BotConfig => _botConfig;
 
     public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ILogger logger)
     {
@@ -69,6 +66,11 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> where CALLSTAT
         }
 
         return false;
+    }
+    
+    public async Task HandleNotificationsAsync(CommsNotificationsPayload notifications)
+    {
+        await _botNotificationsHandler.HandleNotificationsAsync(notifications);
     }
 
     #region Bot Events
@@ -177,6 +179,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> where CALLSTAT
 
         return content ?? throw new Exception("Unexpected Graph response");
     }
+
 
     #endregion
 }

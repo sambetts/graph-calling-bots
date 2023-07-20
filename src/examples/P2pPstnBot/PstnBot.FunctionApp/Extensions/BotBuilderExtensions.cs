@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PstnBot.Shared;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace PstnBot.FunctionApp.Extensions;
@@ -14,7 +15,7 @@ public static class BotBuilderExtensions
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
 
-        return services.AddSingleton<RickrollPstnBot>();
+        return services.AddSingleton<IGraphCallingBot, RickrollPstnBot>();
     }
 
 }

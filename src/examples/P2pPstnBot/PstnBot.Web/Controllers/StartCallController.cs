@@ -2,15 +2,16 @@
 using Microsoft.Graph;
 using PstnBot.Shared;
 using PstnBot.Web;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 namespace PstnBot.Web.Controllers;
 
 [Route("[controller]")]
 public class StartCallController : Controller
 {
-    private readonly RickrollPstnBot _callingBot;
+    private readonly IPstnCallingBot _callingBot;
 
-    public StartCallController(RickrollPstnBot callingBot)
+    public StartCallController(IPstnCallingBot callingBot)
     {
         _callingBot = callingBot;
     }

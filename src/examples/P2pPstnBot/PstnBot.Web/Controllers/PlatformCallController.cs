@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PstnBot.Shared;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace PstnBot.Web.Controllers;
@@ -9,9 +9,9 @@ namespace PstnBot.Web.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly RickrollPstnBot _callingBot;
+    private readonly IPstnCallingBot _callingBot;
 
-    public PlatformCallController(RickrollPstnBot callingBot)
+    public PlatformCallController(IPstnCallingBot callingBot)
     {
         _callingBot = callingBot;
     }
@@ -26,7 +26,7 @@ public class PlatformCallController : ControllerBase
         var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
-            await _callingBot.BotNotificationsHandler.HandleNotificationsAsync(notifications);
+            await _callingBot.HandleNotificationsAsync(notifications);
             return Accepted();
         }
         else

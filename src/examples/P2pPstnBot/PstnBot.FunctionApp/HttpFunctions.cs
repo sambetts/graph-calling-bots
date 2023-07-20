@@ -1,29 +1,60 @@
 using System.Net;
+using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace PstnBot.FunctionApp
+namespace PstnBot.FunctionApp;
+
+public class HttpFunctions
 {
-    public class HttpFunctions
+    private readonly ILogger _logger;
+    private readonly IGraphCallingBot _callingBot;
+
+    public HttpFunctions(ILoggerFactory loggerFactory, IGraphCallingBot callingBot)
     {
-        private readonly ILogger _logger;
+        _logger = loggerFactory.CreateLogger<HttpFunctions>();
+        _callingBot = callingBot;
+    }
 
-        public HttpFunctions(ILoggerFactory loggerFactory)
+    [Function("CallNotification")]
+    public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+        var reqBodyContent = await req.ReadAsStringAsync();
+
+        // Deserialise the JSON payload into a strongly typed Microsoft.Graph.Communications.Calls.Media.CommsNotificationsPayload object
+        CommsNotificationsPayload? notifications = null;
+        try
         {
-            _logger = loggerFactory.CreateLogger<HttpFunctions>();
+            notifications = JsonSerializer.Deserialize<CommsNotificationsPayload>(reqBodyContent ?? string.Empty);
         }
-
-        [Function("Function1")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req)
+        catch (JsonException)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            // Ignore invalid JSON
+        }
+        if (notifications != null)
+        {
+            try
+            {
+                await _callingBot.HandleNotificationsAsync(notifications);
+            }
+            catch (Exception ex)
+            {
+                var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+                exResponse.WriteString(ex.ToString());
+                return exResponse;
+            }
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-
-            response.WriteString("Welcome to Azure Functions!");
-
+            var response = req.CreateResponse(HttpStatusCode.Accepted);
+            return response;
+        }
+        else
+        {
+            var response = req.CreateResponse(HttpStatusCode.BadRequest);
             return response;
         }
     }
