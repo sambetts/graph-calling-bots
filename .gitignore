@@ -32,3 +32,7 @@
 *.user
 /src/examples/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/bin/Debug
 /src/examples/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/obj
+/src/examples/P2pPstnBot/PstnBot.Shared/obj
+/src/examples/P2pPstnBot/PstnBot.Web/.vs/PstnBot
+/src/examples/P2pPstnBot/PstnBot.Web/bin/Debug/net7.0
+/src/examples/P2pPstnBot/PstnBot.Web/obj
