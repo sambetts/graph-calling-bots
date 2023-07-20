@@ -6,17 +6,10 @@
 public static class HttpRouteConstants
 {
     /// <summary>
-    /// Route prefix for all incoming requests.
-    /// </summary>
-    public const string CallbackPrefix = "/callback";
-
-    /// <summary>
     /// Route for incoming requests including notifications, callbacks and incoming call.
     /// </summary>
-    public const string CallNotificationsRoute = CallbackPrefix + "/calling";
+    public const string CallNotificationsRoute = "/api/CallNotification";
 
-    /// <summary>
-    /// Bot Framework route for incoming requests.
-    /// </summary>
-    public const string MessageNotificationsRoute = "api/messages";
+
+    public const string WavFileRoute = "/api/WavFile";
 }

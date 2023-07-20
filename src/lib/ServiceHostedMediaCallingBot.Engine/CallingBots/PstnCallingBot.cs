@@ -20,7 +20,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
     /// </summary>
     public async Task<Call> StartPTSNCall(string phoneNumber)
     {
-        // PSTN call
+        // PSTN call target - identity is type "phone", which the usual object model doesn't support very well
         var target = new IdentitySet();
         target.SetPhone(new Identity { Id = phoneNumber, DisplayName = phoneNumber });
 
@@ -31,7 +31,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
             mediaToPrefetch.Add(m.Value.MediaInfo);
         }
 
-        var newCall = new Call
+        var pstnCall = new Call
         {
             Targets = new List<InvitationParticipantInfo>() { new InvitationParticipantInfo { Identity = target }, },
             MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = mediaToPrefetch },
@@ -41,6 +41,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
             Direction = CallDirection.Outgoing,
             Source = new ParticipantInfo
             {
+                // Set identity as this bot app ID (not user)
                 Identity = new IdentitySet
                 {
                     Application = new Identity { Id = _botConfig.AppId },
@@ -48,15 +49,15 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
             }
         };
 
-        // Set source as this bot
-        newCall.Source.Identity.SetApplicationInstance(
+        // Also set ApplicationInstance source as this bot user account. Both are needed for PSTN calls
+        pstnCall.Source.Identity.SetApplicationInstance(
             new Identity
             {
                 Id = _botConfig.AppInstanceObjectId,
                 DisplayName = _botConfig.AppInstanceObjectName,
-            });
+            }
+        );
 
-        return await StartNewCall(newCall);
+        return await StartNewCall(pstnCall);
     }
-
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Graph;
 using PstnBot.Shared;
-using PstnBot.Web;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 namespace PstnBot.Web.Controllers;

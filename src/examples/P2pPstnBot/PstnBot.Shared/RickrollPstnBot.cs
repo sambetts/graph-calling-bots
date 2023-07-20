@@ -16,14 +16,15 @@ public class RickrollPstnBot : PstnCallingBot<BaseActiveCallState>
     /// <summary>
     /// Initializes a new instance of the <see cref="RickrollPstnBot" /> class.
     /// </summary>
-    public RickrollPstnBot(RemoteMediaCallingBotConfiguration botOptions, ILogger logger, ICallStateManager<BaseActiveCallState> callStateManager) : base(botOptions, callStateManager, logger)
+    public RickrollPstnBot(SingleWavFileBotConfig botOptions, ILogger<RickrollPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager) 
+        : base(botOptions, callStateManager, logger)
     {
         // Generate media prompts. Used later in call & need to have consistent IDs.
         MediaMap[NotificationPromptName] = new MediaPrompt
         {
             MediaInfo = new MediaInfo
             {
-                Uri = new Uri(botOptions.BotBaseUrl + "/audio/rickroll.wav").ToString(),
+                Uri = new Uri(botOptions.BotBaseUrl + botOptions.RelativeWavUrl).ToString(),
                 ResourceId = Guid.NewGuid().ToString(),
             },
         };

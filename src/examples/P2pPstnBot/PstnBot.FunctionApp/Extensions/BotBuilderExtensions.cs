@@ -7,15 +7,13 @@ namespace PstnBot.FunctionApp.Extensions;
 
 public static class BotBuilderExtensions
 {
-
-    public static IServiceCollection AddCallingBot(this IServiceCollection services, CallingBotConfig config)
+    internal static IServiceCollection AddCallingBot(this IServiceCollection services, FunctionsAppCallingBotConfig config)
     {
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
 
-        return services.AddSingleton<IGraphCallingBot, RickrollPstnBot>();
+        return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();
     }
-
 }

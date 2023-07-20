@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RickrollP2PPstnBot", "examples\P2pPstnBot\PstnBot.Web\PstnBot.Web.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Web", "examples\P2pPstnBot\PstnBot.Web\PstnBot.Web.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceHostedMediaCallingBot.UnitTests", "tests\UnitTests\ServiceHostedMediaCallingBot.UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
 EndProject
@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "examples\Cha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingChatBot.Web", "examples\ChatBotWithCalling\Solution\GroupCallingChatBot.Web\GroupCallingChatBot.Web.csproj", "{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RickrollPstnBot.FunctionApp", "examples\P2pPstnBot\PstnBot.FunctionApp\PstnBot.FunctionApp.csproj", "{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.FunctionApp", "examples\P2pPstnBot\PstnBot.FunctionApp\PstnBot.FunctionApp.csproj", "{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PstnBot.Shared", "examples\P2pPstnBot\PstnBot.Shared\PstnBot.Shared.csproj", "{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Shared", "examples\P2pPstnBot\PstnBot.Shared\PstnBot.Shared.csproj", "{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -19,3 +19,11 @@ public class RemoteMediaCallingBotConfiguration
 
     public string CallingEndpoint { get; set; } = null!;
 }
+
+public class SingleWavFileBotConfig : RemoteMediaCallingBotConfiguration
+{
+    /// <summary>
+    /// A callback URL for the sound played over the phone.
+    /// </summary>
+    public string RelativeWavUrl { get; set; } = null!;
+}
