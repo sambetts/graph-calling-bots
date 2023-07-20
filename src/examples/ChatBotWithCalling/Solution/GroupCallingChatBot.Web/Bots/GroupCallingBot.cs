@@ -11,7 +11,13 @@ using System.Threading.Tasks;
 
 namespace GroupCallingChatBot.Web.Bots;
 
-public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
+public interface IGroupCallingBot : IGraphCallingBot
+{
+    Task<Call> StartPTSNCall(string phoneNumber);
+    Task<Call> StartGroupCall(MeetingRequest meetingRequest);
+}
+
+public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>, IGroupCallingBot
 {
     public const string NotificationPromptName = "NotificationPrompt";
 

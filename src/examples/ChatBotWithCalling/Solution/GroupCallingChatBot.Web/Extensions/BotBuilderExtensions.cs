@@ -6,6 +6,7 @@ using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using GroupCallingChatBot.Web.Bots;
 using GroupCallingChatBot.Web.Dialogues;
 using GroupCallingChatBot.Web.Models;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 namespace GroupCallingChatBot.Web.Extensions;
 
@@ -19,7 +20,7 @@ public static class BotBuilderExtensions
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
 
-        return services.AddSingleton<GroupCallingBot>();
+        return services.AddSingleton<IGroupCallingBot, GroupCallingBot>();
     }
 
     public static IServiceCollection AddChatBot(this IServiceCollection services)

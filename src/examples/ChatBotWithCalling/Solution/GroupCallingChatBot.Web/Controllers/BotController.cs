@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace GroupCallingChatBot.Web.Controllers;
 
+/// <summary>
+/// Chatbot controller.
+/// </summary>
 [Route(HttpRouteConstants.MessageNotificationsRoute)]
 [ApiController]
 public class BotController : ControllerBase

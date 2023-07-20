@@ -10,9 +10,9 @@ namespace GroupCallingChatBot.Web.Controllers;
 [Route("[controller]")]
 public class StartCallController : Controller
 {
-    private readonly GroupCallingBot _callingBot;
+    private readonly IGroupCallingBot _callingBot;
 
-    public StartCallController(GroupCallingBot callingBot)
+    public StartCallController(IGroupCallingBot callingBot)
     {
         _callingBot = callingBot;
     }
