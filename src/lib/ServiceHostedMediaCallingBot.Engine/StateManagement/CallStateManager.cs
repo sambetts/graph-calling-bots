@@ -8,18 +8,22 @@ namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 /// </summary>
 public interface ICallStateManager<T> where T : BaseActiveCallState
 {
+    Task Initialise();
+    bool Initialised { get; }
+
     /// <param name="resourceId">Example: "/app/calls/4d1f5d00-1a60-4db8-bed0-706b16a6cf67"</param>
     Task<T?> GetByNotificationResourceUrl(string resourceId);
     Task AddCallState(T callState);
     Task<bool> Remove(string resourceUrl);
     Task Update(T callState);
+    Task<int> GetCount();
 }
 
 
 /// <summary>
 /// State of a call made by the bot. Base implementation.
 /// </summary>
-public class BaseActiveCallState
+public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 {
     public string ResourceUrl { get; set; } = null!;
 
@@ -44,6 +48,11 @@ public class BaseActiveCallState
 
         ResourceUrl = fromNotification.ResourceUrl;
         StateEnum = fromNotification.AssociatedCall?.State;
+    }
+
+    public bool Equals(BaseActiveCallState? other)
+    {
+        return other != null && other.ResourceUrl == ResourceUrl && other.CallId == CallId;
     }
 
     /// <summary>

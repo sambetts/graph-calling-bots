@@ -59,14 +59,17 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         return Task.CompletedTask;
     }
 
-    public int Count
+    public Task Initialise()
     {
-        get
+        return Task.CompletedTask;
+    }
+    public bool Initialised => true;        // Nothing to initialise
+
+    public Task<int> GetCount()
+    {
+        lock (this)
         {
-            lock (this)
-            {
-                return _callStates.Count;
-            }
+            return Task.FromResult(_callStates.Count);
         }
     }
 }

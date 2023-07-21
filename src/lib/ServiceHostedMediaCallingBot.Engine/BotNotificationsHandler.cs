@@ -27,6 +27,10 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
     public async Task HandleNotificationsAsync(CommsNotificationsPayload? notificationPayload)
     {
         if (notificationPayload == null) return;
+        if (!_callStateManager.Initialised)
+        {
+            await _callStateManager.Initialise();
+        }
 
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
