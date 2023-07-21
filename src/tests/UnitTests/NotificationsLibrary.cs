@@ -1,7 +1,7 @@
-﻿using SimpleCallingBotEngine.Models;
+﻿using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Text.Json;
 
-namespace UnitTests;
+namespace ServiceHostedMediaCallingBot.UnitTests;
 
 internal class NotificationsLibrary
 {

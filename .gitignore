@@ -26,3 +26,14 @@
 /src/examples/ChatBotWithCalling/Solution/Engine/bin/Debug/net7.0
 /src/examples/ChatBotWithCalling/Solution/UnitTests/bin/Debug/net7.0
 /src/examples/ChatBotWithCalling/Solution/UnitTests/obj
+/src/lib/ServiceHostedMediaCallingBot.Engine/.vs/SimpleCallingBot
+/src/lib/ServiceHostedMediaCallingBot.Engine/bin/Debug/net7.0
+/src/lib/ServiceHostedMediaCallingBot.Engine/obj
+*.user
+/src/examples/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/bin/Debug
+/src/examples/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/obj
+/src/examples/P2pPstnBot/PstnBot.Shared/obj
+/src/examples/P2pPstnBot/PstnBot.Web/.vs/PstnBot
+/src/examples/P2pPstnBot/PstnBot.Web/bin/Debug/net7.0
+/src/examples/P2pPstnBot/PstnBot.Web/obj
+/src/examples/P2pPstnBot/PstnBot.Shared/bin/Debug/net7.0

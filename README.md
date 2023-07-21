@@ -41,6 +41,16 @@ public class SurveyCallingBot : BaseStatelessGraphCallingBot
     }
 }
 ```
+Also a bonus: as the bots run "stateless", they can scale much easier, in Azure Functions apps for example. There is one such example bot in this repo...
+## Example Projects
+There are a few projects that use the same engine. 
+* P2P calling for PSTN calls.
+  * Web API implementation.
+  * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
+* Group calling example for PSTN and Teams users.
+  * Also implements Bot Framework SDK - does chat & calling in one bot.
+
+All the examples need this setup being done.
 ## Configuration
 These configuration settings are needed:
 
@@ -139,7 +149,7 @@ Get-CsOnlineApplicationInstance
 
 Unless all 3 details are correct, the calls won’t work.
 
-## Publishing the Bot
+## Publishing the Bot/Developer Tests
 You can either publish this to a public site with an SSL endpoint, or just NGrok or some reverse-proxy tool to run from your local machine. In either case the bot will need a base URL configuration.
 
 ## Testing the Bot
