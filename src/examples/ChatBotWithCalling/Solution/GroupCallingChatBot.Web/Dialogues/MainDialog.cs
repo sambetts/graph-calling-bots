@@ -157,7 +157,12 @@ public class MainDialog : CancellableDialogue
                 if (!validInput)
                 {
                     validInput = DataValidation.IsValidNumber(addContactActionInfo.ContactId);
-                    meetingState.Attendees.Add(new AttendeeCallInfo { Id = addContactActionInfo.ContactId, Type = MeetingAttendeeType.Phone });
+                    meetingState.Attendees.Add(new AttendeeCallInfo 
+                    { 
+                        Id = addContactActionInfo.ContactId, 
+                        Type = MeetingAttendeeType.Phone,
+                        DisplayId = addContactActionInfo.ContactId
+                    });
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Number added"), cancellationToken);
                 }
                 else
