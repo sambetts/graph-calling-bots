@@ -15,14 +15,14 @@ BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
 
 
 ## Testing the Bot
+Expose the bot with NGrok:
+```
+ngrok http http://localhost:7221
+```
+
 POST this JSon to the bot endpoint /api/StartCall:
 ```json
 {
   "PhoneNumber": "+34682796XXX"
 }
 ```
-
-The result:
-![alt](../../../../imgs/calling.jpg)
-
-Rick calling!

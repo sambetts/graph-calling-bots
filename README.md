@@ -11,7 +11,18 @@ For PSTN bots especially we just want some basic logic-flow controls:
 * Play pre-recorded media.
 * Record responses.
 
-That way we can build nice clean bots on a minimalist framework. 
+That way we can build nice clean bots on a minimalist framework (see below). 
+
+## Example Projects
+There are a few projects that use the same engine. 
+* [P2P calling for PSTN calls - x2 examples.](src/examples/P2pPstnBot/README.md)
+  * Web API implementation.
+  * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
+* [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/README.md)
+  * Also implements Bot Framework SDK - does chat & calling in one bot.
+
+## How do Bots Work in this Framework?
+Here's an example:
 
 ```C#
 public class SurveyCallingBot : BaseStatelessGraphCallingBot
@@ -42,17 +53,11 @@ public class SurveyCallingBot : BaseStatelessGraphCallingBot
 }
 ```
 Also a bonus: as the bots run "stateless", they can scale much easier, in Azure Functions apps for example. There is one such example bot in this repo...
-## Example Projects
-There are a few projects that use the same engine. 
-* [P2P calling for PSTN calls.](src/examples/P2pPstnBot/README.md)
-  * Web API implementation.
-  * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
-* [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/README.md)
-  * Also implements Bot Framework SDK - does chat & calling in one bot.
+
 
 All the examples need this setup being done.
 
-## Setup Bot
+## Setup Bot in Teams
 The official documentation is here: https://learn.microsoft.com/en-us/graph/cloud-communications-phone-number#prerequisite-register-a-bot 
 
 I had problems with it so resorted to my own setup methodology, but “your mileage may vary”. 
@@ -72,7 +77,7 @@ Permissions needed (application):
 * Calls.JoinGroupCall.All
 * Calls.JoinGroupCallAsGuest.All
 
-All these permissions need administrator consent to be effective. 
+All these permissions need administrator consent to be effective. The group-call bot has extra requirements. 
 That should be enough to make calls to Teams users (P2P – more permissions are needed if calling a group).
 
 ## Optional: Setup PSTN Calling
@@ -141,3 +146,4 @@ Unless all 3 details are correct, the calls won’t work.
 ## Publishing the Bot/Developer Tests
 You can either publish this to a public site with an SSL endpoint, or just NGrok or some reverse-proxy tool to run from your local machine. In either case the bot will need a base URL configuration.
 
+**Important**: for NGrok, you'll need an account even if it's a free one. https://ngrok.com/

@@ -96,7 +96,6 @@ ngrok http http://localhost:3978 --host-header="localhost:3978"
 ```
 * Update 'BotBaseUrl' if needed with NGrok URL.
 * Run bot, and open in Bot Framework Emulator - configure bot with same application ID & password as configured for bot.
-* 
 
 ## Configuration
 These configuration settings are needed:
@@ -115,4 +114,9 @@ Additional permissions needed (application):
 
 * User.Read.All
 
-See the repo home for the existing permissions.
+See the repo home README for the existing permissions.
+
+The result:
+![alt](../../../../imgs/calling.jpg)
+
+Rick calling!
