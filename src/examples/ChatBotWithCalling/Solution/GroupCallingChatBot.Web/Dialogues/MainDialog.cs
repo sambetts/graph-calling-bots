@@ -80,6 +80,7 @@ public class MainDialog : CancellableDialogue
             }
             else if (actionInfo.Action == CardConstants.CardActionValStartMeeting)
             {
+                // Start configured meeting
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Starting call. Have a nice meeting!"), cancellationToken);
                 await _groupCallBot.StartGroupCall(meetingState);
                 return await stepContext.EndDialogAsync(meetingState, cancellationToken);

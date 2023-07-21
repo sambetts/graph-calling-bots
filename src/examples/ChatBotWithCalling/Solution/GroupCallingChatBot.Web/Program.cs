@@ -15,6 +15,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.ConfigureGraphClient(config);
 
+// Add bot services
 builder.Services.AddCallingBot(config);
 builder.Services.AddChatBot();
 

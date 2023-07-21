@@ -44,24 +44,13 @@ public class SurveyCallingBot : BaseStatelessGraphCallingBot
 Also a bonus: as the bots run "stateless", they can scale much easier, in Azure Functions apps for example. There is one such example bot in this repo...
 ## Example Projects
 There are a few projects that use the same engine. 
-* P2P calling for PSTN calls.
+* [P2P calling for PSTN calls.](src/examples/P2pPstnBot/readme.md)
   * Web API implementation.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
-* Group calling example for PSTN and Teams users.
+* [P2P calling for PSTN calls.](src/examples/ChatBotWithCalling/readme.md)Group calling example for PSTN and Teams users.
   * Also implements Bot Framework SDK - does chat & calling in one bot.
 
 All the examples need this setup being done.
-## Configuration
-These configuration settings are needed:
-
-Name | Description
---------------- | -----------
-Bot:AppId | ID of bot Azure AD application
-Bot:AppInstanceObjectId | For PSTN calls only: object ID of the user account used for calling
-Bot:AppInstanceObjectIdName | For PSTN calls only: object ID of the user account used for calling
-Bot:TenantId | Tenant ID of Azure AD application
-Bot:AppSecret | Bot app secret
-Bot:BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
 
 ## Setup Bot
 The official documentation is here: https://learn.microsoft.com/en-us/graph/cloud-communications-phone-number#prerequisite-register-a-bot 
@@ -152,15 +141,3 @@ Unless all 3 details are correct, the calls won’t work.
 ## Publishing the Bot/Developer Tests
 You can either publish this to a public site with an SSL endpoint, or just NGrok or some reverse-proxy tool to run from your local machine. In either case the bot will need a base URL configuration.
 
-## Testing the Bot
-POST this JSon to the bot endpoint /StartCall:
-```json
-{
-  "PhoneNumber": "+34682796XXX"
-}
-```
-
-The result:
-![alt](imgs/calling.jpg)
-
-Rick calling!
