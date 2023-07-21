@@ -47,7 +47,7 @@ There are a few projects that use the same engine.
 * [P2P calling for PSTN calls.](src/examples/P2pPstnBot/readme.md)
   * Web API implementation.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
-* [P2P calling for PSTN calls.](src/examples/ChatBotWithCalling/readme.md)Group calling example for PSTN and Teams users.
+* [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/readme.md)
   * Also implements Bot Framework SDK - does chat & calling in one bot.
 
 All the examples need this setup being done.
