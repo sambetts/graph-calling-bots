@@ -15,7 +15,7 @@ That way we can build nice clean bots on a minimalist framework (see below).
 
 ## Example Projects
 There are a few projects that use the same engine. 
-* [P2P calling for PSTN calls - x2 examples.](src/examples/P2pPstnBot/README.md)
+* [P2P calling for PSTN calls - x2 examples.](src/examples/P2pPstnBot/readme.md)
   * Web API implementation.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
 * [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/README.md)
