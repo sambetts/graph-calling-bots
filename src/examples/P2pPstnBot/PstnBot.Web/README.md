@@ -15,6 +15,10 @@ Bot:BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
 
 
 ## Testing the Bots
+Expose the bot with NGrok:
+```
+ngrok http https://localhost:7028 --host-header="localhost:7028"
+```
 POST this JSon to the bot endpoint /StartCall:
 ```json
 {
