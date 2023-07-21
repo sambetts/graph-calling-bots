@@ -44,10 +44,10 @@ public class SurveyCallingBot : BaseStatelessGraphCallingBot
 Also a bonus: as the bots run "stateless", they can scale much easier, in Azure Functions apps for example. There is one such example bot in this repo...
 ## Example Projects
 There are a few projects that use the same engine. 
-* [P2P calling for PSTN calls.](src/examples/P2pPstnBot/readme.md)
+* [P2P calling for PSTN calls.](src/examples/P2pPstnBot/README.md)
   * Web API implementation.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
-* [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/readme.md)
+* [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/README.md)
   * Also implements Bot Framework SDK - does chat & calling in one bot.
 
 All the examples need this setup being done.
