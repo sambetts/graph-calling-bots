@@ -6,7 +6,7 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 public interface IGraphCallingBot 
 {
-    Task HandleNotificationsAsync(CommsNotificationsPayload notifications);
+    Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
     Task<bool> ValidateNotificationRequestAsync(HttpRequest request);
 }
 

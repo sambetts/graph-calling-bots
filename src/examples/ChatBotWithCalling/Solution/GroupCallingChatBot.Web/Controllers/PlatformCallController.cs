@@ -27,7 +27,7 @@ public class PlatformCallController : ControllerBase
         var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
-            await _callingBot.HandleNotificationsAsync(notifications);
+            await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             return Accepted();
         }
         else

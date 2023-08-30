@@ -24,7 +24,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAsync(CommsNotificationsPayload? notificationPayload)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload)
     {
         if (notificationPayload == null) return;
         if (!_callStateManager.Initialised)
