@@ -3,7 +3,6 @@ using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Runtime.CompilerServices;
 
 namespace CallingTestBot.FunctionApp.Engine;
 
@@ -34,14 +33,20 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     {
         await base.CallEstablishing(callState);
 
-        await _botTestsManager.NewCallEstablishing(callState.CallId);
+        if (callState.CallId != null)
+        {
+            await _botTestsManager.NewCallEstablishing(callState.CallId);
+        }
     }
 
     protected override async Task CallEstablished(BaseActiveCallState callState)
     {
         await base.CallEstablished(callState);
 
-        await _botTestsManager.CallConnectedSuccesfully(callState.CallId);
+        if (callState.CallId != null)
+        {
+            await _botTestsManager.CallConnectedSuccesfully(callState.CallId);
+        }
     }
 
     protected override async Task CallTerminated(string callId, ResultInfo resultInfo)
