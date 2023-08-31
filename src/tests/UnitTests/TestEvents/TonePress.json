@@ -1,20 +1,20 @@
 {
-    "@odata.type": "#microsoft.graph.commsNotifications",
-    "value": [
-        {
-            "@odata.type": "#microsoft.graph.commsNotification",
-            "changeType": "updated",
-            "resource": "/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
-            "resourceUrl": "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
-            "resourceData": {
-                "@odata.type": "#microsoft.graph.call",
-                "state": "established",
-                "toneInfo": {
-                    "@odata.type": "#microsoft.graph.toneInfo",
-                    "sequenceId": 6,
-                    "tone": "tone1"
-                }
-            }
+  "@odata.type": "#microsoft.graph.commsNotifications",
+  "value": [
+    {
+      "@odata.type": "#microsoft.graph.commsNotification",
+      "changeType": "updated",
+      "resource": "/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
+      "resourceUrl": "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
+      "resourceData": {
+        "@odata.type": "#microsoft.graph.call",
+        "state": "established",
+        "toneInfo": {
+          "@odata.type": "#microsoft.graph.toneInfo",
+          "sequenceId": 6,
+          "tone": "tone1"
         }
-    ]
+      }
+    }
+  ]
 }

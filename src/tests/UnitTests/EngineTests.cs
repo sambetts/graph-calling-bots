@@ -44,6 +44,9 @@ public class EngineTests
         await callStateManager.Initialise();
         await callStateManager.RemoveAll();
         await Test(callStateManager);
+
+        // Test also a failed call
+        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager);
     }
     async Task Test<T>(ICallStateManager<T> callStateManager) where T : BaseActiveCallState, new()
     {

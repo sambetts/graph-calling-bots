@@ -35,6 +35,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
         {
+            CallEstablishing = CallEstablishing,
             CallEstablished = CallEstablished,
             CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
             NewTonePressed = NewTonePressed,
@@ -75,11 +76,16 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     #region Bot Events
 
-    protected virtual Task CallTerminated(string callId)
+    protected virtual Task CallEstablishing(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }
+
     protected virtual Task CallEstablished(CALLSTATETYPE callState)
+    {
+        return Task.CompletedTask;
+    }
+    protected virtual Task CallTerminated(string callId, Models.ResultInfo resultInfo)
     {
         return Task.CompletedTask;
     }

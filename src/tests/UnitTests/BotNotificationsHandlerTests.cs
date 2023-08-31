@@ -18,20 +18,79 @@ public class BotNotificationsHandlerTests
         }).CreateLogger("Unit tests");
     }
 
+    /// <summary>
+    /// A call is established, but failed to connect. The call is then deleted.
+    /// </summary>
+    [TestMethod]
+    public async Task FailedP2PCallFlowTests()
+    {
+        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        await FailedCallTest(_logger, callStateManager);
+    }
+
+    public static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> callStateManager)
+    {
+        var callEstablishingCount = 0;
+
+        var callConnectedCount = 0;
+        var callTerminatedCount = 0;
+        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
+        {
+            CallEstablishing = (callState) =>
+            {
+                callEstablishingCount++;
+                return Task.CompletedTask;
+            },
+            CallEstablished = (callState) =>
+            {
+                callConnectedCount++;
+                return Task.CompletedTask;
+            },
+            CallTerminated = (callState) =>
+            {
+                callTerminatedCount++;
+                return Task.CompletedTask;
+            }
+        };
+        var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, logger);
+
+        var callResourceUrl = NotificationsLibrary.FailedCallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
+
+        // Handle call establish for a call never seen before
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallEstablishingP2P);
+        Assert.IsTrue(callEstablishingCount == 1);
+
+        var postEstablishingCallState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
+        Assert.IsNotNull(postEstablishingCallState);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallDeleted);
+
+        var postCallDeletedState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
+        Assert.IsNull(postCallDeletedState);
+
+        Assert.AreEqual(0, callConnectedCount);
+        Assert.AreEqual(1, callTerminatedCount);
+    }
+
     [TestMethod]
     public async Task BotNotificationsHandlerP2PFlowTests()
     {
         var callConnectedWithP2PAudioCount = 0;
-        var callConnectedCount = 0;
+        var callEstablishingCount = 0;
+        var callEstablishedCount = 0;
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
         var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
         var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
         {
+            CallEstablishing = (callState) =>
+            {
+                callEstablishingCount++;
+                return Task.CompletedTask;
+            },
             CallEstablished = (callState) =>
             {
-                callConnectedCount++;
+                callEstablishedCount++;
                 return Task.CompletedTask;
             },
             CallConnectedWithP2PAudio = (callState) =>
@@ -66,9 +125,10 @@ public class BotNotificationsHandlerTests
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum, CallState.Establishing);
 
         // Establish the call
-        Assert.IsTrue(callConnectedCount == 0);
+        Assert.IsTrue(callEstablishingCount == 1);
+        Assert.IsTrue(callEstablishedCount == 0);
         await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedP2P);
-        Assert.IsTrue(callConnectedCount == 1);
+        Assert.IsTrue(callEstablishedCount == 1);
 
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
             CallState.Established);
@@ -107,6 +167,7 @@ public class BotNotificationsHandlerTests
     [TestMethod]
     public async Task BotNotificationsHandlerGroupFlowTests()
     {
+        var callEstablishingCount = 0;
         var userJoinedCount = 0;
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
@@ -114,6 +175,11 @@ public class BotNotificationsHandlerTests
         var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
         var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
         {
+            CallEstablishing = (callState) =>
+            {
+                callEstablishingCount++;
+                return Task.CompletedTask;
+            },
             UserJoined = (callState) =>
             {
                 userJoinedCount++;
@@ -141,6 +207,7 @@ public class BotNotificationsHandlerTests
 
         // Handle call establish for a call never seen before
         await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.GroupCallEstablishing);
+        Assert.IsTrue(callEstablishingCount == 1);
 
         // We should find the call in the call state manager
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,

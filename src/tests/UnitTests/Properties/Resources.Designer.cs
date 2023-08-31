@@ -122,6 +122,49 @@ namespace ServiceHostedMediaCallingBot.UnitTests.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;deleted&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6c1f5e00-76e1-4d4a-9a16-dc2b92a449dd&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6c1f5e00-76e1-4d4a-9a16-dc2b92a449dd&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;terminated&quot;,
+        ///        &quot;resultInfo&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.resultInfo&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string FailedCallDeleted {
+            get {
+                return ResourceManager.GetString("FailedCallDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6c1f5e00-76e1-4d4a-9a16-dc2b92a449dd&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6c1f5e00-76e1-4d4a-9a16-dc2b92a449dd&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;establishing&quot;,
+        ///        &quot;callChainId&quot;: &quot;ffec1e98-9d8b-4201-ac1f-a5509347d041&quot;
+        ///      }
+        ///    } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string FailedCallEstablishing {
+            get {
+                return ResourceManager.GetString("FailedCallEstablishing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
         ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
         ///    &quot;value&quot;: [
         ///        {

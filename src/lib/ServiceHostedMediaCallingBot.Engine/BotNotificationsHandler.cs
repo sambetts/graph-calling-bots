@@ -85,6 +85,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     var newCallState = new T();
                     newCallState.PopulateFromCallNotification(callnotification);
 
+                    if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(newCallState);
                     await _callStateManager.AddCallState(newCallState);
 
                     _logger.LogWarning($"Call {newCallState.CallId} is connecting");
@@ -126,8 +127,17 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             if (!string.IsNullOrEmpty(callState.CallId))
             {
                 _logger.LogInformation($"Call {callState.CallId} terminated");
-                await _callStateManager.Remove(callState.ResourceUrl);
-                if (_callbackInfo.CallTerminated != null) await _callbackInfo.CallTerminated(callState.CallId);
+                var removeSuccess = await _callStateManager.Remove(callState.ResourceUrl);
+                if (removeSuccess)
+                {
+                    _logger.LogInformation($"Call {callState.CallId} state removed");
+                }
+                else
+                {
+                    _logger.LogWarning($"Call {callState.CallId} state could not be removed");
+                }
+
+                if (_callbackInfo.CallTerminated != null && callNotification.ResultInfo != null) await _callbackInfo.CallTerminated(callState.CallId, callNotification.ResultInfo);
             }
             else
             {
@@ -160,9 +170,10 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
 public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
 {
     public Func<T, Task>? CallConnectedWithP2PAudio { get; set; }
+    public Func<T, Task>? CallEstablishing { get; set; }
     public Func<T, Task>? CallEstablished { get; set; }
     public Func<T, Task>? PlayPromptFinished { get; set; }
-    public Func<string, Task>? CallTerminated { get; set; }
+    public Func<string, Models.ResultInfo, Task>? CallTerminated { get; set; }
     public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
     public Func<T, Task>? UserJoined { get; set; }

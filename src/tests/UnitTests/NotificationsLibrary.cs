@@ -17,4 +17,9 @@ internal class NotificationsLibrary
     public static CommsNotificationsPayload GroupCallBotJoin => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.GroupCallBotJoin)!;
     public static CommsNotificationsPayload GroupCallUserJoin => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.GroupCallUserJoin)!;
     public static CommsNotificationsPayload GroupCallEnd => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.GroupCallEnd)!;
+
+
+
+    public static CommsNotificationsPayload FailedCallEstablishingP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.FailedCallEstablishing)!;
+    public static CommsNotificationsPayload FailedCallDeleted => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.FailedCallDeleted)!;
 }

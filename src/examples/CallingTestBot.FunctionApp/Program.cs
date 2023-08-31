@@ -15,7 +15,7 @@ var host = new HostBuilder()
     .ConfigureServices(configureDelegate: (hostContext, services) =>
     {
         var config = new CallingTestBotConfig(hostContext.Configuration);
-        services.AddCallingBot(config);
+        services.AddTestCallingBot(config);
 
     })
     .ConfigureFunctionsWorkerDefaults()

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CallingTestBot.FunctionApp.Engine;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -6,7 +7,7 @@ namespace CallingTestBot.FunctionApp.Extensions;
 
 public static class BotBuilderExtensions
 {
-    internal static IServiceCollection AddCallingBot(this IServiceCollection services, CallingTestBotConfig config)
+    internal static IServiceCollection AddTestCallingBot(this IServiceCollection services, CallingTestBotConfig config)
     {
         // Configure the common config options for engine
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
@@ -17,6 +18,7 @@ public static class BotBuilderExtensions
         // Storage must be Azure Tables. Value isn't optional.
         services.AddSingleton<ICallStateManager<BaseActiveCallState>>(new AzTablesCallStateManager<BaseActiveCallState>(config.Storage));
 
-        return services.AddSingleton<IPstnCallingBot, TestPstnBot>();
+        services.AddSingleton<BotTestsManager>();
+        return services.AddSingleton<IPstnCallingBot, TestCallPstnBot>();
     }
 }

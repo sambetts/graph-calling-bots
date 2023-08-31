@@ -1,34 +1,34 @@
 {
-    "@odata.type": "#microsoft.graph.commsNotifications",
-    "value": [
-        {
-            "@odata.type": "#microsoft.graph.commsNotification",
-            "changeType": "deleted",
-            "resource": "/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85",
-            "resourceUrl": "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85",
-            "resourceData": {
-                "@odata.type": "#microsoft.graph.playPromptOperation",
-                "prompts": [
-                    {
-                        "@odata.type": "#microsoft.graph.mediaPrompt",
-                        "mediaInfo": {
-                            "@odata.type": "#microsoft.graph.mediaInfo",
-                            "uri": "https://sambetts.eu.ngrok.io/audio/responder-notification.wav",
-                            "resourceId": "59962c96-0bdc-4587-83b1-8afc9703d1fb"
-                        }
-                    }
-                ],
-                "completionReason": "completedSuccessfully",
-                "status": "completed",
-                "clientContext": "299adb91-c8b5-47d8-9eec-003a7179aff3",
-                "resultInfo": {
-                    "@odata.type": "#microsoft.graph.resultInfo",
-                    "code": 200,
-                    "subcode": 0,
-                    "message": "Action completed successfully."
-                },
-                "id": "11cccef9-7eeb-4910-9189-977c0f0eae85"
+  "@odata.type": "#microsoft.graph.commsNotifications",
+  "value": [
+    {
+      "@odata.type": "#microsoft.graph.commsNotification",
+      "changeType": "deleted",
+      "resource": "/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85",
+      "resourceUrl": "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85",
+      "resourceData": {
+        "@odata.type": "#microsoft.graph.playPromptOperation",
+        "prompts": [
+          {
+            "@odata.type": "#microsoft.graph.mediaPrompt",
+            "mediaInfo": {
+              "@odata.type": "#microsoft.graph.mediaInfo",
+              "uri": "https://sambetts.eu.ngrok.io/audio/responder-notification.wav",
+              "resourceId": "59962c96-0bdc-4587-83b1-8afc9703d1fb"
             }
-        }
-    ]
+          }
+        ],
+        "completionReason": "completedSuccessfully",
+        "status": "completed",
+        "clientContext": "299adb91-c8b5-47d8-9eec-003a7179aff3",
+        "resultInfo": {
+          "@odata.type": "#microsoft.graph.resultInfo",
+          "code": 200,
+          "subcode": 0,
+          "message": "Action completed successfully."
+        },
+        "id": "11cccef9-7eeb-4910-9189-977c0f0eae85"
+      }
+    }
+  ]
 }

@@ -127,6 +127,12 @@
   <data name="CallEstablishing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\TestEvents\CallEstablishing.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="FailedCallDeleted" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\FailedP2P\CallDeleted.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="FailedCallEstablishing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\FailedP2P\CallEstablishing.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="GroupCallBotJoin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\TestEvents\GroupCalls\GroupCallBotJoin.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

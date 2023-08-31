@@ -4,12 +4,12 @@
     {
       "@odata.type": "#microsoft.graph.commsNotification",
       "changeType": "updated",
-      "resource": "/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
-      "resourceUrl": "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
+      "resource": "/app/calls/6c1f5e00-76e1-4d4a-9a16-dc2b92a449dd",
+      "resourceUrl": "/communications/calls/6c1f5e00-76e1-4d4a-9a16-dc2b92a449dd",
       "resourceData": {
         "@odata.type": "#microsoft.graph.call",
         "state": "establishing",
-        "callChainId": "b0fe8425-6f48-41ed-9dd6-b706ff66319a"
+        "callChainId": "ffec1e98-9d8b-4201-ac1f-a5509347d041"
       }
     }
   ]
