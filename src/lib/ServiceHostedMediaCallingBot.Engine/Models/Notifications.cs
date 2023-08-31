@@ -28,9 +28,6 @@ public class CallNotification
 
     public List<Participant>? JoinedParticipants => GetTypedResourceArray<Participant>();
 
-    public ResultInfo? ResultInfo => GetTypedResourceObject<ResultInfo>("#microsoft.graph.resultInfo");
-
-
     T? GetTypedResourceObject<T>(string odataType) where T : class
     {
         if (NotificationResource != null)

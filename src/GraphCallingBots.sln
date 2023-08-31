@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Shared", "examples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.FunctionApp", "examples\CallingTestBot\FunctionApp\CallingTestBot.FunctionApp.csproj", "{B77B155C-84B8-442B-A1A9-328745A800D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CallingTestBot.UnitTests", "examples\CallingTestBot\UnitTests\CallingTestBot.UnitTests.csproj", "{8AF589C9-723D-4BD0-80C7-1B435800CC69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.UnitTests", "examples\CallingTestBot\UnitTests\CallingTestBot.UnitTests.csproj", "{8AF589C9-723D-4BD0-80C7-1B435800CC69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

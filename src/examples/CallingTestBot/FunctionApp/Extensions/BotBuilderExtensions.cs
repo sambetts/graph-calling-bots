@@ -18,7 +18,7 @@ public static class BotBuilderExtensions
         // Storage must be Azure Tables. Value isn't optional.
         services.AddSingleton<ICallStateManager<BaseActiveCallState>>(new AzTablesCallStateManager<BaseActiveCallState>(config.Storage));
 
-        services.AddSingleton<AzTablesBotTestsManager>();
+        services.AddSingleton<IBotTestsLogger, AzTablesBotTestsLogger>();
         return services.AddSingleton<IPstnCallingBot, TestCallPstnBot>();
     }
 }

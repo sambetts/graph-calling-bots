@@ -137,7 +137,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     _logger.LogWarning($"Call {callState.CallId} state could not be removed");
                 }
 
-                if (_callbackInfo.CallTerminated != null && callNotification.ResultInfo != null) await _callbackInfo.CallTerminated(callState.CallId, callNotification.ResultInfo);
+                if (_callbackInfo.CallTerminated != null && callNotification.AssociatedCall?.ResultInfo != null) await _callbackInfo.CallTerminated(callState.CallId, callNotification.AssociatedCall.ResultInfo);
             }
             else
             {

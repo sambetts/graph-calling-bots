@@ -9,12 +9,12 @@ namespace CallingTestBot.FunctionApp.Engine;
 public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
-    private readonly AzTablesBotTestsManager _botTestsManager;
+    private readonly IBotTestsLogger _botTestsLogger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCallPstnBot" /> class.
     /// </summary>
-    public TestCallPstnBot(SingleWavFileBotConfig botOptions, ILogger<TestCallPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, AzTablesBotTestsManager botTestsManager)
+    public TestCallPstnBot(SingleWavFileBotConfig botOptions, ILogger<TestCallPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, IBotTestsLogger botTestsLogger)
         : base(botOptions, callStateManager, logger)
     {
         // Play a notification prompt when the call is answered
@@ -26,7 +26,7 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
                 ResourceId = Guid.NewGuid().ToString(),
             },
         };
-        _botTestsManager = botTestsManager;
+        _botTestsLogger = botTestsLogger;
     }
 
     protected override async Task CallEstablishing(BaseActiveCallState callState)
@@ -35,7 +35,7 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
 
         if (callState.CallId != null)
         {
-            await _botTestsManager.NewCallEstablishing(callState.CallId);
+            await _botTestsLogger.LogNewCallEstablishing(callState.CallId);
         }
     }
 
@@ -45,7 +45,7 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
 
         if (callState.CallId != null)
         {
-            await _botTestsManager.CallConnectedSuccesfully(callState.CallId);
+            await _botTestsLogger.LogCallConnectedSuccesfully(callState.CallId);
         }
     }
 
@@ -53,7 +53,6 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     {
         await base.CallTerminated(callId, resultInfo);
 
-
-        await _botTestsManager.CallTerminated(callId, resultInfo);
+        await _botTestsLogger.LogCallTerminated(callId, resultInfo);
     }
 }

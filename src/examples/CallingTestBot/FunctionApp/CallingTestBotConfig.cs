@@ -6,6 +6,10 @@ namespace CallingTestBot.FunctionApp;
 
 public class CallingTestBotConfig : PropertyBoundConfig
 {
+    public CallingTestBotConfig()
+    {
+    }
+
     public CallingTestBotConfig(IConfiguration config) : base(config) { }
 
     [ConfigValue]

@@ -10,8 +10,7 @@ namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 /// </summary>
 public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICallStateManager<T> where T : BaseActiveCallState
 {
-    const string TABLE_NAME = "CallState";
-
+    public override string TableName => "CallState";
 
     public AzTablesCallStateManager(string storageConnectionString) : base(storageConnectionString)
     {
@@ -68,19 +67,6 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         await AddCallState(callState);
     }
 
-    public async Task Initialise()
-    {
-        try
-        {
-            await _tableServiceClient.CreateTableIfNotExistsAsync(TABLE_NAME);
-        }
-        catch (RequestFailedException ex) when (ex.ErrorCode == "TableAlreadyExists")
-        {
-            // Supposedly CreateTableIfNotExistsAsync should silently fail if already exists, but this doesn't seem to happen
-        }
-
-        _tableClient = _tableServiceClient.GetTableClient(TABLE_NAME);
-    }
 
     public async Task<int> GetCount()
     {
