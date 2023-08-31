@@ -173,7 +173,7 @@ public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
     public Func<T, Task>? CallEstablishing { get; set; }
     public Func<T, Task>? CallEstablished { get; set; }
     public Func<T, Task>? PlayPromptFinished { get; set; }
-    public Func<string, Models.ResultInfo, Task>? CallTerminated { get; set; }
+    public Func<string, ResultInfo, Task>? CallTerminated { get; set; }
     public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
     public Func<T, Task>? UserJoined { get; set; }

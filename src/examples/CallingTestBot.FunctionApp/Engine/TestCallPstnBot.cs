@@ -10,12 +10,12 @@ namespace CallingTestBot.FunctionApp.Engine;
 public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
-    private readonly BotTestsManager _botTestsManager;
+    private readonly AzTablesBotTestsManager _botTestsManager;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCallPstnBot" /> class.
     /// </summary>
-    public TestCallPstnBot(SingleWavFileBotConfig botOptions, ILogger<TestCallPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, BotTestsManager botTestsManager)
+    public TestCallPstnBot(SingleWavFileBotConfig botOptions, ILogger<TestCallPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, AzTablesBotTestsManager botTestsManager)
         : base(botOptions, callStateManager, logger)
     {
         // Play a notification prompt when the call is answered
@@ -34,7 +34,7 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     {
         await base.CallEstablishing(callState);
 
-        await _botTestsManager.CallConnectedSuccesfully(callState.CallId);
+        await _botTestsManager.NewCallEstablishing(callState.CallId);
     }
 
     protected override async Task CallEstablished(BaseActiveCallState callState)
@@ -44,11 +44,11 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
         await _botTestsManager.CallConnectedSuccesfully(callState.CallId);
     }
 
-    protected override async Task CallTerminated(string callId, ServiceHostedMediaCallingBot.Engine.Models.ResultInfo resultInfo)
+    protected override async Task CallTerminated(string callId, ResultInfo resultInfo)
     {
         await base.CallTerminated(callId, resultInfo);
 
 
-        await _botTestsManager.CallTerminated(callId);
+        await _botTestsManager.CallTerminated(callId, resultInfo);
     }
 }

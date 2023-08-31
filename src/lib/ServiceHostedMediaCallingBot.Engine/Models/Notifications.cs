@@ -69,15 +69,3 @@ public class CallNotification
         return null;
     }
 }
-
-public class ResultInfo
-{
-    [JsonPropertyName("resourceData")]
-    public int Code { get; set; }
-
-    [JsonPropertyName("resourceData")]
-    public int SubCode { get; set; }
-
-    [JsonPropertyName("resourceData")]
-    public string Message { get; set; } = null!;
-}

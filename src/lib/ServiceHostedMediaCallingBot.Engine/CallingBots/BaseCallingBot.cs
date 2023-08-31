@@ -85,7 +85,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     {
         return Task.CompletedTask;
     }
-    protected virtual Task CallTerminated(string callId, Models.ResultInfo resultInfo)
+    protected virtual Task CallTerminated(string callId, ResultInfo resultInfo)
     {
         return Task.CompletedTask;
     }

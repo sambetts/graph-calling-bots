@@ -46,7 +46,7 @@ public class BotNotificationsHandlerTests
                 callConnectedCount++;
                 return Task.CompletedTask;
             },
-            CallTerminated = (callState) =>
+            CallTerminated = (callState, result) =>
             {
                 callTerminatedCount++;
                 return Task.CompletedTask;
@@ -108,7 +108,7 @@ public class BotNotificationsHandlerTests
                 toneList.Add(tone);
                 return Task.CompletedTask;
             },
-            CallTerminated = (callState) =>
+            CallTerminated = (callState, result) =>
             {
                 callTerminatedCount++;
                 return Task.CompletedTask;
@@ -195,7 +195,7 @@ public class BotNotificationsHandlerTests
                 toneList.Add(tone);
                 return Task.CompletedTask;
             },
-            CallTerminated = (callState) =>
+            CallTerminated = (callState, result) =>
             {
                 callTerminatedCount++;
                 return Task.CompletedTask;
