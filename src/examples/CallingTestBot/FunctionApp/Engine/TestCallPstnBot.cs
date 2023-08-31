@@ -33,9 +33,18 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     {
         await base.CallEstablishing(callState);
 
+        await InitLoggerIfNotAlready();
         if (callState.CallId != null)
         {
             await _botTestsLogger.LogNewCallEstablishing(callState.CallId);
+        }
+    }
+
+    private async Task InitLoggerIfNotAlready()
+    {
+        if (!_botTestsLogger.Initialised)
+        {
+            await _botTestsLogger.Initialise();
         }
     }
 
@@ -43,6 +52,7 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     {
         await base.CallEstablished(callState);
 
+        await InitLoggerIfNotAlready();
         if (callState.CallId != null)
         {
             await _botTestsLogger.LogCallConnectedSuccesfully(callState.CallId);

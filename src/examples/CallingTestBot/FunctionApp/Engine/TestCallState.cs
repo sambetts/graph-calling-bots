@@ -6,13 +6,14 @@ namespace CallingTestBot.FunctionApp.Engine;
 
 public class TestCallState : ITableEntity
 {
-    public const string PARTITION_KEY = "TestCallState";
-
+    /// <summary>
+    /// Partition on date
+    /// </summary>
     public string PartitionKey
     {
         get
         {
-            return PARTITION_KEY;
+            return Timestamp.HasValue ? Timestamp.Value.DateTime.Date.ToString("dd-MM-yyyy") : "All";
         }
         set
         {

@@ -38,6 +38,7 @@ public class HttpFunctions
             _logger.LogInformation($"Processing Graph call notification");
             try
             {
+                // Process notifications and update call state. Events will be captured on bot class.
                 await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             }
             catch (Exception ex)
@@ -82,10 +83,10 @@ public class HttpFunctions
     /// <summary>
     /// Start call triggered by HTTP request. Not normally needed as done on a timer.
     /// </summary>
-    [Function(nameof(StartCall))]
-    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
+    [Function(nameof(StartCallManualTrigger))]
+    public async Task<HttpResponseData> StartCallManualTrigger([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        _logger.LogInformation($"Starting new call to number {_callingTestBotConfig.TestNumber}");
+        _logger.LogInformation($"Starting new call to number {_callingTestBotConfig.TestNumber} (manual call)");
         try
         {
             await _callingBot.StartPTSNCall(_callingTestBotConfig.TestNumber);

@@ -13,11 +13,20 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
     }
     public override string TableName => "TestCallState";
 
+    public async Task LogNewCallEstablishing(string callId)
+    {
+        InitCheck(_tableClient);
+
+        var newCallTestLog = new TestCallState { CallId = callId, CallConnected = false, Timestamp = DateTime.UtcNow };
+        await _tableClient!.UpsertEntityAsync(newCallTestLog);
+    }
+
     public async Task LogCallConnectedSuccesfully(string callId)
     {
         InitCheck(_tableClient);
 
-        var existingCallTestLog = new TestCallState { CallId = callId, CallConnected = true };
+        var existingCallTestLog = await GetTestCallStateOrThrowIfNone(callId);
+        existingCallTestLog.CallConnected = true;
         await _tableClient!.UpsertEntityAsync(existingCallTestLog);
     }
 
@@ -25,22 +34,21 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
     {
         InitCheck(_tableClient);
 
-        var existingCallTestLog = await GetTestCallState(callId);
-        if (existingCallTestLog == null)
-        {
-            throw new Exception($"Call {callId} not found in {TableName}");
-        }
+        var existingCallTestLog = await GetTestCallStateOrThrowIfNone(callId);
+
         existingCallTestLog.CallTerminateCode = resultInfo.Code;
         existingCallTestLog.CallTerminateMessage = resultInfo.Message;
         await _tableClient!.UpsertEntityAsync(existingCallTestLog);
     }
 
-    public async Task LogNewCallEstablishing(string callId)
+    async Task<TestCallState> GetTestCallStateOrThrowIfNone(string callId)
     {
-        InitCheck(_tableClient);
-
-        var newCallTestLog = new TestCallState { CallId = callId, CallConnected = false };
-        await _tableClient!.UpsertEntityAsync(newCallTestLog);
+        var existingCallTestLog = await GetTestCallState(callId);
+        if (existingCallTestLog == null)
+        {
+            throw new Exception($"Call {callId} not found in {TableName}");
+        }
+        return existingCallTestLog;
     }
 
 

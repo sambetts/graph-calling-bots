@@ -88,7 +88,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(newCallState);
                     await _callStateManager.AddCallState(newCallState);
 
-                    _logger.LogWarning($"Call {newCallState.CallId} is connecting");
+                    _logger.LogInformation($"Call {newCallState.CallId} is connecting");
                 }
                 else
                 {
