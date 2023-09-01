@@ -13,11 +13,11 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
     }
     public override string TableName => "TestCallState";
 
-    public async Task LogNewCallEstablishing(string callId)
+    public async Task LogNewCallEstablishing(string callId, string numberCalled)
     {
         InitCheck(_tableClient);
 
-        var newCallTestLog = new TestCallState { CallId = callId, CallConnected = false, Timestamp = DateTime.UtcNow };
+        var newCallTestLog = new TestCallState { CallId = callId, CallConnectedOk = false, Timestamp = DateTime.UtcNow, NumberCalled = numberCalled };
         await _tableClient!.UpsertEntityAsync(newCallTestLog);
     }
 
@@ -26,7 +26,7 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
         InitCheck(_tableClient);
 
         var existingCallTestLog = await GetTestCallStateOrThrowIfNone(callId);
-        existingCallTestLog.CallConnected = true;
+        existingCallTestLog.CallConnectedOk = true;
         await _tableClient!.UpsertEntityAsync(existingCallTestLog);
     }
 
@@ -41,17 +41,6 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
         await _tableClient!.UpsertEntityAsync(existingCallTestLog);
     }
 
-    async Task<TestCallState> GetTestCallStateOrThrowIfNone(string callId)
-    {
-        var existingCallTestLog = await GetTestCallState(callId);
-        if (existingCallTestLog == null)
-        {
-            throw new Exception($"Call {callId} not found in {TableName}");
-        }
-        return existingCallTestLog;
-    }
-
-
     public async Task<TestCallState?> GetTestCallState(string callId)
     {
         InitCheck(_tableClient);
@@ -63,5 +52,15 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
         }
 
         return null;
+    }
+
+    async Task<TestCallState> GetTestCallStateOrThrowIfNone(string callId)
+    {
+        var existingCallTestLog = await GetTestCallState(callId);
+        if (existingCallTestLog == null)
+        {
+            throw new Exception($"Call {callId} not found in {TableName}");
+        }
+        return existingCallTestLog;
     }
 }

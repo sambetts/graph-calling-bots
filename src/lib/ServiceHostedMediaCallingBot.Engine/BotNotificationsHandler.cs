@@ -41,7 +41,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                 var updateCallState = false;
 
                 // Is this notification for a call we're tracking?
-                updateCallState = await HandleCallObjectUpdate(callState, callnotification);
+                updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification);
 
                 // If we're not updating the call state, check for other events
                 if (!updateCallState)
@@ -98,28 +98,32 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         }
     }
 
-    private async Task<bool> HandleCallObjectUpdate(T callState, CallNotification callNotification)
+    private async Task<bool> HandleCallChangeTypeUpdate(T callState, CallNotification callNotification)
     {
         if (callNotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED)
         {
-            // An update happened to the call
+            var updateCallState = false;
+
+            // An update happened to the call. Check for call state changes
             if (callNotification.AssociatedCall != null && callState.StateEnum != callNotification.AssociatedCall.State && callNotification.AssociatedCall.State == CallState.Established)
             {
                 // Call state changed to established from previous state
                 _logger.LogInformation($"Call {callState.CallId} established");
-
                 callState.StateEnum = callNotification.AssociatedCall.State;
                 if (_callbackInfo.CallEstablished != null) await _callbackInfo.CallEstablished(callState);
 
                 // Update call state
-                return true;
+                updateCallState = true;
             }
-            else if (callNotification.AssociatedCall?.MediaState != null && callNotification.AssociatedCall.MediaState.Audio.HasValue && callNotification.AssociatedCall.MediaState.Audio.Value == MediaState.Active)
+            if (callNotification.AssociatedCall?.MediaState != null && callNotification.AssociatedCall.MediaState.Audio.HasValue && callNotification.AssociatedCall.MediaState.Audio.Value == MediaState.Active)
             {
-                // No change in call state - but audio is now active
+                // Audio is now active. THREADING FUN:
+                // We can be here before we've set the call state to established above if the second notification arrives before we save state on the "call established" notification
                 _logger.LogInformation($"Call {callState.CallId} connected with audio");
                 if (_callbackInfo.CallConnectedWithP2PAudio != null) await _callbackInfo.CallConnectedWithP2PAudio(callState);
+                updateCallState = true;
             }
+            return updateCallState;
         }
         else if (callNotification.ChangeType == CallConstants.NOTIFICATION_TYPE_DELETED && callNotification.ResourceUrl == callState.ResourceUrl)
         {
@@ -129,19 +133,21 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                 _logger.LogInformation($"Call {callState.CallId} terminated");
                 var removeSuccess = await _callStateManager.Remove(callState.ResourceUrl);
                 if (removeSuccess)
-                {
                     _logger.LogInformation($"Call {callState.CallId} state removed");
-                }
+                else
+                    _logger.LogWarning($"Call {callState.CallId} state could not be removed");
+
+                if (_callbackInfo.CallTerminated != null && callNotification.AssociatedCall?.ResultInfo != null)
+                    await _callbackInfo.CallTerminated(callState.CallId, callNotification.AssociatedCall.ResultInfo);
                 else
                 {
-                    _logger.LogWarning($"Call {callState.CallId} state could not be removed");
+                    if (callNotification.AssociatedCall?.ResultInfo == null)
+                        _logger.LogWarning($"Call {callState.CallId} terminated with no result info");
                 }
-
-                if (_callbackInfo.CallTerminated != null && callNotification.AssociatedCall?.ResultInfo != null) await _callbackInfo.CallTerminated(callState.CallId, callNotification.AssociatedCall.ResultInfo);
             }
             else
             {
-                _logger.LogWarning($"Unkown call finished");
+                _logger.LogWarning($"Unknown call finished");
             }
         }
 

@@ -31,7 +31,7 @@ public class EngineTests
     [TestMethod]
     public async Task ConcurrentInMemoryCallStateManager()
     {
-        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
         await Test(callStateManager);
     }
 

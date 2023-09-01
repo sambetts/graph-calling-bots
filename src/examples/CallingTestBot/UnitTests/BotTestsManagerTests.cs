@@ -15,31 +15,36 @@ public class BotTestsManagerTests
         await m.Initialise();
 
         // Test that we can create a new call state
-        var randomId = Guid.NewGuid().ToString();
-        await m.LogNewCallEstablishing(randomId);
+        var randomCallId = Guid.NewGuid().ToString();
+        var randomPhoneNumber = DateTime.Now.Ticks.ToString();
+        await m.LogNewCallEstablishing(randomCallId, randomPhoneNumber);
 
         // Call should not've connected yet
-        var testCallStatePreConnect = await m.GetTestCallState(randomId);
+        var testCallStatePreConnect = await m.GetTestCallState(randomCallId);
         Assert.IsNotNull(testCallStatePreConnect);
-        Assert.AreEqual(randomId, testCallStatePreConnect!.CallId);
-        Assert.IsFalse(testCallStatePreConnect.CallConnected);
+        Assert.AreEqual(randomCallId, testCallStatePreConnect!.CallId);
+        Assert.IsFalse(testCallStatePreConnect.CallConnectedOk);
+        Assert.AreEqual(randomPhoneNumber, testCallStatePreConnect!.NumberCalled);
 
         // Call connected
-        await m.LogCallConnectedSuccesfully(randomId);
-        var testCallStatePostConnect = await m.GetTestCallState(randomId);
+        await m.LogCallConnectedSuccesfully(randomCallId);
+        var testCallStatePostConnect = await m.GetTestCallState(randomCallId);
         Assert.IsNotNull(testCallStatePostConnect);
-        Assert.AreEqual(randomId, testCallStatePostConnect!.CallId);
-        Assert.IsTrue(testCallStatePostConnect.CallConnected);
+        Assert.AreEqual(randomCallId, testCallStatePostConnect!.CallId);
+        Assert.AreEqual(randomPhoneNumber, testCallStatePostConnect!.NumberCalled);
+        Assert.IsTrue(testCallStatePostConnect.CallConnectedOk);
 
         // Call finished
-        await m.LogCallTerminated(randomId, new ResultInfo { Code = 200, Message = "OK" });
-        var testCallStatePostTerminate = await m.GetTestCallState(randomId);
+        await m.LogCallTerminated(randomCallId, new ResultInfo { Code = 200, Message = "OK" });
+        var testCallStatePostTerminate = await m.GetTestCallState(randomCallId);
 
         Assert.IsNotNull(testCallStatePostTerminate);
-        Assert.AreEqual(randomId, testCallStatePostTerminate!.CallId);
-        Assert.IsTrue(testCallStatePostTerminate.CallConnected);
+        Assert.AreEqual(randomCallId, testCallStatePostTerminate!.CallId);
+        Assert.IsTrue(testCallStatePostTerminate.CallConnectedOk);
         Assert.AreEqual(200, testCallStatePostTerminate.CallTerminateCode);
         Assert.AreEqual("OK", testCallStatePostTerminate.CallTerminateMessage);
+        Assert.AreEqual(randomPhoneNumber, testCallStatePostTerminate!.NumberCalled);
+
     }
 
     AzTablesBotTestsLogger GetBotTestsLogger()
@@ -56,13 +61,13 @@ public class BotTestsManagerTests
 
         // Test that we can create a new call state
         var randomId = Guid.NewGuid().ToString();
-        await m.LogNewCallEstablishing(randomId);
+        await m.LogNewCallEstablishing(randomId, "123");
 
         // Call should not've connected yet
         var testCallStatePreConnect = await m.GetTestCallState(randomId);
         Assert.IsNotNull(testCallStatePreConnect);
         Assert.AreEqual(randomId, testCallStatePreConnect!.CallId);
-        Assert.IsFalse(testCallStatePreConnect.CallConnected);
+        Assert.IsFalse(testCallStatePreConnect.CallConnectedOk);
 
         // Call finished
         await m.LogCallTerminated(randomId, new ResultInfo { Code = 400, Message = "Massive error" });
@@ -70,7 +75,7 @@ public class BotTestsManagerTests
 
         Assert.IsNotNull(testCallStatePostTerminate);
         Assert.AreEqual(randomId, testCallStatePostTerminate!.CallId);
-        Assert.IsFalse(testCallStatePostTerminate.CallConnected);
+        Assert.IsFalse(testCallStatePostTerminate.CallConnectedOk);
         Assert.AreEqual(400, testCallStatePostTerminate.CallTerminateCode);
         Assert.AreEqual("Massive error", testCallStatePostTerminate.CallTerminateMessage);
     }

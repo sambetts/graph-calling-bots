@@ -35,7 +35,7 @@ public class HttpFunctions
 
         if (notifications != null)
         {
-            _logger.LogInformation($"Processing Graph call notification");
+            _logger.LogInformation($"Processing Graph call notification: {req}");
             try
             {
                 // Process notifications and update call state. Events will be captured on bot class.
@@ -64,6 +64,8 @@ public class HttpFunctions
     [Function(HttpRouteConstants.WavFileActionName)]
     public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
     {
+        _logger.LogInformation($"Sending WAV file HTTP response");
+
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
         {

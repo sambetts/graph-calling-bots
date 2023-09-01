@@ -24,7 +24,7 @@ public class BotNotificationsHandlerTests
     [TestMethod]
     public async Task FailedP2PCallFlowTests()
     {
-        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
         await FailedCallTest(_logger, callStateManager);
     }
 
@@ -80,7 +80,7 @@ public class BotNotificationsHandlerTests
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
-        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
         var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
         {
             CallEstablishing = (callState) =>
@@ -165,6 +165,77 @@ public class BotNotificationsHandlerTests
 
 
     [TestMethod]
+    public async Task AudoConnectMultiThreaded()
+    {
+        var callConnectedWithP2PAudioCount = 0;
+        var callEstablishingCount = 0;
+        var callEstablishedCount = 0;
+        var callPlayPromptFinished = 0;
+        var callTerminatedCount = 0;
+        var toneList = new List<Tone>();
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
+        {
+            CallEstablishing = (callState) =>
+            {
+                callEstablishingCount++;
+                return Task.CompletedTask;
+            },
+            CallEstablished = (callState) =>
+            {
+                callEstablishedCount++;
+                return Task.CompletedTask;
+            },
+            CallConnectedWithP2PAudio = (callState) =>
+            {
+                callConnectedWithP2PAudioCount++;
+                return Task.CompletedTask;
+            },
+            PlayPromptFinished = (callState) =>
+            {
+                callPlayPromptFinished++;
+                return Task.CompletedTask;
+            },
+            NewTonePressed = (callState, tone) =>
+            {
+                toneList.Add(tone);
+                return Task.CompletedTask;
+            },
+            CallTerminated = (callState, result) =>
+            {
+                callTerminatedCount++;
+                return Task.CompletedTask;
+            }
+        };
+        var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
+
+        var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
+
+        // Handle call establish for a call never seen before
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishingP2P);
+
+        // Parallel establish the call
+        var tasks = new List<Task>
+        {
+            notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedP2P),
+            notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedWithAudioP2P)
+        };
+        await Task.WhenAll(tasks);
+
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
+
+        // Pretend we've finished playing a prompt
+        var callState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
+
+        // Add a media prompt to the call state
+        callState!.MediaPromptsPlaying.Add(new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.PlayPromptFinish);
+        Assert.IsTrue(callPlayPromptFinished == 1);
+
+    }
+
+
+    [TestMethod]
     public async Task BotNotificationsHandlerGroupFlowTests()
     {
         var callEstablishingCount = 0;
@@ -172,7 +243,7 @@ public class BotNotificationsHandlerTests
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
-        var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
         var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
         {
             CallEstablishing = (callState) =>
