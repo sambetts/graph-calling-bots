@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace ServiceHostedMediaCallingBot.Engine.Models;
 
-
 public class CommsNotificationsPayload
 {
 
@@ -28,7 +27,6 @@ public class CallNotification
     public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResourceObject<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
 
     public List<Participant>? JoinedParticipants => GetTypedResourceArray<Participant>();
-
 
     T? GetTypedResourceObject<T>(string odataType) where T : class
     {
@@ -67,12 +65,4 @@ public class CallNotification
         }
         return null;
     }
-}
-
-public class GenericResource
-{
-
-    [JsonPropertyName("@odata.type")]
-    public string? Type { get; set; }
-
 }

@@ -35,6 +35,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
         {
+            CallEstablishing = CallEstablishing,
             CallEstablished = CallEstablished,
             CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
             NewTonePressed = NewTonePressed,
@@ -68,18 +69,23 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         return false;
     }
     
-    public async Task HandleNotificationsAsync(CommsNotificationsPayload notifications)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
-        await _botNotificationsHandler.HandleNotificationsAsync(notifications);
+        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
     }
 
     #region Bot Events
 
-    protected virtual Task CallTerminated(string callId)
+    protected virtual Task CallEstablishing(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }
+
     protected virtual Task CallEstablished(CALLSTATETYPE callState)
+    {
+        return Task.CompletedTask;
+    }
+    protected virtual Task CallTerminated(string callId, ResultInfo resultInfo)
     {
         return Task.CompletedTask;
     }
@@ -148,6 +154,15 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         await PostData($"/communications/calls/{callId}/participants/invite", i);
     }
 
+    /// <summary>
+    /// https://learn.microsoft.com/en-us/graph/api/call-delete
+    /// </summary>
+    protected async Task HangUp(string callId)
+    {
+        _logger.LogInformation($"Hanging up call {callId}");
+        await this.Delete($"/communications/calls/{callId}");
+    }
+
     class InviteInfo : EmptyModelWithClientContext
     {
         public List<InvitationParticipantInfo> participants { get; set; } = new List<InvitationParticipantInfo>();
@@ -164,20 +179,33 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     }
     async Task<string> PostData(string urlMinusRoot, object payload)
     {
-        var r = await _httpClient.PostAsJsonAsync($"https://graph.microsoft.com/v1.0" + urlMinusRoot, payload);
+        var response = await _httpClient.PostAsJsonAsync($"https://graph.microsoft.com/v1.0" + urlMinusRoot, payload);
+        var content = await response.Content.ReadAsStringAsync();
 
-        var content = await r.Content.ReadAsStringAsync();
-        if (!r.IsSuccessStatusCode)
+        HandleResponse(response, content, urlMinusRoot);
+
+        return content ?? throw new Exception("Unexpected Graph response");
+    }
+
+    async Task Delete(string urlMinusRoot)
+    {
+        var response = await _httpClient.DeleteAsync($"https://graph.microsoft.com/v1.0" + urlMinusRoot);
+        var content = await response.Content.ReadAsStringAsync();
+
+        HandleResponse(response, content, urlMinusRoot);
+    }
+
+    void HandleResponse(HttpResponseMessage response, string content, string urlMinusRoot)
+    {
+        if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError($"Error response {r.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
+            _logger.LogError($"Error response {response.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
         }
-        if (!r.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
             // Oops
         }
-        r.EnsureSuccessStatusCode();
-
-        return content ?? throw new Exception("Unexpected Graph response");
+        response.EnsureSuccessStatusCode();
     }
 
 

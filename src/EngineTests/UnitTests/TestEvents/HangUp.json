@@ -1,0 +1,26 @@
+{
+  "@odata.type": "#microsoft.graph.commsNotifications",
+  "value": [
+    {
+      "@odata.type": "#microsoft.graph.commsNotification",
+      "changeType": "deleted",
+      "resource": "/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
+      "resourceUrl": "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9",
+      "resourceData": {
+        "@odata.type": "#microsoft.graph.call",
+        "state": "terminated",
+        "resultInfo": {
+          "@odata.type": "#microsoft.graph.resultInfo",
+          "code": 200,
+          "subcode": 5002,
+          "message": "The conversation has ended. DiagCode: 0#5002.@"
+        },
+        "meetingCapability": {
+          "@odata.type": "#microsoft.graph.meetingCapability"
+        },
+        "coOrganizers": [],
+        "callChainId": "b0fe8425-6f48-41ed-9dd6-b706ff66319a"
+      }
+    }
+  ]
+}

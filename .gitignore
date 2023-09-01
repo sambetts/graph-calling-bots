@@ -37,3 +37,14 @@
 /src/examples/P2pPstnBot/PstnBot.Web/bin/Debug/net7.0
 /src/examples/P2pPstnBot/PstnBot.Web/obj
 /src/examples/P2pPstnBot/PstnBot.Shared/bin/Debug/net7.0
+/src/EngineTests/UnitTests/bin
+/src/EngineTests/UnitTests/obj
+/src/examples/CallingTestBot/UnitTests/bin/Debug/net7.0
+/src/examples/CallingTestBot/UnitTests/obj
+/src/examples/CallingTestBot/FunctionApp/Properties/PublishProfiles
+/src/examples/CallingTestBot/FunctionApp/Properties/ServiceDependencies/CallingTestBot - Zip Deploy
+/src/examples/ChatBotWithCalling/Solution/CommonUtils/bin/Release/net7.0
+/src/lib/ServiceHostedMediaCallingBot.Engine/bin/Release/net7.0
+/src/examples/CallingTestBot/FunctionApp/Properties/serviceDependencies.CallingTestBot - Zip Deploy.json
+/src/examples/ChatBotWithCalling/Solution/UnitTests/bin/Release/net7.0
+/src/examples/CallingTestBot/UnitTests/bin/Release/net7.0

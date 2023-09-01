@@ -1,4 +1,4 @@
-﻿namespace PstnBot.FunctionApp;
+﻿namespace CallingTestBot.FunctionApp;
 
 /// <summary>
 /// HTTP route constants for routing requests to controller methods.
@@ -12,5 +12,5 @@ public static class HttpRouteConstants
 
 
     public static string WavFileRoute = $"/api/{WavFileActionName}";
-    public const string WavFileActionName = "WavFile";
+    public const string WavFileActionName = "TestCallNotificationWavFile";
 }
