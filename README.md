@@ -20,7 +20,7 @@ There are a few projects that use the same engine.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
 * [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/README.md)
   * Also implements Bot Framework SDK - does chat & calling in one bot.
-
+* [PSTN "calling test bot"](src/examples/CallingTestBot/README.md) - useful for proactively testing if PSTN and Teams infrastructure is working.
 ## How do Bots Work in this Framework?
 Here's an example:
 
