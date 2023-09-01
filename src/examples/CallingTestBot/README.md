@@ -1,5 +1,5 @@
 # Teams Calling Test Bot
-This bot monitors your Teams Phones infrastructure automatically. It makes periodic tests to a PSTN number and reports the results to an Azure storage table.
+This bot monitors your Teams Phones infrastructure automatically. It makes scheduled calls to a configurable PSTN number and reports the results of the test to an Azure storage table. When connected, the bot plays a message that says "this is a test call" (my own voice), and then hangs up. 
 
 ![Logs](imgs/log.jpg)
 
