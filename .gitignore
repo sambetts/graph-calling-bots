@@ -48,3 +48,4 @@
 /src/examples/CallingTestBot/FunctionApp/Properties/serviceDependencies.CallingTestBot - Zip Deploy.json
 /src/examples/ChatBotWithCalling/Solution/UnitTests/bin/Release/net7.0
 /src/examples/CallingTestBot/UnitTests/bin/Release/net7.0
+/src/examples/GroupCallingBotFunctionsApp/Solution/.vs
