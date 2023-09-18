@@ -1,5 +1,4 @@
 using System.Net;
-using System.Reflection;
 using System.Text.Json;
 using CommonUtils;
 using Microsoft.Azure.Functions.Worker;
@@ -8,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace CallingTestBot.FunctionApp;
+namespace GroupCallingBotFunctionsApp.FunctionApp;
 
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
@@ -16,14 +15,12 @@ namespace CallingTestBot.FunctionApp;
 public class HttpFunctions
 {
     private readonly ILogger _logger;
-    private readonly IPstnCallingBot _callingBot;
-    private readonly CallingTestBotConfig _callingTestBotConfig;
+    private readonly GroupCallingBot _callingBot;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, IPstnCallingBot callingBot, CallingTestBotConfig callingTestBotConfig)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallingBot callingBot)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;
-        _callingTestBotConfig = callingTestBotConfig;
     }
 
     /// <summary>
@@ -36,10 +33,9 @@ public class HttpFunctions
 
         if (notifications != null)
         {
-            _logger.LogInformation($"Processing Graph call notification: {req}");
+            _logger.LogInformation($"Processing Graph call notification");
             try
             {
-                // Process notifications and update call state. Events will be captured on bot class.
                 await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             }
             catch (Exception ex)
@@ -58,7 +54,6 @@ public class HttpFunctions
         }
     }
 
-
     /// <summary>
     /// Send WAV file for call. Recommended: use CDN to deliver content.
     /// </summary>
@@ -70,7 +65,7 @@ public class HttpFunctions
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
         {
-            using (var localWavStream = Resources.ReadResource("CallingTestBot.FunctionApp.testcall.wav"))
+            using (var localWavStream = Resources.ReadResource("GroupCallingBotFunctionsApp.FunctionApp.groupcall.wav"))
             {
                 localWavStream.CopyTo(memoryStream);
 
@@ -82,27 +77,27 @@ public class HttpFunctions
         }
     }
 
-
     /// <summary>
-    /// Start call triggered by HTTP request. Not normally needed as done on a timer.
+    /// Start call triggered by HTTP request.
     /// </summary>
-    [Function(nameof(StartCallManualTrigger))]
-    public async Task<HttpResponseData> StartCallManualTrigger([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
+    [Function(nameof(StartCall))]
+    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        _logger.LogInformation($"Starting new call to number {_callingTestBotConfig.TestNumber} (manual call)");
-        try
-        {
-            await _callingBot.StartPTSNCall(_callingTestBotConfig.TestNumber);
-        }
-        catch (Exception ex)
-        {
-            var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-            exResponse.WriteString(ex.ToString());
-            return exResponse;
-        }
 
-        var response = req.CreateResponse(HttpStatusCode.Accepted);
-        return response;
+        var newCallReq = await GetBody<StartCallData>(req);
+        if (newCallReq != null)
+        {
+            var call = await _callingBot.StartGroupCall(newCallReq);
+
+
+            var response = req.CreateResponse(HttpStatusCode.Accepted);
+            await response.WriteAsJsonAsync(call);
+            return response;
+        }
+        else
+        {
+            return SendBadRequest(req);
+        }
     }
 
     HttpResponseData SendBadRequest(HttpRequestData req)

@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.FunctionApp"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.UnitTests", "examples\CallingTestBot\UnitTests\CallingTestBot.UnitTests.csproj", "{8AF589C9-723D-4BD0-80C7-1B435800CC69}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingBotFunctionsApp.FunctionApp", "examples\GroupCallingBotFunctionsApp\Solution\FunctionApp\GroupCallingBotFunctionsApp.FunctionApp.csproj", "{AD753247-6EF6-42C1-A677-8BBFF235DC29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{8AF589C9-723D-4BD0-80C7-1B435800CC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AF589C9-723D-4BD0-80C7-1B435800CC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AF589C9-723D-4BD0-80C7-1B435800CC69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,6 +99,7 @@ Global
 		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
 		{B77B155C-84B8-442B-A1A9-328745A800D8} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
 		{8AF589C9-723D-4BD0-80C7-1B435800CC69} = {272C9B11-A001-4726-9D65-AA3281148F25}
+		{AD753247-6EF6-42C1-A677-8BBFF235DC29} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE9A9A1A-CC56-45F3-8647-06996C708164}

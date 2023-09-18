@@ -1,4 +1,6 @@
-﻿namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+﻿using ServiceHostedMediaCallingBot.Engine.StateManagement;
+
+namespace ServiceHostedMediaCallingBot.UnitTests.TestServices;
 
 public class SlowInMemoryCallStateManager<T> : ICallStateManager<T> where T : BaseActiveCallState
 {
