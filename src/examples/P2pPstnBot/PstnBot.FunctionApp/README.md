@@ -8,7 +8,7 @@ Name | Description
 --------------- | -----------
 MicrosoftAppId | ID of bot Azure AD application
 AppInstanceObjectId | For PSTN calls only: object ID of the user account used for calling
-AppInstanceObjectIdName | For PSTN calls only: object ID of the user account used for calling
+AppInstanceObjectIdName | Display name of the bot to appear in calls
 TenantId | Tenant ID of Azure AD application
 MicrosoftAppPassword | Bot app secret
 BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
