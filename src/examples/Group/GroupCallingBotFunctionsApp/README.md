@@ -26,7 +26,7 @@ POST this JSon to the bot endpoint /api/StartCall:
   "Attendees":
   [
       {
-          "Id": "+34682796913",
+          "Id": "+3468279XXXX",
           "DisplayId" : "Sam",
           "Type": 1
       },
