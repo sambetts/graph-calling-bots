@@ -8,12 +8,6 @@
     <UserSecretsId>dcdf819c-1dd7-401d-88dc-4d918cc92b17</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="groupcall.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="groupcall.wav" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.9.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.14.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
@@ -21,8 +15,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\lib\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
-    <ProjectReference Include="..\..\..\ChatBotWithCalling\Solution\CommonUtils\CommonUtils.csproj" />
+    <ProjectReference Include="..\PstnBot.Shared\PstnBot.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

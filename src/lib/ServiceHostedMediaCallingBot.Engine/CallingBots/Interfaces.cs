@@ -12,5 +12,5 @@ public interface IGraphCallingBot
 
 public interface IPstnCallingBot : IGraphCallingBot
 {
-    Task<Call> StartPTSNCall(string phoneNumber);
+    Task<Call?> StartPTSNCall(string phoneNumber);
 }

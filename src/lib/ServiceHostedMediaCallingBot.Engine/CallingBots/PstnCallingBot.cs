@@ -18,7 +18,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
     /// <summary>
     /// Call someone over the phone with media set.
     /// </summary>
-    public async Task<Call> StartPTSNCall(string phoneNumber)
+    public async Task<Call?> StartPTSNCall(string phoneNumber)
     {
         // PSTN call target - identity is type "phone", which the usual object model doesn't support very well
         var target = new IdentitySet();

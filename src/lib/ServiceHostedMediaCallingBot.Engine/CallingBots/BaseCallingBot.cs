@@ -112,12 +112,21 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     #region Bot Actions
 
-    protected async Task<Call> StartNewCall(Call newCall)
+    protected async Task<Call?> StartNewCall(Call newCall)
     {
-        var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
+        _logger.LogInformation($"Creatung call");
+        try
+        {
+            var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
 
-        _logger.LogInformation($"Call {callCreated.Id} created");
-        return callCreated;
+            _logger.LogInformation($"Call {callCreated.Id} created");
+            return callCreated;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError($"Can't create call: {ex.Message}");
+        }
+        return null;
     }
 
     /// <summary>

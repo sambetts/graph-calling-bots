@@ -5,24 +5,24 @@
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UserSecretsId>3005e3b6-75a9-4257-a4c3-e8eb26a31401</UserSecretsId>
+    <UserSecretsId>dcdf819c-1dd7-401d-88dc-4d918cc92b17</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="testcall.wav" />
+    <None Remove="groupcall.wav" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="testcall.wav" />
+    <EmbeddedResource Include="groupcall.wav" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.9.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.14.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.0.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.10.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\lib\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
-    <ProjectReference Include="..\..\ChatBotWithCalling\Solution\CommonUtils\CommonUtils.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

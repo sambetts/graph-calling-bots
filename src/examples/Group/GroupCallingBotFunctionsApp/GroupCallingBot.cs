@@ -28,7 +28,7 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
     /// <summary>
     /// Start group call with required attendees.
     /// </summary>
-    public async Task<Call> StartGroupCall(StartCallData meetingRequest)
+    public async Task<Call?> StartGroupCall(StartCallData meetingRequest)
     {
         // Attach media list
         var mediaToPrefetch = new List<MediaInfo>();
@@ -65,17 +65,19 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 
         // Start call
         var createdCall = await StartNewCall(newCall);
-
-        // Wait 2 seconds for call to be created and notification to be recieved (so we have a call state to update)
-        await Task.Delay(2000);
-
-        // Get state and save invite list for when call is established
-        var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
-        if (createdCallState != null)
+        if (createdCall != null)
         {
-            createdCallState.Invites = inviteNumberList;
-        }
 
+            // Wait 2 seconds for call to be created and notification to be recieved (so we have a call state to update)
+            await Task.Delay(2000);
+
+            // Get state and save invite list for when call is established
+            var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
+            if (createdCallState != null)
+            {
+                createdCallState.Invites = inviteNumberList;
+            }
+        }
         return createdCall;
     }
 

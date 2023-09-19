@@ -29,9 +29,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
-		<ProjectReference Include="..\..\..\P2pPstnBot\PstnBot.Shared\PstnBot.Shared.csproj" />
-		<ProjectReference Include="..\CommonUtils\CommonUtils.csproj" />
+		<ProjectReference Include="..\..\..\..\..\lib\CommonUtils\CommonUtils.csproj" />
+		<ProjectReference Include="..\..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

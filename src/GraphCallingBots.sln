@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Web", "examples\P2pPstnBot\PstnBot.Web\PstnBot.Web.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Web", "examples\P2P\P2pPstnBot\PstnBot.Web\PstnBot.Web.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceHostedMediaCallingBot.UnitTests", "EngineTests\UnitTests\ServiceHostedMediaCallingBot.UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
 EndProject
@@ -13,25 +13,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{38
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "P2P", "P2P", "{A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingChatBot.UnitTests", "examples\ChatBotWithCalling\Solution\UnitTests\GroupCallingChatBot.UnitTests.csproj", "{9DD7FAF6-60E5-41B8-BCCA-62F144532F39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingChatBot.UnitTests", "examples\Group\ChatBotWithCalling\Solution\UnitTests\GroupCallingChatBot.UnitTests.csproj", "{9DD7FAF6-60E5-41B8-BCCA-62F144532F39}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GroupCalls", "GroupCalls", "{02176A33-D9F8-4F80-B67E-21F73E649E0E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{272C9B11-A001-4726-9D65-AA3281148F25}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "examples\ChatBotWithCalling\Solution\CommonUtils\CommonUtils.csproj", "{FA145292-2B9A-4107-9F5B-1307C26D628C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "lib\CommonUtils\CommonUtils.csproj", "{FA145292-2B9A-4107-9F5B-1307C26D628C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingChatBot.Web", "examples\ChatBotWithCalling\Solution\GroupCallingChatBot.Web\GroupCallingChatBot.Web.csproj", "{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingChatBot.Web", "examples\Group\ChatBotWithCalling\Solution\GroupCallingChatBot.Web\GroupCallingChatBot.Web.csproj", "{D600A3D2-D87D-4E0F-B680-DD99E8507D4F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.FunctionApp", "examples\P2pPstnBot\PstnBot.FunctionApp\PstnBot.FunctionApp.csproj", "{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.FunctionApp", "examples\P2P\P2pPstnBot\PstnBot.FunctionApp\PstnBot.FunctionApp.csproj", "{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Shared", "examples\P2pPstnBot\PstnBot.Shared\PstnBot.Shared.csproj", "{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Shared", "examples\P2P\P2pPstnBot\PstnBot.Shared\PstnBot.Shared.csproj", "{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.FunctionApp", "examples\CallingTestBot\FunctionApp\CallingTestBot.FunctionApp.csproj", "{B77B155C-84B8-442B-A1A9-328745A800D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.FunctionApp", "examples\P2P\CallingTestBot\FunctionApp\CallingTestBot.FunctionApp.csproj", "{B77B155C-84B8-442B-A1A9-328745A800D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.UnitTests", "examples\CallingTestBot\UnitTests\CallingTestBot.UnitTests.csproj", "{8AF589C9-723D-4BD0-80C7-1B435800CC69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.UnitTests", "examples\P2P\CallingTestBot\UnitTests\CallingTestBot.UnitTests.csproj", "{8AF589C9-723D-4BD0-80C7-1B435800CC69}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingBotFunctionsApp.FunctionApp", "examples\GroupCallingBotFunctionsApp\Solution\FunctionApp\GroupCallingBotFunctionsApp.FunctionApp.csproj", "{AD753247-6EF6-42C1-A677-8BBFF235DC29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingBotFunctionsApp.FunctionApp", "examples\Group\GroupCallingBotFunctionsApp\GroupCallingBotFunctionsApp.FunctionApp.csproj", "{AD753247-6EF6-42C1-A677-8BBFF235DC29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{6B7625F8-844B-4705-AF7D-AF25D6F9807A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,10 +92,11 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{41B58F3B-9F6C-48C5-B2E1-420C64FC270F} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
 		{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420} = {272C9B11-A001-4726-9D65-AA3281148F25}
+		{2BCCDA31-DB8C-48C4-917B-91A6652B446E} = {6B7625F8-844B-4705-AF7D-AF25D6F9807A}
 		{A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86} = {3897B9CF-F021-4E78-9984-B3B67F377AD0}
 		{9DD7FAF6-60E5-41B8-BCCA-62F144532F39} = {272C9B11-A001-4726-9D65-AA3281148F25}
 		{02176A33-D9F8-4F80-B67E-21F73E649E0E} = {3897B9CF-F021-4E78-9984-B3B67F377AD0}
-		{FA145292-2B9A-4107-9F5B-1307C26D628C} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
+		{FA145292-2B9A-4107-9F5B-1307C26D628C} = {6B7625F8-844B-4705-AF7D-AF25D6F9807A}
 		{D600A3D2-D87D-4E0F-B680-DD99E8507D4F} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
 		{023F1E91-5BC1-40BC-ACEC-8CD37DAA9754} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
 		{ED0F1C17-C3E0-4BA2-867F-F5AAB7B62E6C} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}

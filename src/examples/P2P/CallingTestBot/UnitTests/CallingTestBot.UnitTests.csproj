@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
     <ProjectReference Include="..\FunctionApp\CallingTestBot.FunctionApp.csproj" />
   </ItemGroup>
 
