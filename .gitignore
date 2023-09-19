@@ -49,3 +49,16 @@
 /src/examples/ChatBotWithCalling/Solution/UnitTests/bin/Release/net7.0
 /src/examples/CallingTestBot/UnitTests/bin/Release/net7.0
 /src/examples/GroupCallingBotFunctionsApp/Solution/.vs
+/src/examples/Group/ChatBotWithCalling/Solution/.vs
+/src/examples/Group/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/bin/Debug
+/src/examples/Group/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/obj
+/src/examples/Group/ChatBotWithCalling/Solution/UnitTests/bin
+/src/examples/Group/ChatBotWithCalling/Solution/UnitTests/obj
+/src/examples/P2P/CallingTestBot/UnitTests/bin
+/src/examples/P2P/CallingTestBot/UnitTests/obj
+/src/examples/P2P/P2pPstnBot/PstnBot.Shared/bin/Debug/net7.0
+/src/examples/P2P/P2pPstnBot/PstnBot.Shared/obj
+/src/examples/P2P/P2pPstnBot/PstnBot.Web/bin/Debug/net7.0
+/src/examples/P2P/P2pPstnBot/PstnBot.Web/obj
+/src/lib/CommonUtils/bin
+/src/lib/CommonUtils/obj
