@@ -70,7 +70,7 @@ public class HttpFunctions
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
         {
-            using (var localWavStream = Resources.ReadResource("CallingTestBot.FunctionApp.testcall.wav"))
+            using (var localWavStream = Resources.ReadResource("CallingTestBot.FunctionApp.testcall.wav", Assembly.GetExecutingAssembly()))
             {
                 localWavStream.CopyTo(memoryStream);
 
