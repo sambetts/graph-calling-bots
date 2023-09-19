@@ -8,10 +8,9 @@ using System.Collections.Generic;
 using Microsoft.Graph;
 using Attachment = Microsoft.Bot.Schema.Attachment;
 using GroupCallingChatBot.Web.Dialogues.Utils;
-using GroupCallingChatBot.Web.Bots;
 using GroupCallingChatBot.Web.Models;
 using GroupCallingChatBot.Web.AdaptiveCards;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
+using GroupCalls.Common;
 
 namespace GroupCallingChatBot.Web.Dialogues;
 
@@ -22,10 +21,10 @@ public class MainDialog : CancellableDialogue
 {
     private readonly UserState _userState;
     private readonly TeamsChatbotBotConfig _config;
-    private readonly IGroupCallingBot _groupCallBot;
+    private readonly GroupCallingBot _groupCallBot;
     private readonly GraphServiceClient _graphServiceClient;
 
-    public MainDialog(UserState userState, TeamsChatbotBotConfig config, IGroupCallingBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallingBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {
@@ -48,8 +47,8 @@ public class MainDialog : CancellableDialogue
     private async Task<DialogTurnResult> SendBotMenu(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         // Get user state
-        var userStateAccessors = _userState.CreateProperty<MeetingRequest>(nameof(MeetingRequest));
-        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => new MeetingRequest());
+        var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
+        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => new StartGroupCallData());
 
         var val = stepContext.Context.Activity.Value ?? string.Empty;
 
@@ -80,10 +79,18 @@ public class MainDialog : CancellableDialogue
             }
             else if (actionInfo.Action == CardConstants.CardActionValStartMeeting)
             {
-                // Start configured meeting
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Starting call. Have a nice meeting!"), cancellationToken);
-                await _groupCallBot.StartGroupCall(meetingState);
-                return await stepContext.EndDialogAsync(meetingState, cancellationToken);
+                if (meetingState.Attendees.Count > 0)
+                {
+                    // Start configured meeting
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Starting call. Have a nice meeting!"), cancellationToken);
+                    await _groupCallBot.StartGroupCall(meetingState);
+                    return await stepContext.EndDialogAsync(meetingState, cancellationToken);
+                }
+                else
+                {
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"The meeting details I've got remembered has nobody in it, for some reason. Try adding members and starting the meeting again."), cancellationToken);
+                    return await stepContext.EndDialogAsync(meetingState, cancellationToken);
+                }
             }
             else
             {
@@ -108,8 +115,8 @@ public class MainDialog : CancellableDialogue
     private async Task<DialogTurnResult> ProcessNumberAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         // Get user state
-        var userStateAccessors = _userState.CreateProperty<MeetingRequest>(nameof(MeetingRequest));
-        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => new MeetingRequest());
+        var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
+        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => new StartGroupCallData());
 
         // Form action
         var validInput = false;
@@ -122,7 +129,7 @@ public class MainDialog : CancellableDialogue
                 validInput = DataValidation.IsValidEmail(addContactActionInfo.ContactId);
                 if (validInput)
                 {
-                    // Lookup ID
+                    // Lookup object ID in Azure AD for email address
                     var userId = string.Empty;
                     try
                     {

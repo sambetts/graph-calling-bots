@@ -44,7 +44,7 @@ public class CallingTestBotConfig : PropertyBoundConfig
             AppInstanceObjectName = "Test Call Bot",
             BotBaseUrl = BotBaseUrl,
             CallingEndpoint = BotBaseUrl + relativeUrlCallingEndPoint,
-            RelativeWavUrl = HttpRouteConstants.WavFileRoute,
+            RelativeWavCallbackUrl = HttpRouteConstants.WavFileRoute,
             TenantId = TenantId
         };
     }

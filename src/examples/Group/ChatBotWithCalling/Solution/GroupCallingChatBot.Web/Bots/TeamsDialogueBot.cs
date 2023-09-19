@@ -1,5 +1,6 @@
 using GroupCallingChatBot.Web.AdaptiveCards;
 using GroupCallingChatBot.Web.Models;
+using GroupCalls.Common;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -19,8 +20,8 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
 
     protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
     {
-        var userStateAccessors = _userState.CreateProperty<MeetingRequest>(nameof(MeetingRequest));
-        var meetingState = await userStateAccessors.GetAsync(turnContext, () => new MeetingRequest());
+        var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
+        var meetingState = await userStateAccessors.GetAsync(turnContext, () => new StartGroupCallData());
 
         var welcomeText = "Hello and welcome!";
         foreach (var member in membersAdded)

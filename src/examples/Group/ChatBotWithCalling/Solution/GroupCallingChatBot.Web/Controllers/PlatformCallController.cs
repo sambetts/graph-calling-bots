@@ -1,4 +1,4 @@
-﻿using GroupCallingChatBot.Web.Bots;
+﻿using GroupCalls.Common;
 using Microsoft.AspNetCore.Mvc;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace GroupCallingChatBot.Web.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly IGroupCallingBot _callingBot;
+    private readonly GroupCallingBot _callingBot;
 
-    public PlatformCallController(IGroupCallingBot callingBot)
+    public PlatformCallController(GroupCallingBot callingBot)
     {
         _callingBot = callingBot;
     }

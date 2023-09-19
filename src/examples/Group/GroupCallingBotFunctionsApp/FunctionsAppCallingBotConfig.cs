@@ -37,7 +37,7 @@ internal class FunctionsAppCallingBotConfig : PropertyBoundConfig
             AppInstanceObjectName = "Group Call Bot",
             BotBaseUrl = BotBaseUrl,
             CallingEndpoint = BotBaseUrl + relativeUrlCallingEndPoint,
-            RelativeWavUrl = HttpRouteConstants.WavFileRoute,
+            RelativeWavCallbackUrl = HttpRouteConstants.WavFileRoute,
             TenantId = TenantId
         };
     }

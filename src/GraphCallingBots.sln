@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingBotFunctionsApp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{6B7625F8-844B-4705-AF7D-AF25D6F9807A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupCalls.Common", "examples\Group\GroupCalls.Common\GroupCalls.Common.csproj", "{7E806D56-7175-4CE5-8779-1A2770AB526E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD753247-6EF6-42C1-A677-8BBFF235DC29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E806D56-7175-4CE5-8779-1A2770AB526E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E806D56-7175-4CE5-8779-1A2770AB526E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E806D56-7175-4CE5-8779-1A2770AB526E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E806D56-7175-4CE5-8779-1A2770AB526E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{B77B155C-84B8-442B-A1A9-328745A800D8} = {A2D4A9E8-72A3-4DA1-9AC5-2C935D00ED86}
 		{8AF589C9-723D-4BD0-80C7-1B435800CC69} = {272C9B11-A001-4726-9D65-AA3281148F25}
 		{AD753247-6EF6-42C1-A677-8BBFF235DC29} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
+		{7E806D56-7175-4CE5-8779-1A2770AB526E} = {02176A33-D9F8-4F80-B67E-21F73E649E0E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE9A9A1A-CC56-45F3-8647-06996C708164}

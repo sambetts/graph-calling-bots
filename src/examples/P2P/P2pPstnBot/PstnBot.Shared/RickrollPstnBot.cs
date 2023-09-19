@@ -24,7 +24,7 @@ public class RickrollPstnBot : PstnCallingBot<BaseActiveCallState>
         {
             MediaInfo = new MediaInfo
             {
-                Uri = new Uri(botOptions.BotBaseUrl + botOptions.RelativeWavUrl).ToString(),
+                Uri = new Uri(botOptions.BotBaseUrl + botOptions.RelativeWavCallbackUrl).ToString(),
                 ResourceId = Guid.NewGuid().ToString(),
             },
         };

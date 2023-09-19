@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using GroupCalls.Common;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace GroupCallingBotFunctionsApp.FunctionApp.Extensions;

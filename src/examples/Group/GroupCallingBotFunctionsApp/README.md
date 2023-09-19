@@ -31,11 +31,12 @@ POST this JSon to the bot endpoint /api/StartCall:
           "Type": 1
       },
       {
-          "Id": "sam@alfredoj.info",
-          "DisplayId" : " Teams",
+          "Id": "3b10aa94-739a-472c-a68a-0000000",
+          "DisplayId" : "sam@alfredoj.local",
           "Type": 2
       }
   ]
 }
 
 ```
+The call data can include PSTN numbers or Teams users. The bot will call the PSTN numbers and Teams users will be called via Teams.

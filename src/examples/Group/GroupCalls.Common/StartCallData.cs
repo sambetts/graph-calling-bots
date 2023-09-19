@@ -1,9 +1,9 @@
 ﻿using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace GroupCallingBotFunctionsApp.FunctionApp;
+namespace GroupCalls.Common;
 
-public class StartCallData
+public class StartGroupCallData
 {
     public List<AttendeeCallInfo> Attendees { get; set; } = new();
 

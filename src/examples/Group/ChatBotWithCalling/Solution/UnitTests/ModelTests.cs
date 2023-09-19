@@ -1,4 +1,5 @@
 using GroupCallingChatBot.Web.Models;
+using GroupCalls.Common;
 using Microsoft.Extensions.Logging;
 
 namespace GroupCallingChatBot.UnitTests;
@@ -13,7 +14,7 @@ public class ModelTests
     [TestMethod]
     public void MeetingRequestInvites()
     {
-        var twoTeamsPlusOnePhoneUserMeeting = new MeetingRequest()
+        var twoTeamsPlusOnePhoneUserMeeting = new StartGroupCallData()
         {
             Attendees = new List<AttendeeCallInfo>
             {
@@ -28,7 +29,7 @@ public class ModelTests
         Assert.AreEqual(1, inviteNumberList.Count);
 
 
-        var threePhoneUsersMeeting = new MeetingRequest()
+        var threePhoneUsersMeeting = new StartGroupCallData()
         {
             Attendees = new List<AttendeeCallInfo>
             {

@@ -1,15 +1,15 @@
 ﻿using AdaptiveCards;
-using GroupCallingChatBot.Web;
 using GroupCallingChatBot.Web.Models;
+using GroupCalls.Common;
 using System.Collections.Generic;
 
 namespace GroupCallingChatBot.Web.AdaptiveCards;
 
 public class MenuCard : BaseAdaptiveCard
 {
-    private readonly MeetingRequest _meetingState;
+    private readonly StartGroupCallData _meetingState;
 
-    public MenuCard(MeetingRequest meetingState)
+    public MenuCard(StartGroupCallData meetingState)
     {
         _meetingState = meetingState;
     }

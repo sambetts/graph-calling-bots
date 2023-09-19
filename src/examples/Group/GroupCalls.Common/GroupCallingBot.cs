@@ -4,7 +4,7 @@ using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace GroupCallingBotFunctionsApp.FunctionApp;
+namespace GroupCalls.Common;
 
 public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 {
@@ -19,7 +19,7 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
         {
             MediaInfo = new MediaInfo
             {
-                Uri = new Uri(botOptions.BotBaseUrl + "/audio/rickroll.wav").ToString(),
+                Uri = new Uri(botOptions.BotBaseUrl + botOptions.RelativeWavCallbackUrl).ToString(),
                 ResourceId = Guid.NewGuid().ToString(),
             },
         };
@@ -28,7 +28,7 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
     /// <summary>
     /// Start group call with required attendees.
     /// </summary>
-    public async Task<Call?> StartGroupCall(StartCallData meetingRequest)
+    public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
         // Attach media list
         var mediaToPrefetch = new List<MediaInfo>();
@@ -76,6 +76,7 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
             if (createdCallState != null)
             {
                 createdCallState.Invites = inviteNumberList;
+                await _callStateManager.Update(createdCallState);
             }
         }
         return createdCall;

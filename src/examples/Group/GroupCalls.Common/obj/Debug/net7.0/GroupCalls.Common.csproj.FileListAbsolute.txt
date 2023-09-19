@@ -1,0 +1,15 @@
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\bin\Debug\net7.0\GroupCalls.Common.deps.json
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\bin\Debug\net7.0\GroupCalls.Common.dll
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\bin\Debug\net7.0\GroupCalls.Common.pdb
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\bin\Debug\net7.0\ServiceHostedMediaCallingBot.Engine.dll
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\bin\Debug\net7.0\ServiceHostedMediaCallingBot.Engine.pdb
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.csproj.AssemblyReference.cache
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.AssemblyInfoInputs.cache
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.AssemblyInfo.cs
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.csproj.CoreCompileInputs.cache
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.csproj.CopyComplete
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.dll
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\refint\GroupCalls.Common.dll
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\GroupCalls.Common.pdb
+C:\Users\sambetts\source\repos\graph-calling-bots\src\examples\Group\GroupCalls.Common\obj\Debug\net7.0\ref\GroupCalls.Common.dll

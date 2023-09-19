@@ -5,10 +5,8 @@ namespace CommonUtils;
 public class Resources
 {
 
-    public static Stream ReadResource(string resourcePath)
+    public static Stream ReadResource(string resourcePath, Assembly assembly)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         var stream = assembly.GetManifestResourceStream(resourcePath);
         if (stream != null)

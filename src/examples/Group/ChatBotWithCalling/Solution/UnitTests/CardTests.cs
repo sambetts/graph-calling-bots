@@ -1,6 +1,6 @@
 using AdaptiveCards;
 using GroupCallingChatBot.Web.AdaptiveCards;
-using GroupCallingChatBot.Web.Models;
+using GroupCalls.Common;
 using Microsoft.Extensions.Logging;
 
 namespace GroupCallingChatBot.UnitTests;
@@ -24,7 +24,7 @@ public class CardTests
     [TestMethod]
     public void LoadMenuCard()
     {
-        var c = new MenuCard(new MeetingRequest());
+        var c = new MenuCard(new StartGroupCallData());
         var json = c.GetCardContent();
         Assert.IsNotNull(json);
 

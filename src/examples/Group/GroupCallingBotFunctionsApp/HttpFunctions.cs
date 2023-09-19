@@ -1,10 +1,11 @@
 using System.Net;
+using System.Reflection;
 using System.Text.Json;
 using CommonUtils;
+using GroupCalls.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace GroupCallingBotFunctionsApp.FunctionApp;
@@ -65,7 +66,7 @@ public class HttpFunctions
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
         {
-            using (var localWavStream = Resources.ReadResource("GroupCallingBotFunctionsApp.FunctionApp.groupcall.wav"))
+            using (var localWavStream = Resources.ReadResource("GroupCallingBotFunctionsApp.FunctionApp.groupcall.wav", Assembly.GetExecutingAssembly()))
             {
                 localWavStream.CopyTo(memoryStream);
 
@@ -84,7 +85,7 @@ public class HttpFunctions
     public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
 
-        var newCallReq = await GetBody<StartCallData>(req);
+        var newCallReq = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
         {
             var call = await _callingBot.StartGroupCall(newCallReq);
