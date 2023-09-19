@@ -62,3 +62,6 @@
 /src/examples/P2P/P2pPstnBot/PstnBot.Web/obj
 /src/lib/CommonUtils/bin
 /src/lib/CommonUtils/obj
+/src/examples/Group/ChatBotWithCalling/Solution/CommonUtils/obj
+/src/examples/GroupCallingBotFunctionsApp/Solution/FunctionApp/obj
+/src/examples/P2P/P2pPstnBot/PstnBot.Web/.vs/PstnBot
