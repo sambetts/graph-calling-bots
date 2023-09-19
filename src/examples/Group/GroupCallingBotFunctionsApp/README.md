@@ -1,5 +1,7 @@
 # Group Calling Bots - Azure Functions App
-This is the more "cloud" version of the P2P bot, being that Azure Function Apps are "serverless". It does have the small downside that static content isn't so easy to host - in this example we send an embedded WAV file as an action, but usually we'd recommend hosting this on a CDN.
+This example calls a bunch of people and plays a "this is a group call" message to anyone that joins. 
+
+Functions apps are the more "cloud" version of the group calling bot, being that Azure Function Apps are "serverless". It does have the small downside that static content isn't so easy to host - in this example we send an embedded WAV file as an action, but usually we'd recommend hosting this on a CDN.
 
 ## Configuration 
 These configuration settings are needed (in "local.settings.json" normally):
@@ -39,4 +41,4 @@ POST this JSon to the bot endpoint /api/StartCall:
 }
 
 ```
-The call data can include PSTN numbers or Teams users. The bot will call the PSTN numbers and Teams users will be called via Teams.
+The call data can include PSTN numbers or Teams users (object IDs). The bot will call the PSTN numbers and Teams users will be called via Teams. It only works with users in the same tenant as the bot. 
