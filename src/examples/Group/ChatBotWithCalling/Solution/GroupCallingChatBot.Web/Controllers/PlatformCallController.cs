@@ -10,9 +10,9 @@ namespace GroupCallingChatBot.Web.Controllers;
 /// </summary>
 public class PlatformCallController : ControllerBase
 {
-    private readonly GroupCallingBot _callingBot;
+    private readonly GroupCallStartBot _callingBot;
 
-    public PlatformCallController(GroupCallingBot callingBot)
+    public PlatformCallController(GroupCallStartBot callingBot)
     {
         _callingBot = callingBot;
     }

@@ -20,7 +20,7 @@ public static class BotBuilderExtensions
         // Use in-memory storage for the call state for now
         services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
 
-        return services.AddSingleton<GroupCallingBot>();
+        return services.AddSingleton<GroupCallStartBot>();
     }
 
     public static IServiceCollection AddChatBot(this IServiceCollection services)

@@ -16,9 +16,9 @@ namespace GroupCallingBotFunctionsApp.FunctionApp;
 public class HttpFunctions
 {
     private readonly ILogger _logger;
-    private readonly GroupCallingBot _callingBot;
+    private readonly GroupCallStartBot _callingBot;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallingBot callingBot)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCalls.Common.GroupCallStartBot callingBot)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;

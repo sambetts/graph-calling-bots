@@ -21,10 +21,10 @@ public class MainDialog : CancellableDialogue
 {
     private readonly UserState _userState;
     private readonly TeamsChatbotBotConfig _config;
-    private readonly GroupCallingBot _groupCallBot;
+    private readonly GroupCallStartBot _groupCallBot;
     private readonly GraphServiceClient _graphServiceClient;
 
-    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallingBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallStartBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {

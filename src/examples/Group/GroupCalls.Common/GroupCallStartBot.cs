@@ -6,11 +6,14 @@ using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace GroupCalls.Common;
 
-public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
+/// <summary>
+/// A bot that starts a call with a bunch of people, internal and external.
+/// </summary>
+public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
 {
     public const string NotificationPromptName = "NotificationPrompt";
 
-    public GroupCallingBot(SingleWavFileBotConfig botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallingBot> logger)
+    public GroupCallStartBot(SingleWavFileBotConfig botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallStartBot> logger)
         : base(botOptions, callStateManager, logger)
     {
 

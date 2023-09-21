@@ -17,6 +17,6 @@ public static class BotBuilderExtensions
         else
             services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
 
-        return services.AddSingleton<GroupCallingBot>();
+        return services.AddSingleton<GroupCallStartBot>();
     }
 }
