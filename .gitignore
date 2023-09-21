@@ -65,3 +65,5 @@
 /src/examples/Group/ChatBotWithCalling/Solution/CommonUtils/obj
 /src/examples/GroupCallingBotFunctionsApp/Solution/FunctionApp/obj
 /src/examples/P2P/P2pPstnBot/PstnBot.Web/.vs/PstnBot
+/src/examples/Group/GroupCalls.Common/bin/Release/net7.0
+/src/examples/Group/GroupCalls.Common/obj
