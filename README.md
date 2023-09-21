@@ -15,12 +15,13 @@ That way we can build nice clean bots on a minimalist framework (see below).
 
 ## Example Projects
 There are a few projects that use the same engine. 
-* [P2P calling for PSTN calls - x2 examples.](src/examples/P2pPstnBot/readme.md)
+* [P2P calling for PSTN calls - x2 examples.](src/examples/P2P/P2pPstnBot/README.md)
   * Web API implementation.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
-* [Group calling example for PSTN and Teams users.](src/examples/ChatBotWithCalling/README.md)
-  * Also implements Bot Framework SDK - does chat & calling in one bot.
-* [PSTN "calling test bot"](src/examples/CallingTestBot/README.md) - useful for proactively testing if PSTN and Teams infrastructure is working.
+* Group calling examples 2x:
+  * [Group calling chatbot for PSTN and Teams users.](src/examples/Group/ChatBotWithCalling/README.md)
+  * [Group calling functions app for PSTN and Teams users.](src/examples/Group/GroupCallingBotFunctionsApp/README.md)
+* Misc: [PSTN "calling test bot"](src/examples/P2P/CallingTestBot/README.md) - useful for proactively testing if PSTN and Teams infrastructure is working.
 ## How do Bots Work in this Framework?
 Here's an example:
 
