@@ -67,7 +67,6 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
         var createdCall = await StartNewCall(newCall);
         if (createdCall != null)
         {
-
             // Wait 2 seconds for call to be created and notification to be recieved (so we have a call state to update)
             await Task.Delay(2000);
 
@@ -82,6 +81,9 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
         return createdCall;
     }
 
+    /// <summary>
+    /// Due to how group calls work with PSTN numbers especially, we need to invite everyone else after the call is established.
+    /// </summary>
     protected async override Task CallEstablished(GroupCallActiveCallState callState)
     {
         if (!string.IsNullOrEmpty(callState?.CallId))
@@ -94,8 +96,9 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
         }
     }
 
-    protected override async Task UserJoined(GroupCallActiveCallState callState)
+    protected override async Task UserJoinedGroupCall(GroupCallActiveCallState callState)
     {
+        // Don't play media if already playing
         var alreadyPlaying = false;
         foreach (var itemToPlay in MediaMap.Values)
         {
@@ -106,10 +109,11 @@ public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
             }
         }
 
+        // But if not playing, play notification prompt again
         if (!alreadyPlaying)
         {
             await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
         }
-        await base.UserJoined(callState);
+        await base.UserJoinedGroupCall(callState);
     }
 }

@@ -67,7 +67,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     }
                     else if (callnotification.JoinedParticipants != null)
                     {
-                        if (_callbackInfo.UserJoined != null) await _callbackInfo.UserJoined(callState);
+                        if (_callbackInfo.UserJoinedGroupCall != null) await _callbackInfo.UserJoinedGroupCall(callState);
                     }
                 }
                 // Processing ended. Update?
@@ -182,5 +182,5 @@ public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
     public Func<string, ResultInfo, Task>? CallTerminated { get; set; }
     public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
-    public Func<T, Task>? UserJoined { get; set; }
+    public Func<T, Task>? UserJoinedGroupCall { get; set; }
 }

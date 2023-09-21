@@ -11,7 +11,8 @@ using ServiceHostedMediaCallingBot.Engine.Http;
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 /// <summary>
-/// A simple, stateless bot that can make outbound calls and play prompts.
+/// A simple, stateless bot that can make outbound calls, and play prompts.
+/// State is held in the call state manager.
 /// </summary>
 public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot where CALLSTATETYPE : BaseActiveCallState, new()
 {
@@ -41,7 +42,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             NewTonePressed = NewTonePressed,
             CallTerminated = CallTerminated,
             PlayPromptFinished = PlayPromptFinished,
-            UserJoined = UserJoined
+            UserJoinedGroupCall = UserJoinedGroupCall
         };
         _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, callBacks, _logger);
     }
@@ -97,7 +98,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     {
         return Task.CompletedTask;
     }
-    protected virtual Task UserJoined(CALLSTATETYPE callState)
+    protected virtual Task UserJoinedGroupCall(CALLSTATETYPE callState)
     {
         return Task.CompletedTask;
     }

@@ -31,11 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.FunctionApp"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CallingTestBot.UnitTests", "examples\P2P\CallingTestBot\UnitTests\CallingTestBot.UnitTests.csproj", "{8AF589C9-723D-4BD0-80C7-1B435800CC69}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingBotFunctionsApp.FunctionApp", "examples\Group\GroupCallingBotFunctionsApp\GroupCallingBotFunctionsApp.FunctionApp.csproj", "{AD753247-6EF6-42C1-A677-8BBFF235DC29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCallingBot.FunctionApp", "examples\Group\GroupCallingBotFunctionsApp\GroupCallingBot.FunctionApp.csproj", "{AD753247-6EF6-42C1-A677-8BBFF235DC29}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{6B7625F8-844B-4705-AF7D-AF25D6F9807A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupCalls.Common", "examples\Group\GroupCalls.Common\GroupCalls.Common.csproj", "{7E806D56-7175-4CE5-8779-1A2770AB526E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroupCalls.Common", "examples\Group\GroupCalls.Common\GroupCalls.Common.csproj", "{7E806D56-7175-4CE5-8779-1A2770AB526E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

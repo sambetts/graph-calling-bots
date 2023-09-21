@@ -252,7 +252,7 @@ public class BotNotificationsHandlerTests
                 callEstablishingCount++;
                 return Task.CompletedTask;
             },
-            UserJoined = (callState) =>
+            UserJoinedGroupCall = (callState) =>
             {
                 userJoinedCount++;
                 return Task.CompletedTask;
