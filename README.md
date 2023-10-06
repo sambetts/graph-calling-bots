@@ -81,6 +81,10 @@ Permissions needed (application):
 All these permissions need administrator consent to be effective. The group-call bot has extra requirements. 
 That should be enough to make calls to Teams users (P2P – more permissions are needed if calling a group).
 
+## Recording Bot Messages
+In the examples given, there are a couple of example messages. Assuming you want your own, it needs to be (a specific format)[https://learn.microsoft.com/en-us/graph/api/resources/mediainfo?view=graph-rest-1.0]. From the docs:
+* Currently supports only Wave file (.wav) format, single-channel, 16-bit samples with a 16,000 (16 KHz) sampling rate.
+
 ## Optional: Setup PSTN Calling
 If you need PSTN calling, here are the extra steps. 
 
