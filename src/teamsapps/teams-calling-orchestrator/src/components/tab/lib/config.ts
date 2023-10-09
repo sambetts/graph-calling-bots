@@ -3,6 +3,7 @@ const config = {
   clientId: process.env.REACT_APP_CLIENT_ID,
   apiEndpoint: process.env.REACT_APP_FUNC_ENDPOINT,
   apiName: process.env.REACT_APP_FUNC_NAME,
+  bot: process.env.REACT_APP_BOT_ENDPOINT,
 };
 
 export default config;

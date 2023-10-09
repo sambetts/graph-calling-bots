@@ -149,6 +149,7 @@ deploy:
         REACT_APP_START_LOGIN_PAGE_URL: ${{TAB_ENDPOINT}}/auth-start.html
         REACT_APP_FUNC_NAME: ${{FUNC_NAME}}
         REACT_APP_FUNC_ENDPOINT: ${{FUNC_ENDPOINT}}
+        REACT_APP_BOT_ENDPOINT: ${{BOT_ENDPOINT}}
 
   # Generate runtime environment variables for backend
   - uses: file/createOrUpdateEnvironmentFile

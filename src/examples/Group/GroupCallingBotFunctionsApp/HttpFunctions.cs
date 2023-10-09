@@ -90,10 +90,16 @@ public class HttpFunctions
         {
             var call = await _callingBot.StartGroupCall(newCallReq);
 
-
-            var response = req.CreateResponse(HttpStatusCode.Accepted);
-            await response.WriteAsJsonAsync(call);
-            return response;
+            if (call != null)
+            {
+                var response = req.CreateResponse(HttpStatusCode.Accepted);
+                await response.WriteAsJsonAsync(call);
+                return response;
+            }
+            else
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }
         }
         else
         {

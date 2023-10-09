@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { TeamsFxContext } from "./Context";
-import { AppPageContents } from "./sample/AppPageContents";
+import { AppPageContents } from "./tab/AppPageContents";
 import './Tab.css'
 
 export default function Tab() {

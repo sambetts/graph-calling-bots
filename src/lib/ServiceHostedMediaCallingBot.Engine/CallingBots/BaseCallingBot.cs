@@ -115,7 +115,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     protected async Task<Call?> StartNewCall(Call newCall)
     {
-        _logger.LogInformation($"Creatung call");
+        _logger.LogInformation($"Creating call");
         try
         {
             var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
@@ -163,6 +163,16 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
         await PostData($"/communications/calls/{callId}/participants/invite", i);
     }
+
+    protected async Task InviteToCallAsync(string callId, List<InvitationParticipantInfo> participantInfo)
+    {
+        var i = new InviteInfo
+        {
+            participants = participantInfo
+        };
+        await PostData($"/communications/calls/{callId}/participants/invite", i);
+    }
+
 
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-delete

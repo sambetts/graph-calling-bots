@@ -29,7 +29,7 @@
     "staticTabs": [
         {
             "entityId": "index",
-            "name": "Team Tab",
+            "name": "Call Orchestrator",
             "contentUrl": "${{TAB_ENDPOINT}}/index.html#/tab",
             "websiteUrl": "${{TAB_ENDPOINT}}/index.html#/tab",
             "scopes": [

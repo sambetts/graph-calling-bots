@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Client } from "@microsoft/microsoft-graph-client";
 import { SCOPES } from "../../constants";
-import { GraphAuthenticatedContents } from "./GraphAuthenticatedContents";
 import { GraphContainer } from "./GraphContainer";
 import { app } from "@microsoft/teams-js";
 import { useData } from "@microsoft/teamsfx-react";
+import {
+  Image
+} from "@fluentui/react-components";
+import { CallOrchestrator } from "./CallOrchestrator";
 
 export function AppPageContents() {
 
@@ -20,7 +23,9 @@ export function AppPageContents() {
   return (
     <div className="welcome page">
       <div className="narrow page-padding">
-        <h1>Call Orchestrator</h1>
+        <h1 className="center">Call Orchestrator</h1>
+        <Image src="hello.png" />
+        <p className="center">Start a new call with people in this channel - everyone with a tag</p>
         {teamInfo === undefined ?
           <div>
             Loading...
@@ -36,7 +41,7 @@ export function AppPageContents() {
                 <GraphContainer scopes={SCOPES} onGraphClientValidated={(c: Client) => setGraphClient(c)}>
 
                   {graphClient ?
-                    <GraphAuthenticatedContents graphClient={graphClient} team={teamInfo} />
+                    <CallOrchestrator graphClient={graphClient} team={teamInfo} />
                     :
                     <p>Oops. We have auth but no Graph client and/or playlists to read? Reload app maybe?</p>
                   }
