@@ -33,6 +33,11 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
     /// </summary>
     public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
+        if (!_callStateManager.Initialised)
+        {
+            await _callStateManager.Initialise();
+        }
+
         // Attach media list
         var mediaToPrefetch = new List<MediaInfo>();
         foreach (var m in MediaMap) mediaToPrefetch.Add(m.Value.MediaInfo);
@@ -44,27 +49,26 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
             RequestedModalities = new List<Modality> { Modality.Audio },
             TenantId = _botConfig.TenantId,
             CallbackUri = _botConfig.CallingEndpoint,
-            Direction = CallDirection.Outgoing,
-            Source = new ParticipantInfo
-            {
-                Identity = new IdentitySet
-                {
-                    Application = new Identity { Id = _botConfig.AppId },
-                },
-            }
+            Direction = CallDirection.Outgoing
         };
+
+        // Set source as this bot if we're calling PSTN numbers
+        if (meetingRequest.HasPSTN)
+        {
+            newCall.Source = new ParticipantInfo
+            {
+                Identity = new IdentitySet { Application = new Identity { Id = _botConfig.AppId } },
+            };
+
+            newCall.Source.Identity.SetApplicationInstance(new Identity {
+                Id = _botConfig.AppInstanceObjectId,
+                DisplayName = _botConfig.AppInstanceObjectName,
+            });
+        }
 
         // Work out who to call first & who to invite
         var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites(_botConfig.TenantId);
         newCall.Targets = initialAddList;
-
-        // Set source as this bot
-        newCall.Source.Identity.SetApplicationInstance(
-            new Identity
-            {
-                Id = _botConfig.AppInstanceObjectId,
-                DisplayName = _botConfig.AppInstanceObjectName,
-            });
 
         // Start call
         var createdCall = await StartNewCall(newCall);
@@ -94,7 +98,13 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
             // Invite everyone else
             foreach (var invite in callState.Invites)
             {
-                await InvitePstnNumberToCallAsync(callState.CallId, invite);
+            }
+            if (callState.Invites != null && callState.Invites.Count > 0)
+            {
+                await InviteToCallAsync(callState.CallId, callState.Invites);
+
+                callState.Invites.Clear();
+                await _callStateManager.Update(callState);
             }
         }
     }
