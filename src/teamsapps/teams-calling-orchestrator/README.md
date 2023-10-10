@@ -20,7 +20,7 @@ This app is to start a call for everyone within a Team where the app is installe
 4. When Teams launches in the browser, select the Add button in the dialog to install your app to Teams.
 
 ## Configuring Solution
-
+The Teams app relies on the [Group Calling Bots - Azure Functions App](https://github.com/sambetts/graph-calling-bots/blob/main/src/examples/Group/GroupCallingBotFunctionsApp/README.md) project running, either locally or in 
 
 ## Directory Layout
 
