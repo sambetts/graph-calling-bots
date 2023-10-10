@@ -14,6 +14,8 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
     private readonly ICallStateManager<T> _callStateManager;
     private readonly NotificationCallbackInfo<T> _callbackInfo;
 
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
     public BotNotificationsHandler(ICallStateManager<T> callStateManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
     {
         _logger = logger;
@@ -27,6 +29,9 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload)
     {
         if (notificationPayload == null) return;
+
+        await _semaphore.WaitAsync();
+
         if (!_callStateManager.Initialised)
         {
             await _callStateManager.Initialise();
@@ -67,9 +72,24 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     }
                     else if (callnotification.JoinedParticipants != null)
                     {
-                        // User joined group call
-                        _logger.LogInformation($"User joined group call {callState.CallId}");
-                        if (_callbackInfo.UserJoinedGroupCall != null) await _callbackInfo.UserJoinedGroupCall(callState);
+                        var newPartipants = callnotification.JoinedParticipants.GetJoinedParticipants(callState.JoinedParticipants);
+                        if (newPartipants.Count > 0)
+                        {
+                            // User joined group call
+                            _logger.LogInformation($"{newPartipants.Count} user(s) joined group call {callState.CallId}");
+                            if (_callbackInfo.UsersJoinedGroupCall != null) await _callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
+                        }
+
+                        var diconnectedPartipants = callnotification.JoinedParticipants.GetDisconnectedParticipants(callState.JoinedParticipants);
+                        if (diconnectedPartipants.Count > 0)
+                        {
+                            // User left group call
+                            _logger.LogInformation($"{diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
+                            if (_callbackInfo.UsersLeftGroupCall != null) await _callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
+                        }
+
+                        callState.JoinedParticipants = callnotification.JoinedParticipants;
+                        updateCallState = true;
                     }
                 }
                 // Processing ended. Update?
@@ -98,6 +118,8 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                 }
             }
         }
+
+        _semaphore.Release();
     }
 
     private async Task<bool> HandleCallChangeTypeUpdate(T callState, CallNotification callNotification)
@@ -186,5 +208,6 @@ public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
     public Func<string, ResultInfo, Task>? CallTerminated { get; set; }
     public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
-    public Func<T, Task>? UserJoinedGroupCall { get; set; }
+    public Func<T, List<Participant>, Task>? UsersJoinedGroupCall { get; set; }
+    public Func<T, List<Participant>, Task>? UsersLeftGroupCall { get; set; }
 }

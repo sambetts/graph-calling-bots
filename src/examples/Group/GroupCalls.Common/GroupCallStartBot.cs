@@ -3,7 +3,6 @@ using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Runtime.CompilerServices;
 
 namespace GroupCalls.Common;
 
@@ -111,7 +110,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         }
     }
 
-    protected override async Task UserJoinedGroupCall(GroupCallActiveCallState callState)
+    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<Participant> participants)
     {
         await CheckCall(callState);
     }
@@ -137,7 +136,14 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         // But if not playing, play notification prompt again
         if (!alreadyPlaying)
         {
-            await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
+            try
+            {
+                await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Error playing prompt");
+            }
         }
     }
 }

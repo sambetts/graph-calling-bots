@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine;
+using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.UnitTests.TestServices;
 
@@ -307,6 +308,7 @@ public class BotNotificationsHandlerTests
     {
         var callEstablishingCount = 0;
         var userJoinedCount = 0;
+        var userLeftCount = 0;
         var callPlayPromptFinished = 0;
         var callTerminatedCount = 0;
         var toneList = new List<Tone>();
@@ -318,9 +320,14 @@ public class BotNotificationsHandlerTests
                 callEstablishingCount++;
                 return Task.CompletedTask;
             },
-            UserJoinedGroupCall = (callState) =>
+            UsersJoinedGroupCall = (callState, usersJoined) =>
             {
-                userJoinedCount++;
+                userJoinedCount += usersJoined.Count;
+                return Task.CompletedTask;
+            },
+            UsersLeftGroupCall = (callState, usersLeft) =>
+            {
+                userLeftCount+= usersLeft.Count;
                 return Task.CompletedTask;
             },
             PlayPromptFinished = (callState) =>

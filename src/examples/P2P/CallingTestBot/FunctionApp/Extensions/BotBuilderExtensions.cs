@@ -1,6 +1,7 @@
 ﻿using CallingTestBot.FunctionApp.Engine;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
+using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace CallingTestBot.FunctionApp.Extensions;

@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Runtime.Serialization;
 using System.Text.Json;
 

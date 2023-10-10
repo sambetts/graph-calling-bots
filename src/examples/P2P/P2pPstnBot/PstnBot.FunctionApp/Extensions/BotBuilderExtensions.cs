@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
+using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace PstnBot.FunctionApp.Extensions;

@@ -42,7 +42,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             NewTonePressed = NewTonePressed,
             CallTerminated = CallTerminated,
             PlayPromptFinished = PlayPromptFinished,
-            UserJoinedGroupCall = UserJoinedGroupCall
+            UsersJoinedGroupCall = UsersJoinedGroupCall
         };
         _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, callBacks, _logger);
     }
@@ -98,7 +98,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     {
         return Task.CompletedTask;
     }
-    protected virtual Task UserJoinedGroupCall(CALLSTATETYPE callState)
+    protected virtual Task UsersJoinedGroupCall(CALLSTATETYPE callState, List<Participant> participants)
     {
         return Task.CompletedTask;
     }
