@@ -65,7 +65,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
         })
         .catch(err => {
           console.error(err);
-          alert("Shit");
+          unexpectedResponse();
         });
     }
   };

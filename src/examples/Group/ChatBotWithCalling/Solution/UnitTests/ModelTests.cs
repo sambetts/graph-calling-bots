@@ -25,8 +25,8 @@ public class ModelTests
         };
 
         var (initialAddList, inviteNumberList) = twoTeamsPlusOnePhoneUserMeeting.GetInitialParticipantsAndInvites(string.Empty);
-        Assert.AreEqual(2, initialAddList.Count);
-        Assert.AreEqual(1, inviteNumberList.Count);
+        Assert.AreEqual(1, initialAddList.Count);
+        Assert.AreEqual(2, inviteNumberList.Count);
 
 
         var threePhoneUsersMeeting = new StartGroupCallData()

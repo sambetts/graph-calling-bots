@@ -69,7 +69,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
         return false;
     }
-    
+
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
         await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
@@ -115,7 +115,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     protected async Task<Call?> StartNewCall(Call newCall)
     {
-        _logger.LogInformation($"Creating call");
+        _logger.LogInformation($"Creating new call...");
         try
         {
             var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
@@ -148,28 +148,12 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
     }
 
-    // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0&tabs=http#example-4-invite-one-pstn-participant-to-an-existing-call
-    protected async Task InvitePstnNumberToCallAsync(string callId, string number)
-    {
-        var i = new InviteInfo
-        {
-            participants = new List<InvitationParticipantInfo>() {
-                new InvitationParticipantInfo{
-                    Identity = new IdentitySet(),
-                }
-            }
-        };
-        i.participants[0].Identity.SetPhone(new Identity { Id = number });
 
-        await PostData($"/communications/calls/{callId}/participants/invite", i);
-    }
-
+    // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0
     protected async Task InviteToCallAsync(string callId, List<InvitationParticipantInfo> participantInfo)
     {
-        var i = new InviteInfo
-        {
-            participants = participantInfo
-        };
+        var i = new InviteInfo { participants = participantInfo };
+        _logger.LogInformation($"Inviting {participantInfo.Count} participants to call {callId}");
         await PostData($"/communications/calls/{callId}/participants/invite", i);
     }
 

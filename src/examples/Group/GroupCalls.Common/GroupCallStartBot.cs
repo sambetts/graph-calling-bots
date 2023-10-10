@@ -3,7 +3,6 @@ using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.ComponentModel;
 
 namespace GroupCalls.Common;
 
@@ -53,27 +52,19 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
             Direction = CallDirection.Outgoing
         };
 
-        //newCall.Source = new ParticipantInfo
-        //{
-        //    Identity = new IdentitySet
-        //    {
-        //        Application = new Identity { Id = _botConfig.AppId },
-        //    },
-        //};
-
-        // Set source as this bot
+        // Set source as this bot if we're calling PSTN numbers
         if (meetingRequest.HasPSTN)
         {
-            newCall.Source.Identity.SetApplicationInstance(
-            new Identity
+            newCall.Source = new ParticipantInfo
             {
+                Identity = new IdentitySet { Application = new Identity { Id = _botConfig.AppId } },
+            };
+
+            newCall.Source.Identity.SetApplicationInstance(new Identity {
                 Id = _botConfig.AppInstanceObjectId,
                 DisplayName = _botConfig.AppInstanceObjectName,
             });
-
         }
-        
-
 
         // Work out who to call first & who to invite
         var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites(_botConfig.TenantId);
