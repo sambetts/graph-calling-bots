@@ -110,11 +110,11 @@ MicrosoftAppPassword | Bot app secret
 BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
 
 ## Setup Bot
-Additional permissions needed (application):
+This bot uses the setup procedure in the [root readme](../../../../README.md). 
+
+Additional permissions needed (application) for this example:
 
 * User.Read.All
-
-See the repo home README for the existing permissions.
 
 The result:
 ![alt](../../../../imgs/calling.jpg)

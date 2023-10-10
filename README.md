@@ -20,6 +20,7 @@ There are a few projects that use the same engine.
   * Azure Functions implementation - uses Azure Storage Tables to persist call state. 
 * Group calling examples 2x:
   * [Group calling chatbot for PSTN and Teams users.](src/examples/Group/ChatBotWithCalling/README.md)
+    * Related: a [Teams-app for automating calls for Team members with a specific tag](src/teamsapps/teams-calling-orchestrator/README.md)
   * [Group calling functions app for PSTN and Teams users.](src/examples/Group/GroupCallingBotFunctionsApp/README.md)
 * Misc: [PSTN "calling test bot"](src/examples/P2P/CallingTestBot/README.md) - useful for proactively testing if PSTN and Teams infrastructure is working.
 ## How do Bots Work in this Framework?
@@ -71,7 +72,7 @@ Note, that for all these steps you can do them all in PowerShell if you wish. I�
 4. Create or get a previous client secret for the bot app registration.
 5. Every bot has an application registration in Azure AD, for which we’ll need to assign permissions.
 
-Permissions needed (application):
+Graph permissions needed (application):
 
 * Calls.AccessMedia.All
 * Calls.Initiate.All
@@ -84,6 +85,14 @@ That should be enough to make calls to Teams users (P2P – more permissions are
 ## Recording Bot Messages
 In the examples given, there are a couple of example messages. Assuming you want your own, it needs to be [a specific format](https://learn.microsoft.com/en-us/graph/api/resources/mediainfo?view=graph-rest-1.0). From the docs:
 * Currently supports only Wave file (.wav) format, single-channel, 16-bit samples with a 16,000 (16 KHz) sampling rate.
+
+### Teams Calling Policies
+If the bot is to call Teams users, you need to create Teams app policies to allow the bot to make call by associating it with a user:
+
+``New-CsApplicationAccessPolicy -Identity CallingPolicyDev -AppIds "$botAppId" -Description "Allow calling"``
+``Grant-CsApplicationAccessPolicy -PolicyName CallingPolicyDev -Identity "$userObjectId"``
+
+Replace '$botAppId' and '$userObjectId' with your own values. 
 
 ## Optional: Setup PSTN Calling
 If you need PSTN calling, here are the extra steps. 
