@@ -71,7 +71,3 @@
 /src/examples/Group/GroupCallingBotFunctionsApp/Properties/PublishProfiles
 /src/examples/Group/GroupCalls.Common/bin/Debug/net7.0
 /src/examples/Group/GroupCallingBotFunctionsApp/Properties/ServiceDependencies/GroupCallingBotFunctionApp - Zip Deploy/profile.arm.json
-src/teamsapps/teams-calling-orchestrator/.vscode/extensions.json
-src/teamsapps/teams-calling-orchestrator/.vscode/launch.json
-src/teamsapps/teams-calling-orchestrator/.vscode/settings.json
-src/teamsapps/teams-calling-orchestrator/.vscode/tasks.json
