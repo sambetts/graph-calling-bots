@@ -1,0 +1,38 @@
+{
+  "@odata.type": "#microsoft.graph.commsNotifications",
+  "value": [
+    {
+      "@odata.type": "#microsoft.graph.commsNotification",
+      "changeType": "updated",
+      "resource": "/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97",
+      "resourceUrl": "/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97",
+      "resourceData": {
+        "@odata.type": "#microsoft.graph.call",
+        "state": "established",
+        "mediaState": {
+          "@odata.type": "#microsoft.graph.callMediaState",
+          "audio": "active"
+        },
+        "chatInfo": {
+          "@odata.type": "#microsoft.graph.chatInfo",
+          "threadId": "19:e7339480-8cef-4b7e-936f-05ea012ba657",
+          "messageId": "0"
+        },
+        "meetingInfo": {
+          "@odata.type": "#microsoft.graph.tokenMeetingInfo",
+          "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImtpQ1ljYk5samdDRGs0a1NFSFdiNkdmN1o1NCIsInR5cCI6IkpXVCIsIng1dCI6ImtpQ1ljYk5samdDRGs0a1NFSFdiNkdmN1o1NCJ9.eyJhcHBJZCI6ImQyYTM1NzI2LTEwYmUtNDA5Mi04ZWEwLWQ3MGU3ZmQ4N2NjYSIsImNvbnZlcnNhdGlvbkNvbnRyb2xsZXIiOiJodHRwczovL2FwaS1lbWVhLmZsaWdodHByb3h5LnRlYW1zLm1pY3Jvc29mdC5jb20vYXBpL3YyL2VwL2NvbnYtZXVuby0xMC5jb252LnNreXBlLmNvbS9jb252L21pcjdlSC01Nms2S0NjX3J6LW9sbGc_aT01MSZlPTYzODMyMTU3OTAxMDE5MDQ2NyIsImFjdGl2aXR5SWQiOiJkM2RjNGNmYy00ZmFlLTRmYzgtYmFiMS1jMmY4NTgwOGU0YWYiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRpZCI6ImE5YzQyYjg1LWMxMzMtNGFhZi1hOTM1LTViNDY4NTc2OGIxNiIsIm5iZiI6MTY5Njk0Nzg1OCwiZXhwIjoxNjk3MDM0MjU4LCJpc3MiOiJodHRwczovL2FwaS5ib3RmcmFtZXdvcmsuY29tIiwiYXVkIjoiaHR0cHM6Ly9hcGkuYm90ZnJhbWV3b3JrLmNvbSJ9.nFVMytmhlV4Ay6m9-vFR1zi1rKQgZ7AK5xtVhs-bPbqUy_mc1FMJ7pHfpDssMgybiGZz69v8uP4mx7ucdTBPvc7mwnAlJAgE5p8KT_6B84B3NISVblt8MIEQ92TXLpKeLfJ3shbu8IgY4bSLiisXrJo2merg1-11AJARZDZc_W_Xv6Q6nSVXiekHbZ27Xqu-CU5RR2ml9X38utP4PFi3EUzBU2kgLf6rdfcHWwCUubrNeNChioboqsQOlTiL4OVxGdizOpt1-_9FgTP3a2JtT_42uP6317Q2t4Y3h8n1_sM8vb4jGuCF9-_YDULBPXaTcltAyi8QjR-hBdj-pL5wTg"
+        },
+        "meetingCapability": {
+          "@odata.type": "#microsoft.graph.meetingCapability"
+        },
+        "meetingProperties": {
+          "@odata.type": "#microsoft.graph.meetingProperties",
+          "meetingLabel": "00000000-0000-0000-0000-000000000000"
+        },
+        "coOrganizers": [],
+        "callChainId": "d3dc4cfc-4fae-4fc8-bab1-c2f85808e4af",
+        "replacesContext": "aHR0cHM6Ly9jYy1ldW5vLTExLmNjLnNreXBlLmNvbS9jYy92MS9jYWxsUGFydGljaXBhbnQvODhkOGEwZDUtM2Y0My00YzMxLWIwNTEtYjZjMmZmNTQ2OTM3LzI3L2syLzE2MC9yZXBsYWNlbWVudD9ydD1mMTU2NjZhNjAwMGQ0NzBkYjFkYTYwMmVhZjY2MGUzNCZyYz1leUp5ZEdsa0lqb2lPRHB2Y21kcFpEb3pZakV3WVdFNU5DMDNNemxoTFRRM01tTXRZVFk0WVMxak1tVXpaRFE0TUdWa05tSWlMQ0p5ZEd4cElqb2laVzR0VlZNaUxDSnlkSEp6SWpvaVJXNTBaWEp3Y21selpWQnliM2g1SW4wJTI1M0QmaT0yMCZlPTYzODMyMjQwMzk4NzEyNjAzMw=="
+      }
+    }
+  ]
+}

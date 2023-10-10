@@ -5,12 +5,21 @@ namespace ServiceHostedMediaCallingBot.UnitTests;
 
 internal class NotificationsLibrary
 {
-    public static CommsNotificationsPayload CallEstablishingP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.CallEstablishing)!;
-    public static CommsNotificationsPayload CallEstablishedP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.CallEstablished)!;
-    public static CommsNotificationsPayload CallEstablishedWithAudioP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.CallEstablishedWithAudio)!;
-    public static CommsNotificationsPayload HangUp => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.HangUp)!;
-    public static CommsNotificationsPayload PlayPromptFinish => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.PlayPromptFinish)!;
-    public static CommsNotificationsPayload TonePress => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.TonePress)!;
+    public static CommsNotificationsPayload P2PTest1CallEstablishingP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest1Event1CallEstablishing)!;
+    public static CommsNotificationsPayload P2PTest1CallEstablishedP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest1Event2CallEstablished)!;
+    public static CommsNotificationsPayload P2PTest1CallEstablishedWithAudioP2P => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest1Event3CallEstablishedWithAudio)!;
+    public static CommsNotificationsPayload P2PTest1HangUp => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest1Event6HangUp)!;
+    public static CommsNotificationsPayload P2PTest1PlayPromptFinish => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest1Event5PlayPromptFinish)!;
+    public static CommsNotificationsPayload P2PTest1TonePress => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest1Event4TonePress)!;
+
+
+    public static CommsNotificationsPayload P2PTest2Event1Establishing => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest2Event1Establishing)!;
+    public static CommsNotificationsPayload P2PTest2Event2Established => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest2Event2Established)!;
+    public static CommsNotificationsPayload P2PTest2Event3UpdatedWithMediaState => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest2Event3UpdatedWithMediaState)!;
+    public static CommsNotificationsPayload P2PTest2Event4UpdatedWithChatInfo => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest2Event4UpdatedWithChatInfo)!;
+    public static CommsNotificationsPayload P2PTest2Event5UpdatedWithRandomShit => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest2Event5UpdatedWithRandomShit)!;
+    public static CommsNotificationsPayload P2PTest2Event6UserJoin => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.P2PTest2Event6UserJoin)!;
+
 
     public static CommsNotificationsPayload GroupCallEstablished => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.GroupCallEstablished)!;
     public static CommsNotificationsPayload GroupCallEstablishing => JsonSerializer.Deserialize<CommsNotificationsPayload>(Properties.Resources.GroupCallEstablishing)!;

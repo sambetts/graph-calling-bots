@@ -118,15 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="CallEstablished" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\TestEvents\CallEstablished.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="CallEstablishedWithAudio" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\TestEvents\CallEstablishedWithAudio.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="CallEstablishing" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\TestEvents\CallEstablishing.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
   <data name="FailedCallDeleted" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\TestEvents\FailedP2P\CallDeleted.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
@@ -148,13 +139,40 @@
   <data name="GroupCallUserJoin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\TestEvents\GroupCalls\GroupCallUserJoin.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HangUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\TestEvents\HangUp.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="P2PTest1Event1CallEstablishing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\SimpleTest\P2PTest1Event1CallEstablishing.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="PlayPromptFinish" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\TestEvents\playPromptFinish.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="P2PTest1Event2CallEstablished" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\SimpleTest\P2PTest1Event2CallEstablished.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="TonePress" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\TestEvents\TonePress.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="P2PTest1Event3CallEstablishedWithAudio" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\SimpleTest\P2PTest1Event3CallEstablishedWithAudio.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest1Event4TonePress" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\SimpleTest\P2PTest1Event4TonePress.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest1Event5PlayPromptFinish" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\SimpleTest\P2PTest1Event5PlayPromptFinish.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest1Event6HangUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\SimpleTest\P2PTest1Event6HangUp.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest2Event1Establishing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\CallUpdates\P2PTest2Event1Establishing.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest2Event2Established" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\CallUpdates\P2PTest2Event2Established.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest2Event3UpdatedWithMediaState" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\CallUpdates\P2PTest2Event3UpdatedWithMediaState.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest2Event4UpdatedWithChatInfo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\CallUpdates\P2PTest2Event4UpdatedWithChatInfo.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest2Event5UpdatedWithRandomShit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\CallUpdates\P2PTest2Event5UpdatedWithRandomShit.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="P2PTest2Event6UserJoin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\TestEvents\P2P\CallUpdates\P2PTest2Event6UserJoin.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

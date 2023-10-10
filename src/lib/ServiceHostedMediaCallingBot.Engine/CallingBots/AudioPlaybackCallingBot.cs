@@ -28,5 +28,6 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
         {
             _logger.LogWarning("CallConnected: callState.CallId is null");
         }
+        await base.CallConnectedWithP2PAudio(callState);
     }
 }

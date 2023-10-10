@@ -24,7 +24,7 @@ public class ModelTests
             }
         };
 
-        var (initialAddList, inviteNumberList) = twoTeamsPlusOnePhoneUserMeeting.GetInitialParticipantsAndInvites(string.Empty);
+        var (initialAddList, inviteNumberList) = twoTeamsPlusOnePhoneUserMeeting.GetInitialParticipantsAndInvites();
         Assert.AreEqual(1, initialAddList.Count);
         Assert.AreEqual(2, inviteNumberList.Count);
 
@@ -39,7 +39,7 @@ public class ModelTests
             }
         };
 
-        (initialAddList, inviteNumberList) = threePhoneUsersMeeting.GetInitialParticipantsAndInvites(string.Empty);
+        (initialAddList, inviteNumberList) = threePhoneUsersMeeting.GetInitialParticipantsAndInvites();
         Assert.AreEqual(1, initialAddList.Count);
         Assert.AreEqual(2, inviteNumberList.Count);
     }

@@ -34,7 +34,7 @@ public class MenuCard : BaseAdaptiveCard
         {
             numbers.Add(new AdaptiveTextBlock
             {
-                Text = item.DisplayId,
+                Text = item.DisplayName,
                 Size = AdaptiveTextSize.Small,
                 Weight = AdaptiveTextWeight.Bolder
             });

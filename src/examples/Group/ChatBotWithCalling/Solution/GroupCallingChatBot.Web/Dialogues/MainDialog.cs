@@ -148,7 +148,7 @@ public class MainDialog : CancellableDialogue
                         meetingState.Attendees.Add(new AttendeeCallInfo
                         {
                             Id = userId,
-                            DisplayId = addContactActionInfo.ContactId,
+                            DisplayName = addContactActionInfo.ContactId,
                             Type = MeetingAttendeeType.Teams
                         });
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Teams user added"), cancellationToken);
@@ -169,7 +169,7 @@ public class MainDialog : CancellableDialogue
                     { 
                         Id = addContactActionInfo.ContactId, 
                         Type = MeetingAttendeeType.Phone,
-                        DisplayId = addContactActionInfo.ContactId
+                        DisplayName = addContactActionInfo.ContactId
                     });
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Number added"), cancellationToken);
                 }

@@ -34,7 +34,7 @@ public class HttpFunctions
 
         if (notifications != null)
         {
-            _logger.LogInformation($"Processing Graph call notification");
+            _logger.LogDebug($"Processing {notifications.CommsNotifications.Count} Graph call notification(s)");
             try
             {
                 await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);

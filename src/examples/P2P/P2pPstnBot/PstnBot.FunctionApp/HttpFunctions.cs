@@ -33,7 +33,7 @@ public class HttpFunctions
 
         if (notifications != null)
         {
-            _logger.LogInformation($"Processing Graph call notification");
+            _logger.LogDebug($"Processing Graph call notification");
             try
             {
                 await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);

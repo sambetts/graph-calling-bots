@@ -62,66 +62,6 @@ namespace ServiceHostedMediaCallingBot.UnitTests.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
-        ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;updated&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
-        ///                &quot;state&quot;: &quot;established&quot;,
-        ///                &quot;directi [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string CallEstablished {
-            get {
-                return ResourceManager.GetString("CallEstablished", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {
-        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
-        ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;updated&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
-        ///                &quot;state&quot;: &quot;established&quot;,
-        ///                &quot;mediaSt [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string CallEstablishedWithAudio {
-            get {
-                return ResourceManager.GetString("CallEstablishedWithAudio", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {
-        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
-        ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;updated&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
-        ///                &quot;state&quot;: &quot;establishing&quot;,
-        ///                &quot;callCh [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string CallEstablishing {
-            get {
-                return ResourceManager.GetString("CallEstablishing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {
         ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
         ///  &quot;value&quot;: [
         ///    {
@@ -266,59 +206,254 @@ namespace ServiceHostedMediaCallingBot.UnitTests.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
-        ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;deleted&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
-        ///                &quot;state&quot;: &quot;terminated&quot;,
-        ///                &quot;resultIn [rest of string was truncated]&quot;;.
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;establishing&quot;,
+        ///        &quot;callChainId&quot;: &quot;b0fe8425-6f48-41ed-9dd6-b706ff66319a&quot;
+        ///      }
+        ///    } [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string HangUp {
+        internal static string P2PTest1Event1CallEstablishing {
             get {
-                return ResourceManager.GetString("HangUp", resourceCulture);
+                return ResourceManager.GetString("P2PTest1Event1CallEstablishing", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
-        ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;deleted&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.ty [rest of string was truncated]&quot;;.
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;direction&quot;: &quot;outgoing&quot;,
+        ///        &quot;callChainId&quot;: &quot;b0fe8425-6f48-41ed-9 [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string PlayPromptFinish {
+        internal static string P2PTest1Event2CallEstablished {
             get {
-                return ResourceManager.GetString("PlayPromptFinish", resourceCulture);
+                return ResourceManager.GetString("P2PTest1Event2CallEstablished", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///    &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
-        ///    &quot;value&quot;: [
-        ///        {
-        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
-        ///            &quot;changeType&quot;: &quot;updated&quot;,
-        ///            &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
-        ///            &quot;resourceData&quot;: {
-        ///                &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
-        ///                &quot;state&quot;: &quot;established&quot;,
-        ///                &quot;toneInf [rest of string was truncated]&quot;;.
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;mediaState&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.callMediaS [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string TonePress {
+        internal static string P2PTest1Event3CallEstablishedWithAudio {
             get {
-                return ResourceManager.GetString("TonePress", resourceCulture);
+                return ResourceManager.GetString("P2PTest1Event3CallEstablishedWithAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;toneInfo&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.toneInfo&quot;,
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest1Event4TonePress {
+            get {
+                return ResourceManager.GetString("P2PTest1Event4TonePress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;deleted&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.playPromptOperation&quot;,
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest1Event5PlayPromptFinish {
+            get {
+                return ResourceManager.GetString("P2PTest1Event5PlayPromptFinish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;deleted&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;terminated&quot;,
+        ///        &quot;resultInfo&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.resultInfo&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest1Event6HangUp {
+            get {
+                return ResourceManager.GetString("P2PTest1Event6HangUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;establishing&quot;,
+        ///        &quot;callChainId&quot;: &quot;d3dc4cfc-4fae-4fc8-bab1-c2f85808e4af&quot;
+        ///      }
+        ///    } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest2Event1Establishing {
+            get {
+                return ResourceManager.GetString("P2PTest2Event1Establishing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;direction&quot;: &quot;outgoing&quot;,
+        ///        &quot;callChainId&quot;: &quot;d3dc4cfc-4fae-4fc8-b [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest2Event2Established {
+            get {
+                return ResourceManager.GetString("P2PTest2Event2Established", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;mediaState&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.callMediaS [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest2Event3UpdatedWithMediaState {
+            get {
+                return ResourceManager.GetString("P2PTest2Event3UpdatedWithMediaState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;mediaState&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.callMediaS [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest2Event4UpdatedWithChatInfo {
+            get {
+                return ResourceManager.GetString("P2PTest2Event4UpdatedWithChatInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97&quot;,
+        ///      &quot;resourceData&quot;: {
+        ///        &quot;@odata.type&quot;: &quot;#microsoft.graph.call&quot;,
+        ///        &quot;state&quot;: &quot;established&quot;,
+        ///        &quot;mediaState&quot;: {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.callMediaS [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest2Event5UpdatedWithRandomShit {
+            get {
+                return ResourceManager.GetString("P2PTest2Event5UpdatedWithRandomShit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotifications&quot;,
+        ///  &quot;value&quot;: [
+        ///    {
+        ///      &quot;@odata.type&quot;: &quot;#microsoft.graph.commsNotification&quot;,
+        ///      &quot;changeType&quot;: &quot;updated&quot;,
+        ///      &quot;resource&quot;: &quot;/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97/participants&quot;,
+        ///      &quot;resourceUrl&quot;: &quot;/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97/participants&quot;,
+        ///      &quot;resourceData&quot;: [
+        ///        {
+        ///          &quot;@odata.type&quot;: &quot;#microsoft.graph.participant&quot;,
+        ///          &quot;info&quot;: {
+        ///            &quot;@odata.type&quot;: &quot;#microsoft.graph [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string P2PTest2Event6UserJoin {
+            get {
+                return ResourceManager.GetString("P2PTest2Event6UserJoin", resourceCulture);
             }
         }
     }

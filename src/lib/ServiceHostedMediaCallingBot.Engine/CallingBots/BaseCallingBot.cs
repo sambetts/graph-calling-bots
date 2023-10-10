@@ -152,7 +152,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     // https://learn.microsoft.com/en-us/graph/api/participant-invite?view=graph-rest-1.0
     protected async Task InviteToCallAsync(string callId, List<InvitationParticipantInfo> participantInfo)
     {
-        var i = new InviteInfo { participants = participantInfo };
+        var i = new InviteInfo { Participants = participantInfo };
         _logger.LogInformation($"Inviting {participantInfo.Count} participants to call {callId}");
         await PostData($"/communications/calls/{callId}/participants/invite", i);
     }
@@ -167,10 +167,6 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         await this.Delete($"/communications/calls/{callId}");
     }
 
-    class InviteInfo : EmptyModelWithClientContext
-    {
-        public List<InvitationParticipantInfo> participants { get; set; } = new List<InvitationParticipantInfo>();
-    }
 
     #endregion
 

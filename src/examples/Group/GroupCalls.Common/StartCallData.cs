@@ -1,14 +1,28 @@
 ﻿using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
 public class StartGroupCallData
 {
     public List<AttendeeCallInfo> Attendees { get; set; } = new();
+
+    public bool RepeatMessage { get; set; } = false;
+
+    /// <summary>
+    /// Absolute URL to WAV file to play to attendees.
+    /// </summary>
+    public string? MessageUrl { get; set; } = null;
+
+    [JsonIgnore]
     public bool HasPSTN => this.Attendees.Any(a => a.Type == MeetingAttendeeType.Phone);
 
-    public (List<InvitationParticipantInfo>, List<InvitationParticipantInfo>) GetInitialParticipantsAndInvites(string tenantId)
+    /// <summary>
+    /// Split the attendees into 2 lists, one for the initial call, and one for the invites.
+    /// This is because we can't add everyone at once. 
+    /// </summary>
+    public (List<InvitationParticipantInfo>, List<InvitationParticipantInfo>) GetInitialParticipantsAndInvites()
     {
         var initialAddList = new List<InvitationParticipantInfo>();
         var inviteNumberList = new List<InvitationParticipantInfo>();
@@ -49,7 +63,7 @@ public class StartGroupCallData
 public class AttendeeCallInfo
 {
     public string Id { get; set; } = null!;
-    public string DisplayId { get; set; } = null!;
+    public string? DisplayName { get; set; } = null!;
     public MeetingAttendeeType Type { get; set; }
 
     public IdentitySet ToIdentity()
@@ -57,12 +71,12 @@ public class AttendeeCallInfo
         if (this.Type == MeetingAttendeeType.Phone)
         {
             var i = new IdentitySet();
-            i.SetPhone(new Identity { Id = Id, DisplayName = DisplayId });
+            i.SetPhone(new Identity { Id = Id, DisplayName = DisplayName });
             return i;
         }
         else if (Type == MeetingAttendeeType.Teams)
         {
-            return new IdentitySet { User = new Identity { Id = this.Id, DisplayName = DisplayId } };
+            return new IdentitySet { User = new Identity { Id = this.Id } };
         }
         else
         {

@@ -20,6 +20,72 @@ public class BotNotificationsHandlerTests
     }
 
     /// <summary>
+    /// Tests that call connected only fires once for multiple call updates
+    /// </summary>
+    /// <returns></returns>
+    [TestMethod]
+    public async Task MultipleCallUpdatesTests()
+    {
+        var callConnectedWithP2PAudioCount = 0;
+        var callEstablishingCount = 0;
+        var callEstablishedCount = 0;
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
+        {
+            CallEstablishing = (callState) =>
+            {
+                callEstablishingCount++;
+                return Task.CompletedTask;
+            },
+            CallEstablished = (callState) =>
+            {
+                callEstablishedCount++;
+                return Task.CompletedTask;
+            },
+            CallConnectedWithP2PAudio = (callState) =>
+            {
+                callConnectedWithP2PAudioCount++;
+                return Task.CompletedTask;
+            }
+        };
+        var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
+
+        var callResourceUrl = NotificationsLibrary.P2PTest2Event1Establishing.CommsNotifications[0]!.ResourceUrl!;
+
+        // Handle call establish for a call never seen before
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest2Event1Establishing);
+
+        // We should find the call in the call state manager
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum, CallState.Establishing);
+
+        // Establish the call
+        Assert.IsTrue(callEstablishingCount == 1);
+        Assert.IsTrue(callEstablishedCount == 0);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest2Event2Established);
+        Assert.IsTrue(callEstablishedCount == 1);
+
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
+            CallState.Established);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 0);
+
+        // Connect audio. Should trigger the callback
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest2Event3UpdatedWithMediaState);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
+
+        // More updates. Should not fire callConnectedWithP2PAudio
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest2Event4UpdatedWithChatInfo);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
+
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest2Event5UpdatedWithRandomShit);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
+
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest2Event6UserJoin);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
+
+    }
+
+
+    /// <summary>
     /// A call is established, but failed to connect. The call is then deleted.
     /// </summary>
     [TestMethod]
@@ -73,7 +139,7 @@ public class BotNotificationsHandlerTests
     }
 
     [TestMethod]
-    public async Task BotNotificationsHandlerP2PFlowTests()
+    public async Task P2PFlowTests()
     {
         var callConnectedWithP2PAudioCount = 0;
         var callEstablishingCount = 0;
@@ -117,10 +183,10 @@ public class BotNotificationsHandlerTests
         };
         var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
 
-        var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
+        var callResourceUrl = NotificationsLibrary.P2PTest1CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
 
         // Handle call establish for a call never seen before
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishingP2P);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishingP2P);
 
         // We should find the call in the call state manager
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum, CallState.Establishing);
@@ -128,7 +194,7 @@ public class BotNotificationsHandlerTests
         // Establish the call
         Assert.IsTrue(callEstablishingCount == 1);
         Assert.IsTrue(callEstablishedCount == 0);
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedP2P);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishedP2P);
         Assert.IsTrue(callEstablishedCount == 1);
 
         Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
@@ -136,15 +202,15 @@ public class BotNotificationsHandlerTests
         Assert.IsTrue(callConnectedWithP2PAudioCount == 0);
 
         // Connect audio. Should trigger the callback
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedWithAudioP2P);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishedWithAudioP2P);
         Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
 
         // Pretend we've finished playing a prompt
         var callState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
 
         // Add a media prompt to the call state
-        callState!.MediaPromptsPlaying.Add(new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.PlayPromptFinish);
+        callState!.MediaPromptsPlaying.Add(new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.P2PTest1PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1PlayPromptFinish);
         Assert.IsTrue(callPlayPromptFinished == 1);
 
         // Make sure the media prompt was removed
@@ -152,11 +218,11 @@ public class BotNotificationsHandlerTests
 
         // Press buttons. Should trigger the callback
         Assert.IsTrue(toneList.Count == 0);
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.TonePress);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1TonePress);
         Assert.IsTrue(toneList.Count == 1);
 
         // Terminate the call
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.HangUp);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1HangUp);
         Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
         Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
         Assert.IsTrue(callTerminatedCount == 1);
@@ -210,16 +276,16 @@ public class BotNotificationsHandlerTests
         };
         var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
 
-        var callResourceUrl = NotificationsLibrary.CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
+        var callResourceUrl = NotificationsLibrary.P2PTest1CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
 
         // Handle call establish for a call never seen before
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishingP2P);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishingP2P);
 
         // Parallel establish the call
         var tasks = new List<Task>
         {
-            notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedP2P),
-            notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.CallEstablishedWithAudioP2P)
+            notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishedP2P),
+            notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishedWithAudioP2P)
         };
         await Task.WhenAll(tasks);
 
@@ -229,8 +295,8 @@ public class BotNotificationsHandlerTests
         var callState = await callStateManager.GetByNotificationResourceUrl(callResourceUrl);
 
         // Add a media prompt to the call state
-        callState!.MediaPromptsPlaying.Add(new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.PlayPromptFinish);
+        callState!.MediaPromptsPlaying.Add(new MediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.P2PTest1PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1PlayPromptFinish);
         Assert.IsTrue(callPlayPromptFinished == 1);
 
     }

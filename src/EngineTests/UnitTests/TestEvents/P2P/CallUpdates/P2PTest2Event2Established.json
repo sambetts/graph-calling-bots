@@ -1,0 +1,17 @@
+{
+  "@odata.type": "#microsoft.graph.commsNotifications",
+  "value": [
+    {
+      "@odata.type": "#microsoft.graph.commsNotification",
+      "changeType": "updated",
+      "resource": "/app/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97",
+      "resourceUrl": "/communications/calls/701f5b00-c1c1-43ef-9bdf-3dc7ef9d3e97",
+      "resourceData": {
+        "@odata.type": "#microsoft.graph.call",
+        "state": "established",
+        "direction": "outgoing",
+        "callChainId": "d3dc4cfc-4fae-4fc8-bab1-c2f85808e4af"
+      }
+    }
+  ]
+}

@@ -19,7 +19,7 @@ public class StartCallController : Controller
     /// POST: StartCall
     /// </summary>
     [HttpPost()]
-    public async Task<Call> StartCall([FromBody] StartCallData startCallData)
+    public async Task<Call?> StartCall([FromBody] StartCallData startCallData)
     {
         if (startCallData == null)
         {

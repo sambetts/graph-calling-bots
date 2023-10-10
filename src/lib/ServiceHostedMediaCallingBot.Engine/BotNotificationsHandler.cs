@@ -67,6 +67,8 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                     }
                     else if (callnotification.JoinedParticipants != null)
                     {
+                        // User joined group call
+                        _logger.LogInformation($"User joined group call {callState.CallId}");
                         if (_callbackInfo.UserJoinedGroupCall != null) await _callbackInfo.UserJoinedGroupCall(callState);
                     }
                 }
@@ -115,12 +117,14 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                 // Update call state
                 updateCallState = true;
             }
-            if (callNotification.AssociatedCall?.MediaState != null && callNotification.AssociatedCall.MediaState.Audio.HasValue && callNotification.AssociatedCall.MediaState.Audio.Value == MediaState.Active)
+            if (callNotification.AssociatedCall?.MediaState.IsConnected() == true && callState.MediaState == null)
             {
                 // Audio is now active. THREADING FUN:
                 // We can be here before we've set the call state to established above if the second notification arrives before we save state on the "call established" notification
-                _logger.LogInformation($"Call {callState.CallId} connected with audio");
+                _logger.LogInformation($"Call {callState.CallId} connected with P2P audio");
                 if (_callbackInfo.CallConnectedWithP2PAudio != null) await _callbackInfo.CallConnectedWithP2PAudio(callState);
+
+                callState.MediaState = callNotification.AssociatedCall.MediaState;
                 updateCallState = true;
             }
             return updateCallState;

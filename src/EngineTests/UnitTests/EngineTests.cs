@@ -19,7 +19,7 @@ public class EngineTests
     }
 
     [TestMethod]
-    public void ModelTests()
+    public void CallIdTests()
     {
         Assert.IsNull(new BaseActiveCallState().CallId);
         Assert.IsNull(new BaseActiveCallState { ResourceUrl = "/communications/calls/" }.CallId);

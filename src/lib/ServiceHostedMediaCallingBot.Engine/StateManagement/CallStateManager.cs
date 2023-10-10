@@ -27,6 +27,8 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 {
     public string ResourceUrl { get; set; } = null!;
 
+    public CallMediaState? MediaState { get; set; } = null;
+
     /// <summary>
     /// Calculated from notification <see cref="ResourceUrl"/>   
     /// </summary>

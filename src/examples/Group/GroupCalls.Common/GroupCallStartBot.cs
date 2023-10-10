@@ -3,6 +3,7 @@ using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using System.Runtime.CompilerServices;
 
 namespace GroupCalls.Common;
 
@@ -67,7 +68,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         }
 
         // Work out who to call first & who to invite
-        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites(_botConfig.TenantId);
+        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
         newCall.Targets = initialAddList;
 
         // Start call
@@ -84,6 +85,10 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
                 createdCallState.Invites = inviteNumberList;
                 await _callStateManager.Update(createdCallState);
             }
+            else
+            {
+                _logger.LogError("Unable to find call state for call {CallId}", createdCall.Id);
+            }
         }
         return createdCall;
     }
@@ -96,9 +101,6 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         if (!string.IsNullOrEmpty(callState?.CallId))
         {
             // Invite everyone else
-            foreach (var invite in callState.Invites)
-            {
-            }
             if (callState.Invites != null && callState.Invites.Count > 0)
             {
                 await InviteToCallAsync(callState.CallId, callState.Invites);
@@ -110,6 +112,16 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
     }
 
     protected override async Task UserJoinedGroupCall(GroupCallActiveCallState callState)
+    {
+        await CheckCall(callState);
+    }
+
+    protected async override Task CallConnectedWithP2PAudio(GroupCallActiveCallState callState)
+    {
+        await CheckCall(callState);
+    }
+
+    async Task CheckCall(GroupCallActiveCallState callState)
     {
         // Don't play media if already playing
         var alreadyPlaying = false;
@@ -127,6 +139,5 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         {
             await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
         }
-        await base.UserJoinedGroupCall(callState);
     }
 }

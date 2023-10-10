@@ -36,7 +36,7 @@ public class HttpFunctions
 
         if (notifications != null)
         {
-            _logger.LogInformation($"Processing Graph call notification: {req}");
+            _logger.LogDebug($"Processing Graph call notification: {req}");
             try
             {
                 // Process notifications and update call state. Events will be captured on bot class.
