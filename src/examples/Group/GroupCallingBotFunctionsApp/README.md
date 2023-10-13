@@ -25,18 +25,18 @@ ngrok http http://localhost:7221
 POST this JSon to the bot endpoint /api/StartCall:
 ```json
 {
-  "Attendees":
-  [
-      {
-          "Id": "+3468279XXXX",
-          "DisplayName" : "Sam Phone",
-          "Type": 1
-      },
-      {
-          "Id": "3b10aa94-739a-472c-a68a-0000000",
-          "Type": 2
-      }
-  ]
+    "MessageUrl": "https://callingbot.eu.ngrok.io/Content/GroupCallIntro.wav",
+    "Attendees": [
+        {
+            "Id": "+3468279XXXX",
+            "DisplayName": "Sam Phone",
+            "Type": 1
+        },
+        {
+            "Id": "3b10aa94-739a-472c-a68a-0000000",
+            "Type": 2
+        }
+    ]
 }
 
 ```
