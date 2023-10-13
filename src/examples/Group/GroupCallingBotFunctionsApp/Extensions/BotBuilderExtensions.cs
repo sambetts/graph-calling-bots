@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace GroupCallingBotFunctionsApp.FunctionApp.Extensions;
+namespace GroupCallingBot.FunctionApp.Extensions;
 
 public static class BotBuilderExtensions
 {

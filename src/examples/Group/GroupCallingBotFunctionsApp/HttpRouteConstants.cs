@@ -1,4 +1,4 @@
-﻿namespace GroupCallingBotFunctionsApp.FunctionApp;
+﻿namespace GroupCallingBot.FunctionApp;
 
 /// <summary>
 /// HTTP route constants for routing requests to controller methods.

@@ -8,7 +8,7 @@ using System.Net;
 using System.Reflection;
 using System.Text.Json;
 
-namespace GroupCallingBotFunctionsApp.FunctionApp;
+namespace GroupCallingBot.FunctionApp;
 
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
@@ -18,7 +18,7 @@ public class HttpFunctions
     private readonly ILogger _logger;
     private readonly GroupCallStartBot _callingBot;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCalls.Common.GroupCallStartBot callingBot)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallStartBot callingBot)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;

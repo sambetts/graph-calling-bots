@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace GroupCallingBotFunctionsApp.FunctionApp;
+namespace GroupCallingBot.FunctionApp;
 
 
 internal class FunctionsAppCallingBotConfig : PropertyBoundConfig

@@ -1,5 +1,5 @@
-using GroupCallingBotFunctionsApp.FunctionApp;
-using GroupCallingBotFunctionsApp.FunctionApp.Extensions;
+using GroupCallingBot.FunctionApp;
+using GroupCallingBot.FunctionApp.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
