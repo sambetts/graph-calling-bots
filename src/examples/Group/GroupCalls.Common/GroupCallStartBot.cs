@@ -31,14 +31,19 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         var newCall = await InitAndCreateCallRequest(initialAddList, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Start call
-        var createdCall = await StartNewCall(newCall);
-
-        if (createdCall != null)
+        if (newCall != null)
         {
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
-        }
+            var createdCall = await StartNewCall(newCall);
 
-        return createdCall;
+            if (createdCall != null)
+            {
+                await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
+            }
+            return createdCall;
+
+        }
+        
+        return null;
     }
 
 

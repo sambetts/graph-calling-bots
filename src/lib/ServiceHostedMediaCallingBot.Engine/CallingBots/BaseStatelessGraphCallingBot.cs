@@ -7,6 +7,7 @@ using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Net.Http.Json;
 using System.Text.Json;
+using static Microsoft.Graph.Constants;
 
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
@@ -75,11 +76,18 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request.
     /// </summary>
-    protected async Task<Call> InitAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
+    protected async Task<Call?> InitAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
     {
         if (!_callStateManager.Initialised)
         {
             await _callStateManager.Initialise();
+        }
+
+        bool fileExists = await TestExists(defaultMedia.Uri);
+        if (!fileExists)
+        {
+            _logger.LogError($"Media file {defaultMedia.Uri} does not exist. Aborting call");
+            return null;
         }
 
         // Create call for initial participants
@@ -116,14 +124,26 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
     protected async Task InitCallStateAndStoreMediaInfoForCreatedCall(Call? createdCall, MediaInfo mediaInfoItem)
-    { 
+    {
         await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, null);
     }
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task InitCallStateAndStoreMediaInfoForCreatedCall(Call? createdCall, MediaInfo mediaInfoItem, Action<CALLSTATETYPE>? updateCacheCallback)
+    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call? createdCall, MediaInfo mediaInfoItem, Action<CALLSTATETYPE>? updateCacheCallback)
     {
+        if (!_callStateManager.Initialised)
+        {
+            await _callStateManager.Initialise();
+        }
+
+        bool fileExists = await TestExists(mediaInfoItem.Uri);
+        if (!fileExists)
+        {
+            _logger.LogError($"Media file {mediaInfoItem.Uri} does not exist. Aborting call");
+            return false;
+        }
+
         if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
         {
             await _callStateManager.AddCallStateOrUpdate(new CALLSTATETYPE
@@ -146,10 +166,24 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             {
                 _logger.LogError("Unable to find call state for call {CallId}", createdCall.Id);
             }
+            return true;
         }
         else
         {
             throw new ArgumentOutOfRangeException(nameof(createdCall), "Call not created or no call ID found");
+        }
+    }
+
+    private async Task<bool> TestExists(string uri)
+    {
+        try
+        {
+            var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, uri));
+            return response.IsSuccessStatusCode;
+        }
+        catch (HttpRequestException)
+        {
+            return false;
         }
     }
 

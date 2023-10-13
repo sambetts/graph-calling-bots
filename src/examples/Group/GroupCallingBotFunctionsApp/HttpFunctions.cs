@@ -59,7 +59,7 @@ public class HttpFunctions
     /// Send WAV file for call. Recommended: use CDN to deliver content.
     /// </summary>
     [Function(HttpRouteConstants.WavFileActionName)]
-    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
         _logger.LogInformation($"Sending WAV file HTTP response");
 
