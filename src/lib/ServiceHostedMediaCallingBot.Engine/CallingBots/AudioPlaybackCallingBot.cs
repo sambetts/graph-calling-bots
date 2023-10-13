@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -14,15 +13,13 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
     {
     }
 
-    // Supported media: https://learn.microsoft.com/en-us/graph/api/resources/mediainfo?view=graph-rest-1.0
-    protected Dictionary<string, MediaPrompt> MediaMap { get; } = new();
-
     protected override async Task CallConnectedWithP2PAudio(T callState)
     {
         if (callState.CallId != null)
         {
+            // Play the prompt found in the call state
             await SubscribeToToneAsync(callState.CallId);
-            await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
+            await PlayPromptAsync(callState, callState.BotMediaPlaylist.Select(m => m.Value));
         }
         else
         {

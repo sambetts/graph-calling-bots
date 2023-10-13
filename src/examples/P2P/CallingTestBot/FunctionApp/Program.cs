@@ -7,7 +7,7 @@ var host = new HostBuilder()
     .ConfigureAppConfiguration(c =>
     {
         c.AddEnvironmentVariables()
-            .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+            .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddCommandLine(args)
             .Build();

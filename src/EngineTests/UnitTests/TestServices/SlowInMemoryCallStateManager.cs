@@ -7,7 +7,7 @@ public class SlowInMemoryCallStateManager<T> : ICallStateManager<T> where T : Ba
 {
     private readonly Dictionary<string, T> _callStates = new();
 
-    public async Task AddCallState(T callState)
+    public async Task AddCallStateOrUpdate(T callState)
     {
         if (callState is null || callState.CallId == null)
         {

@@ -1,6 +1,7 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace CallingTestBot.FunctionApp;
 
@@ -10,13 +11,15 @@ public class TimerFunction
 
     private readonly IPstnCallingBot _callingBot;
     private readonly CallingTestBotConfig _callingTestBotConfig;
+    private readonly SingleWavFileBotConfig _botConfig;
 
-    public TimerFunction(ILoggerFactory loggerFactory, IPstnCallingBot callingBot, CallingTestBotConfig callingTestBotConfig)
+    public TimerFunction(ILoggerFactory loggerFactory, IPstnCallingBot callingBot, CallingTestBotConfig callingTestBotConfig, SingleWavFileBotConfig botConfig)
     {
         _logger = loggerFactory.CreateLogger<TimerFunction>();
 
         _callingBot = callingBot;
         _callingTestBotConfig = callingTestBotConfig;
+        _botConfig = botConfig;
     }
 
     [Function(nameof(TestCallTimer))]
@@ -26,7 +29,7 @@ public class TimerFunction
         _logger.LogInformation($"Starting new call to number {_callingTestBotConfig.TestNumber} (timer call)");
         try
         {
-            await _callingBot.StartPTSNCall(_callingTestBotConfig.TestNumber);
+            await _callingBot.StartPTSNCall(_callingTestBotConfig.TestNumber, _botConfig.WavCallbackUrl);
         }
         catch (Exception ex)
         {

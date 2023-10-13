@@ -16,11 +16,13 @@ public class HttpFunctions
 {
     private readonly ILogger _logger;
     private readonly IPstnCallingBot _callingBot;
+    private readonly SingleWavFileBotConfig _botConfig;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, IPstnCallingBot callingBot)
+    public HttpFunctions(ILoggerFactory loggerFactory, IPstnCallingBot callingBot, SingleWavFileBotConfig botConfig)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;
+        _botConfig = botConfig;
     }
 
     /// <summary>
@@ -85,7 +87,7 @@ public class HttpFunctions
             _logger.LogInformation($"Starting new call to number {startCall.PhoneNumber}");
             try
             {
-                await _callingBot.StartPTSNCall(startCall.PhoneNumber);
+                await _callingBot.StartPTSNCall(startCall.PhoneNumber, _botConfig.WavCallbackUrl);
             }
             catch (Exception ex)
             {

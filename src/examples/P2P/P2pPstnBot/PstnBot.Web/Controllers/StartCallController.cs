@@ -2,6 +2,7 @@
 using Microsoft.Graph;
 using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace PstnBot.Web.Controllers;
 
@@ -9,10 +10,12 @@ namespace PstnBot.Web.Controllers;
 public class StartCallController : Controller
 {
     private readonly IPstnCallingBot _callingBot;
+    private readonly SingleWavFileBotConfig _botConfig;
 
-    public StartCallController(IPstnCallingBot callingBot)
+    public StartCallController(IPstnCallingBot callingBot, SingleWavFileBotConfig botConfig)
     {
         _callingBot = callingBot;
+        _botConfig = botConfig;
     }
 
     /// <summary>
@@ -26,7 +29,7 @@ public class StartCallController : Controller
             throw new ArgumentNullException(nameof(startCallData));
         }
 
-        var call = await _callingBot.StartPTSNCall(startCallData.PhoneNumber).ConfigureAwait(false);
+        var call = await _callingBot.StartPTSNCall(startCallData.PhoneNumber, _botConfig.WavCallbackUrl).ConfigureAwait(false);
 
         return call;
     }

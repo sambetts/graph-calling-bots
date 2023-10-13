@@ -11,21 +11,10 @@ namespace GroupCalls.Common;
 /// </summary>
 public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
 {
-    public const string NotificationPromptName = "NotificationPrompt";
 
-    public GroupCallStartBot(SingleWavFileBotConfig botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallStartBot> logger)
+    public GroupCallStartBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallStartBot> logger)
         : base(botOptions, callStateManager, logger)
     {
-
-        // Generate media prompts. Used later in call & need to have consistent IDs.
-        MediaMap[NotificationPromptName] = new MediaPrompt
-        {
-            MediaInfo = new MediaInfo
-            {
-                Uri = new Uri(botOptions.BotBaseUrl + botOptions.RelativeWavCallbackUrl).ToString(),
-                ResourceId = Guid.NewGuid().ToString(),
-            },
-        };
     }
 
     /// <summary>
@@ -33,65 +22,25 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
     /// </summary>
     public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
-        if (!_callStateManager.Initialised)
-        {
-            await _callStateManager.Initialise();
-        }
-
-        // Attach media list
-        var mediaToPrefetch = new List<MediaInfo>();
-        foreach (var m in MediaMap) mediaToPrefetch.Add(m.Value.MediaInfo);
-
-        // Create call for initial participants
-        var newCall = new Call
-        {
-            MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = mediaToPrefetch },
-            RequestedModalities = new List<Modality> { Modality.Audio },
-            TenantId = _botConfig.TenantId,
-            CallbackUri = _botConfig.CallingEndpoint,
-            Direction = CallDirection.Outgoing
-        };
-
-        // Set source as this bot if we're calling PSTN numbers
-        if (meetingRequest.HasPSTN)
-        {
-            newCall.Source = new ParticipantInfo
-            {
-                Identity = new IdentitySet { Application = new Identity { Id = _botConfig.AppId } },
-            };
-
-            newCall.Source.Identity.SetApplicationInstance(new Identity
-            {
-                Id = _botConfig.AppInstanceObjectId,
-                DisplayName = _botConfig.AppInstanceObjectName,
-            });
-        }
+        var mediaInfoItem = new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
 
         // Work out who to call first & who to invite
         var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
-        newCall.Targets = initialAddList;
+
+        // Create call for initial participants
+        var newCall = await InitAndCreateCallRequest(initialAddList, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Start call
         var createdCall = await StartNewCall(newCall);
+
         if (createdCall != null)
         {
-            // Wait 2 seconds for call to be created and notification to be recieved (so we have a call state to update)
-            await Task.Delay(2000);
-
-            // Get state and save invite list for when call is established
-            var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
-            if (createdCallState != null)
-            {
-                createdCallState.Invites = inviteNumberList;
-                await _callStateManager.Update(createdCallState);
-            }
-            else
-            {
-                _logger.LogError("Unable to find call state for call {CallId}", createdCall.Id);
-            }
+            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
         }
+
         return createdCall;
     }
+
 
     /// <summary>
     /// Due to how group calls work with PSTN numbers especially, we need to invite everyone else after the call is established.
@@ -125,7 +74,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
     {
         // Don't play media if already playing
         var alreadyPlaying = false;
-        foreach (var itemToPlay in MediaMap.Values)
+        foreach (var itemToPlay in callState.BotMediaPlaylist.Values)
         {
             if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo.ResourceId).Contains(itemToPlay.MediaInfo.ResourceId))
             {
@@ -139,7 +88,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         {
             try
             {
-                await PlayPromptAsync(callState, MediaMap.Select(m => m.Value));
+                await PlayPromptAsync(callState, callState.BotMediaPlaylist.Select(m => m.Value));
             }
             catch (HttpRequestException ex)
             {

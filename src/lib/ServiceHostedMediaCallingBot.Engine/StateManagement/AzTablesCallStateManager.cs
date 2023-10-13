@@ -17,7 +17,7 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
     {
     }
 
-    public async Task AddCallState(T callState)
+    public async Task AddCallStateOrUpdate(T callState)
     {
         InitCheck(_tableClient);
 
@@ -65,7 +65,7 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
     public async Task Update(T callState)
     {
         // Uses Upsert so will update if exists, or insert if not
-        await AddCallState(callState);
+        await AddCallStateOrUpdate(callState);
     }
 
 

@@ -22,9 +22,9 @@ public class StartGroupCallData
     /// Split the attendees into 2 lists, one for the initial call, and one for the invites.
     /// This is because we can't add everyone at once. 
     /// </summary>
-    public (List<InvitationParticipantInfo>, List<InvitationParticipantInfo>) GetInitialParticipantsAndInvites()
+    public (InvitationParticipantInfo, List<InvitationParticipantInfo>) GetInitialParticipantsAndInvites()
     {
-        var initialAddList = new List<InvitationParticipantInfo>();
+        InvitationParticipantInfo initialAdd = null!;
         var inviteNumberList = new List<InvitationParticipantInfo>();
 
         string? initialIdAdded = null;
@@ -37,7 +37,7 @@ public class StartGroupCallData
             {
                 Identity = attendee.ToIdentity()
             };
-            initialAddList.Add(newTarget);
+            initialAdd = newTarget;
             initialIdAdded = attendee.Id;
             break;
         }
@@ -56,7 +56,7 @@ public class StartGroupCallData
             }
         }
 
-        return (initialAddList, inviteNumberList);
+        return (initialAdd, inviteNumberList);
     }
 }
 

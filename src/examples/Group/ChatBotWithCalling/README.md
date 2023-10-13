@@ -8,67 +8,23 @@ As it uses Bot Framework etc, it can be connected easily to Teams once running. 
 ```C#
 public class GroupCallingBot : PstnCallingBot<GroupCallActiveCallState>
 {
-    public GroupCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallingBot> logger)
-        : base(botOptions, callStateManager, logger)
-    {
-        // Generate media prompts. Used later in call & need to have consistent IDs.
-        MediaMap["Rick"] = new MediaPrompt
-        {
-            MediaInfo = new MediaInfo
-            {
-                Uri = new Uri(botOptions.BotBaseUrl + "/audio/rickroll.wav").ToString(),
-                ResourceId = Guid.NewGuid().ToString(),
-            },
-        };
-    }
-
     /// <summary>
     /// Start group call with required attendees.
     /// </summary>
-    public async Task<Call> StartGroupCall(MeetingRequest meetingRequest)
+    public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
-        // Attach media list
-        var mediaToPrefetch = new List<MediaInfo>();
-        foreach (var m in MediaMap) mediaToPrefetch.Add(m.Value.MediaInfo);
-        
-        // Create call for initial participants
-        var newCall = new Call
-        {
-            MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = mediaToPrefetch },
-            RequestedModalities = new List<Modality> { Modality.Audio },
-            TenantId = _botConfig.TenantId,
-            CallbackUri = _botConfig.CallingEndpoint,
-            Direction = CallDirection.Outgoing,
-            Source = new ParticipantInfo
-            {
-                Identity = new IdentitySet
-                {
-                    Application = new Identity { Id = _botConfig.AppId },
-                },
-            }
-        };
+        var mediaInfoItem = new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
 
         // Work out who to call first & who to invite
-        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites(_botConfig.TenantId);
-        newCall.Targets = initialAddList;
+        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
 
-        // Set source as this bot
-        newCall.Source.Identity.SetApplicationInstance(
-            new Identity { Id = _botConfig.AppInstanceObjectId, DisplayName = _botConfig.AppInstanceObjectName });
+        // Create call for initial participants
+        var newCall = await InitAndCreateCallRequest(initialAddList, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Start call
         var createdCall = await StartNewCall(newCall);
 
-        // Wait 2 seconds for call to be created and notification to be recieved (so we have a call state to update)
-        await Task.Delay(2000);
-
-        // Get state and save invite list for when call is established
-        var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
-        if (createdCallState != null)
-        {
-            createdCallState.Invites = inviteNumberList;
-        }
-
+        await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
         return createdCall;
     }
 

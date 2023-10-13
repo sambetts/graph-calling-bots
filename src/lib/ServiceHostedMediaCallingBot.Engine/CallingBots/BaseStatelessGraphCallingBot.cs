@@ -16,6 +16,8 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// </summary>
 public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot where CALLSTATETYPE : BaseActiveCallState, new()
 {
+    public const string DefaultNotificationPrompt = "DefaultNotificationPrompt";
+
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
@@ -70,6 +72,87 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         return false;
     }
 
+    /// <summary>
+    /// A common way to init the ICallStateManager and create a call request.
+    /// </summary>
+    protected async Task<Call> InitAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
+    {
+        if (!_callStateManager.Initialised)
+        {
+            await _callStateManager.Initialise();
+        }
+
+        // Create call for initial participants
+        var newCall = new Call
+        {
+            MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo> { defaultMedia } },
+            RequestedModalities = new List<Modality> { Modality.Audio },
+            TenantId = _botConfig.TenantId,
+            CallbackUri = _botConfig.CallingEndpoint,
+            Direction = CallDirection.Outgoing
+        };
+
+        // Set source as this bot if we're calling PSTN numbers
+        if (addBotIdentityForPSTN)
+        {
+            newCall.Source = new ParticipantInfo
+            {
+                Identity = new IdentitySet { Application = new Identity { Id = _botConfig.AppId } },
+            };
+
+            newCall.Source.Identity.SetApplicationInstance(new Identity
+            {
+                Id = _botConfig.AppInstanceObjectId,
+                DisplayName = _botConfig.AppInstanceObjectName,
+            });
+        }
+
+        newCall.Targets = new List<InvitationParticipantInfo> { initialAdd };
+
+        return newCall;
+    }
+
+    /// <summary>
+    /// Init the call state manager and store the media info for the created call.
+    /// </summary>
+    protected async Task InitCallStateAndStoreMediaInfoForCreatedCall(Call? createdCall, MediaInfo mediaInfoItem)
+    { 
+        await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, null);
+    }
+    /// <summary>
+    /// Init the call state manager and store the media info for the created call.
+    /// </summary>
+    protected async Task InitCallStateAndStoreMediaInfoForCreatedCall(Call? createdCall, MediaInfo mediaInfoItem, Action<CALLSTATETYPE>? updateCacheCallback)
+    {
+        if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
+        {
+            await _callStateManager.AddCallStateOrUpdate(new CALLSTATETYPE
+            {
+                ResourceUrl = $"/communications/calls/{createdCall.Id}",
+                BotMediaPlaylist = new Dictionary<string, MediaPrompt>
+                {
+                    { DefaultNotificationPrompt, new MediaPrompt { MediaInfo = mediaInfoItem } }
+                }
+            });
+
+            // Get state and save invite list for when call is established
+            var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
+            if (createdCallState != null)
+            {
+                updateCacheCallback?.Invoke(createdCallState);
+                await _callStateManager.Update(createdCallState);
+            }
+            else
+            {
+                _logger.LogError("Unable to find call state for call {CallId}", createdCall.Id);
+            }
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(createdCall), "Call not created or no call ID found");
+        }
+    }
+
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
         await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
@@ -115,7 +198,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     protected async Task<Call?> StartNewCall(Call newCall)
     {
-        _logger.LogInformation($"Creating new call...");
+        _logger.LogInformation($"Creating new call with Graph API...");
         try
         {
             var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
@@ -133,8 +216,13 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    protected async Task<PlayPromptOperation> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<MediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<MediaPrompt> mediaPrompts)
     {
+        if (mediaPrompts.Count() == 0)
+        {
+            _logger.LogWarning($"No media prompts to play for call {callState.CallId}");
+            return null;
+        }
         _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
 
         callState.MediaPromptsPlaying.AddRange(mediaPrompts);
@@ -200,10 +288,6 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError($"Error response {response.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
-        }
-        if (!response.IsSuccessStatusCode)
-        {
-            // Oops
         }
         response.EnsureSuccessStatusCode();
     }

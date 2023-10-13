@@ -16,6 +16,9 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     /// </summary>
     public string? CallId => GetCallId(ResourceUrl);
 
+    /// <summary>
+    /// Returns "6f1f5c00-8c1b-47f1-be9d-660c501041a9" from "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9"
+    /// </summary>
     public static string? GetCallId(string resourceUrl)
     {
         if (string.IsNullOrEmpty(resourceUrl)) return null;
@@ -38,6 +41,11 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     {
         return other != null && other.ResourceUrl == ResourceUrl && other.CallId == CallId;
     }
+
+    /// <summary>
+    /// Sounds to play on call
+    /// </summary>
+    public Dictionary<string, MediaPrompt> BotMediaPlaylist { get; set; } = new();
 
     /// <summary>
     /// Connected, Establishing, etc

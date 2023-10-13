@@ -29,16 +29,17 @@ POST this JSon to the bot endpoint /api/StartCall:
   [
       {
           "Id": "+3468279XXXX",
-          "DisplayId" : "Sam",
+          "DisplayName" : "Sam Phone",
           "Type": 1
       },
       {
           "Id": "3b10aa94-739a-472c-a68a-0000000",
-          "DisplayId" : "sam@alfredoj.local",
           "Type": 2
       }
   ]
 }
 
 ```
+For Teams users, we specify type "2" and the object ID of the user. For PSTN numbers, we specify type "1" and the PSTN number + a display name for that user. Teams users have their own names so can't be set. 
+
 The call data can include PSTN numbers or Teams users (object IDs). The bot will call the PSTN numbers and Teams users will be called via Teams. It only works with users in the same tenant as the bot. 

@@ -41,89 +41,99 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         {
             var callState = await _callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
 
-            if (callState != null && callState.HasValidCallId)
+            var updateCallState = false;
+
+            // Is this notification for a call we're tracking?
+            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification);
+
+            // If we're not updating the call state, check for other events
+            if (!updateCallState && callState != null)
             {
-                var updateCallState = false;
-
-                // Is this notification for a call we're tracking?
-                updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification);
-
-                // If we're not updating the call state, check for other events
-                if (!updateCallState)
+                // More call events
+                if (callnotification.AssociatedCall?.ToneInfo != null)
                 {
-                    // More call events
-                    if (callnotification.AssociatedCall?.ToneInfo != null)
+                    // Is this notification for a tone on a call we're tracking?
+                    updateCallState = true;
+                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState);
+                }
+                else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
+                {
+                    // Tone finished playing
+                    _logger.LogInformation($"Call {callState.CallId} finished playing tone");
+                    var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
+                    if (playingTone.Any())
                     {
-                        // Is this notification for a tone on a call we're tracking?
-                        updateCallState = true;
-                        await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState);
-                    }
-                    else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
-                    {
-                        // Tone finished playing
-                        _logger.LogInformation($"Call {callState.CallId} finished playing tone");
-                        var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
-                        if (playingTone.Any())
-                        {
-                            callState.MediaPromptsPlaying.Remove(playingTone.First());
-                            updateCallState = true;
-                        }
-                        if (_callbackInfo.PlayPromptFinished != null) await _callbackInfo.PlayPromptFinished(callState);
-                    }
-                    else if (callnotification.JoinedParticipants != null)
-                    {
-                        var newPartipants = callnotification.JoinedParticipants.GetJoinedParticipants(callState.JoinedParticipants);
-                        if (newPartipants.Count > 0)
-                        {
-                            // User joined group call
-                            _logger.LogInformation($"{newPartipants.Count} user(s) joined group call {callState.CallId}");
-                            if (_callbackInfo.UsersJoinedGroupCall != null) await _callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
-                        }
-
-                        var diconnectedPartipants = callnotification.JoinedParticipants.GetDisconnectedParticipants(callState.JoinedParticipants);
-                        if (diconnectedPartipants.Count > 0)
-                        {
-                            // User left group call
-                            _logger.LogInformation($"{diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
-                            if (_callbackInfo.UsersLeftGroupCall != null) await _callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
-                        }
-
-                        callState.JoinedParticipants = callnotification.JoinedParticipants;
+                        callState.MediaPromptsPlaying.Remove(playingTone.First());
                         updateCallState = true;
                     }
+                    if (_callbackInfo.PlayPromptFinished != null) await _callbackInfo.PlayPromptFinished(callState);
                 }
-                // Processing ended. Update?
-                if (updateCallState)
+                else if (callnotification.JoinedParticipants != null)
                 {
-                    await _callStateManager.Update(callState);
+                    var newPartipants = callnotification.JoinedParticipants.GetJoinedParticipants(callState.JoinedParticipants);
+                    if (newPartipants.Count > 0)
+                    {
+                        // User joined group call
+                        _logger.LogInformation($"{newPartipants.Count} user(s) joined group call {callState.CallId}");
+                        if (_callbackInfo.UsersJoinedGroupCall != null) await _callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
+                    }
+
+                    var diconnectedPartipants = callnotification.JoinedParticipants.GetDisconnectedParticipants(callState.JoinedParticipants);
+                    if (diconnectedPartipants.Count > 0)
+                    {
+                        // User left group call
+                        _logger.LogInformation($"{diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
+                        if (_callbackInfo.UsersLeftGroupCall != null) await _callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
+                    }
+
+                    callState.JoinedParticipants = callnotification.JoinedParticipants;
+                    updateCallState = true;
                 }
             }
-            else
+            // Processing ended. Update?
+            if (updateCallState && callState != null)
             {
-                // Not seen this call before. Is this notification for a new call?
-                if (callnotification.AssociatedCall != null && callnotification.AssociatedCall.State == CallState.Establishing)
-                {
-                    // Remember the call ID for later
-                    var newCallState = new T();
-                    newCallState.PopulateFromCallNotification(callnotification);
-
-                    if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(newCallState);
-                    await _callStateManager.AddCallState(newCallState);
-
-                    _logger.LogInformation($"Call {newCallState.CallId} is connecting");
-                }
-                else
-                {
-                    _logger.LogWarning($"Received notification for unknown call {callnotification.ResourceUrl}");
-                }
+                await _callStateManager.Update(callState);
             }
+
         }
 
         _semaphore.Release();
     }
 
-    private async Task<bool> HandleCallChangeTypeUpdate(T callState, CallNotification callNotification)
+    private async Task<bool> HandleCallChangeTypeUpdate(T? callState, CallNotification callNotification)
     {
+        // Not seen this call before. Is this notification for a new call?
+        if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
+        {
+            // Add to state manager if not already there
+            var newCallState = false;
+            if (callState == null)
+            {
+                newCallState = true;
+                callState = new T();
+            }
+            callState.PopulateFromCallNotification(callNotification);
+
+            if (newCallState)
+            {
+                await _callStateManager.AddCallStateOrUpdate(callState);
+            }
+            if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(callState);
+
+            _logger.LogInformation($"Call {callState.CallId} is connecting");
+
+            // Update call-state
+            callState.StateEnum = callNotification.AssociatedCall.State;
+            return true;
+        }
+
+        if (callState == null)
+        {
+            _logger.LogWarning($"Unexpected null call-state for call in state '{callNotification?.AssociatedCall?.State}'");
+            return false;
+        }
+
         if (callNotification.ChangeType == CallConstants.NOTIFICATION_TYPE_UPDATED)
         {
             var updateCallState = false;

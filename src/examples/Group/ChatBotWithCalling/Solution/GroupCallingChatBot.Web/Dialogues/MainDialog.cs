@@ -1,5 +1,6 @@
 ﻿using CommonUtils;
 using GroupCallingChatBot.Web.AdaptiveCards;
+using GroupCallingChatBot.Web.Bots;
 using GroupCallingChatBot.Web.Dialogues.Utils;
 using GroupCallingChatBot.Web.Models;
 using GroupCalls.Common;
@@ -48,7 +49,7 @@ public class MainDialog : CancellableDialogue
     {
         // Get user state
         var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
-        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => new StartGroupCallData());
+        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => TeamsDialogueBot<MainDialog>.GetDefaultStartGroupCallData(_config));
 
         var val = stepContext.Context.Activity.Value ?? string.Empty;
 
@@ -116,7 +117,7 @@ public class MainDialog : CancellableDialogue
     {
         // Get user state
         var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
-        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => new StartGroupCallData());
+        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => TeamsDialogueBot<MainDialog>.GetDefaultStartGroupCallData(_config));
 
         // Form action
         var validInput = false;
@@ -194,4 +195,5 @@ public class MainDialog : CancellableDialogue
 
         return await stepContext.EndDialogAsync(meetingState, cancellationToken);
     }
+
 }

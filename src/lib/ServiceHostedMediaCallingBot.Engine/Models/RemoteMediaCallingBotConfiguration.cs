@@ -26,4 +26,6 @@ public class SingleWavFileBotConfig : RemoteMediaCallingBotConfiguration
     /// A callback URL for the sound played over the phone.
     /// </summary>
     public string RelativeWavCallbackUrl { get; set; } = null!;
+
+    public string WavCallbackUrl => BotBaseUrl + RelativeWavCallbackUrl;
 }

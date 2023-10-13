@@ -1,4 +1,5 @@
 using GroupCallingChatBot.Web.AdaptiveCards;
+using GroupCallingChatBot.Web.Models;
 using GroupCalls.Common;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
@@ -12,15 +13,18 @@ namespace GroupCallingChatBot.Web.Bots;
 
 public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
 {
-    public TeamsDialogueBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
+    private readonly TeamsChatbotBotConfig _config;
+
+    public TeamsDialogueBot(TeamsChatbotBotConfig config, ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
         : base(conversationState, userState, dialog, logger)
     {
+        _config = config;
     }
 
     protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
     {
         var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
-        var meetingState = await userStateAccessors.GetAsync(turnContext, () => new StartGroupCallData());
+        var meetingState = await userStateAccessors.GetAsync(turnContext, () => GetDefaultStartGroupCallData(_config));
 
         var welcomeText = "Hello and welcome!";
         foreach (var member in membersAdded)
@@ -34,6 +38,11 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
                 await turnContext.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
             }
         }
+    }
+
+    public static StartGroupCallData GetDefaultStartGroupCallData(TeamsChatbotBotConfig botConfig)
+    {
+        return new StartGroupCallData { MessageUrl = $"{botConfig.BotBaseUrl}/audio/rickroll.wav" };
     }
 }
 

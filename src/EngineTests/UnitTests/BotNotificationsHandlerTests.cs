@@ -140,7 +140,7 @@ public class BotNotificationsHandlerTests
     }
 
     [TestMethod]
-    public async Task P2PFlowTests()
+    public async Task P2PFlowTestsNoPreviousCallState()
     {
         var callConnectedWithP2PAudioCount = 0;
         var callEstablishingCount = 0;
@@ -231,6 +231,62 @@ public class BotNotificationsHandlerTests
         Assert.IsTrue(await callStateManager.GetCount() == 0);
     }
 
+    /// <summary>
+    /// Tests we can add call-state for a call before the notifications are processed
+    /// </summary>
+    /// <returns></returns>
+    [TestMethod]
+    public async Task CallEstablishedWithPreviousCallState()
+    {
+        var callConnectedWithP2PAudioCount = 0;
+        var callEstablishingCount = 0;
+        var callEstablishedCount = 0;
+        var toneList = new List<Tone>();
+        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
+        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
+        {
+            CallEstablishing = (callState) =>
+            {
+                callEstablishingCount++;
+                return Task.CompletedTask;
+            },
+            CallEstablished = (callState) =>
+            {
+                callEstablishedCount++;
+                return Task.CompletedTask;
+            }
+        };
+        var notificationsManager = new BotNotificationsHandler<BaseActiveCallState>(callStateManager, callbackInfo, _logger);
+
+        // Make sure no call state exists
+        var callResourceUrl = NotificationsLibrary.P2PTest1CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
+        await callStateManager.Remove(callResourceUrl);
+        Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
+
+        // Insert initial state
+        var callState = new BaseActiveCallState
+        {
+            StateEnum = CallState.UnknownFutureValue,
+            ResourceUrl = callResourceUrl
+        };
+        await callStateManager.AddCallStateOrUpdate(callState);
+
+        Assert.IsNotNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
+
+
+        // Handle call establish for a call never seen before
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishingP2P);
+
+        // Establish the call
+        Assert.IsTrue(callEstablishingCount == 1, "CallEstablishing not fired");
+        Assert.IsTrue(callEstablishedCount == 0);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1CallEstablishedP2P);
+        Assert.IsTrue(callEstablishedCount == 1);
+
+        Assert.AreEqual(callStateManager.GetByNotificationResourceUrl(callResourceUrl).Result!.StateEnum,
+            CallState.Established);
+        Assert.IsTrue(callConnectedWithP2PAudioCount == 0);
+    }
 
     [TestMethod]
     public async Task AudoConnectMultiThreaded()
@@ -367,7 +423,7 @@ public class BotNotificationsHandlerTests
 
         // Add user. Should trigger the callback
         await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.GroupCallUserJoin);
-        Assert.IsTrue(userJoinedCount == 1, "Was expected a connected call");
+        Assert.IsTrue(userJoinedCount == 2, "Was expecting a call with 2 users joining (bot and user)");
 
 
         // Terminate the call

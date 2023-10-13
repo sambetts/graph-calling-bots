@@ -11,7 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 
 var config = new TeamsChatbotBotConfig(builder.Configuration);
 builder.Services.AddSingleton(config);
+
+#if !DEBUG
 builder.Services.AddApplicationInsightsTelemetry();
+#endif
 
 builder.Services.ConfigureGraphClient(config);
 

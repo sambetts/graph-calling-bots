@@ -18,12 +18,14 @@ public class HttpFunctions
     private readonly ILogger _logger;
     private readonly IPstnCallingBot _callingBot;
     private readonly CallingTestBotConfig _callingTestBotConfig;
+    private readonly SingleWavFileBotConfig _botConfig;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, IPstnCallingBot callingBot, CallingTestBotConfig callingTestBotConfig)
+    public HttpFunctions(ILoggerFactory loggerFactory, IPstnCallingBot callingBot, CallingTestBotConfig callingTestBotConfig, SingleWavFileBotConfig botConfig)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;
         _callingTestBotConfig = callingTestBotConfig;
+        _botConfig = botConfig;
     }
 
     /// <summary>
@@ -92,7 +94,7 @@ public class HttpFunctions
         _logger.LogInformation($"Starting new call to number {_callingTestBotConfig.TestNumber} (manual call)");
         try
         {
-            await _callingBot.StartPTSNCall(_callingTestBotConfig.TestNumber);
+            await _callingBot.StartPTSNCall(_callingTestBotConfig.TestNumber, _botConfig.WavCallbackUrl);
         }
         catch (Exception ex)
         {

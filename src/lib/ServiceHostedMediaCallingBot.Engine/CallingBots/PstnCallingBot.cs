@@ -18,46 +18,19 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
     /// <summary>
     /// Call someone over the phone with media set.
     /// </summary>
-    public async Task<Call?> StartPTSNCall(string phoneNumber)
+    public async Task<Call?> StartPTSNCall(string phoneNumber, string mediaUrl)
     {
         // PSTN call target - identity is type "phone", which the usual object model doesn't support very well
         var target = new IdentitySet();
         target.SetPhone(new Identity { Id = phoneNumber, DisplayName = phoneNumber });
 
-        // Attach media list
-        var mediaToPrefetch = new List<MediaInfo>();
-        foreach (var m in MediaMap)
-        {
-            mediaToPrefetch.Add(m.Value.MediaInfo);
-        }
+        var mediaInfoItem = new MediaInfo { Uri = mediaUrl, ResourceId = Guid.NewGuid().ToString() };
 
-        var pstnCall = new Call
-        {
-            Targets = new List<InvitationParticipantInfo>() { new InvitationParticipantInfo { Identity = target }, },
-            MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = mediaToPrefetch },
-            RequestedModalities = new List<Modality> { Modality.Audio },
-            TenantId = _botConfig.TenantId,
-            CallbackUri = _botConfig.CallingEndpoint,
-            Direction = CallDirection.Outgoing,
-            Source = new ParticipantInfo
-            {
-                // Set identity as this bot app ID (not user)
-                Identity = new IdentitySet
-                {
-                    Application = new Identity { Id = _botConfig.AppId },
-                },
-            }
-        };
+        var pstnCallRequest = await InitAndCreateCallRequest(new InvitationParticipantInfo { Identity = target }, mediaInfoItem, true);
 
-        // Also set ApplicationInstance source as this bot user account. Both are needed for PSTN calls
-        pstnCall.Source.Identity.SetApplicationInstance(
-            new Identity
-            {
-                Id = _botConfig.AppInstanceObjectId,
-                DisplayName = _botConfig.AppInstanceObjectName,
-            }
-        );
+        var createdCall = await StartNewCall(pstnCallRequest);
+        await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
 
-        return await StartNewCall(pstnCall);
+        return createdCall;
     }
 }

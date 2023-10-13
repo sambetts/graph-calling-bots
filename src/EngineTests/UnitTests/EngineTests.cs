@@ -51,7 +51,7 @@ public class EngineTests
 
         // Insert a call
         var callState = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85" };
-        await callStateManager.AddCallState((T)callState);
+        await callStateManager.AddCallStateOrUpdate((T)callState);
 
         // Get by notification resource url
         var callState2 = await callStateManager.GetByNotificationResourceUrl("/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85");

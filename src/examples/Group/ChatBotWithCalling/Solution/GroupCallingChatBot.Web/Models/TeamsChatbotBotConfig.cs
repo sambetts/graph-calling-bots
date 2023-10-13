@@ -34,9 +34,9 @@ public class TeamsChatbotBotConfig : PropertyBoundConfig
     [ConfigValue]
     public string BotBaseUrl { get; set; } = null!;
 
-    public RemoteMediaCallingBotConfiguration ToRemoteMediaCallingBotConfiguration(string relativeUrlCallingEndPoint)
+    public SingleWavFileBotConfig ToRemoteMediaCallingBotConfiguration(string relativeUrlCallingEndPoint)
     {
-        return new RemoteMediaCallingBotConfiguration
+        return new SingleWavFileBotConfig
         {
             AppId = MicrosoftAppId,
             AppInstanceObjectId = AppInstanceObjectId,
@@ -44,7 +44,8 @@ public class TeamsChatbotBotConfig : PropertyBoundConfig
             AppInstanceObjectName = "CallAndRedirectBot",
             BotBaseUrl = BotBaseUrl,
             CallingEndpoint = BotBaseUrl + relativeUrlCallingEndPoint,
-            TenantId = TenantId
+            TenantId = TenantId,
+            RelativeWavCallbackUrl = "/api/CallAndRedirectBot/GetWavFile",
         };
     }
 }

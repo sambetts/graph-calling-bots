@@ -20,7 +20,7 @@ public abstract class AbstractAzTablesStorageManager
 
     protected void InitCheck(TableClient? tableClient)
     {
-        if (tableClient == null) throw new InvalidOperationException("Not initialized");
+        if (tableClient == null) throw new InvalidOperationException($"{nameof(TableClient)} not initialized for read/write operations");
     }
 
     public abstract string TableName { get; }

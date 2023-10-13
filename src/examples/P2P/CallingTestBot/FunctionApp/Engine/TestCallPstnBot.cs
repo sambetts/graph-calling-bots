@@ -22,15 +22,6 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     public TestCallPstnBot(SingleWavFileBotConfig botOptions, CallingTestBotConfig callingTestBotConfig, ILogger<TestCallPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, IBotTestsLogger botTestsLogger)
         : base(botOptions, callStateManager, logger)
     {
-        // Play a "this is a test" wav file when the call is answered. Content delivered by function app.
-        MediaMap[NotificationPromptName] = new MediaPrompt
-        {
-            MediaInfo = new MediaInfo
-            {
-                Uri = new Uri(botOptions.BotBaseUrl + botOptions.RelativeWavCallbackUrl).ToString(),
-                ResourceId = Guid.NewGuid().ToString(),
-            },
-        };
         _callingTestBotConfig = callingTestBotConfig;
         _botTestsLogger = botTestsLogger;
     }

@@ -6,7 +6,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 {
     private readonly Dictionary<string, T> _callStates = new();
 
-    public Task AddCallState(T callState)
+    public Task AddCallStateOrUpdate(T callState)
     {
         if (callState is null || callState.CallId == null)
         {
@@ -14,7 +14,14 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         }
         lock (this)
         {
-            _callStates.Add(callState.CallId, callState);
+            if (_callStates.ContainsKey(callState.CallId))
+            {
+                _callStates[callState.CallId] = callState;
+            }
+            else
+            {
+                _callStates.Add(callState.CallId, callState);
+            }
         }
         return Task.CompletedTask;
     }
