@@ -74,7 +74,7 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         InitCheck(_tableClient);
 
         // There has to be a better way of doing this...
-        var r = _tableClient!.QueryAsync<TableCallState>(f=> f.PartitionKey == TableCallState.PARTITION_KEY);
+        var r = _tableClient!.QueryAsync<TableCallState>(f => f.PartitionKey == TableCallState.PARTITION_KEY);
 
         int count = 0;
         await foreach (var result in r)

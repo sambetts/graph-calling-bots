@@ -1,5 +1,4 @@
 using GroupCallingChatBot.Web.AdaptiveCards;
-using GroupCallingChatBot.Web.Models;
 using GroupCalls.Common;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;

@@ -16,7 +16,7 @@ public class RickrollPstnBot : PstnCallingBot<BaseActiveCallState>
     /// <summary>
     /// Initializes a new instance of the <see cref="RickrollPstnBot" /> class.
     /// </summary>
-    public RickrollPstnBot(SingleWavFileBotConfig botOptions, ILogger<RickrollPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager) 
+    public RickrollPstnBot(SingleWavFileBotConfig botOptions, ILogger<RickrollPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager)
         : base(botOptions, callStateManager, logger)
     {
         // Generate media prompts. Used later in call & need to have consistent IDs.

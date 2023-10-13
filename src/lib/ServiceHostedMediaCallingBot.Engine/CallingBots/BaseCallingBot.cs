@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Graph.Communications.Client.Authentication;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using System.Net.Http.Json;
-using System.Text.Json;
+using Microsoft.Graph.Communications.Client.Authentication;
+using ServiceHostedMediaCallingBot.Engine.Http;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using ServiceHostedMediaCallingBot.Engine.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 

@@ -1,10 +1,10 @@
-﻿using Microsoft.Bot.Builder.Teams;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Teams;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using System.Threading;
-using Microsoft.Bot.Builder.Dialogs;
+using System.Threading.Tasks;
 
 namespace GroupCallingChatBot.Web.Bots;
 

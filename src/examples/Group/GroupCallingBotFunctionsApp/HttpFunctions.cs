@@ -1,12 +1,12 @@
-using System.Net;
-using System.Reflection;
-using System.Text.Json;
 using CommonUtils;
 using GroupCalls.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using System.Net;
+using System.Reflection;
+using System.Text.Json;
 
 namespace GroupCallingBotFunctionsApp.FunctionApp;
 

@@ -60,7 +60,8 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
                 Identity = new IdentitySet { Application = new Identity { Id = _botConfig.AppId } },
             };
 
-            newCall.Source.Identity.SetApplicationInstance(new Identity {
+            newCall.Source.Identity.SetApplicationInstance(new Identity
+            {
                 Id = _botConfig.AppInstanceObjectId,
                 DisplayName = _botConfig.AppInstanceObjectName,
             });

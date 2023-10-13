@@ -4,7 +4,7 @@ using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
-public interface IGraphCallingBot 
+public interface IGraphCallingBot
 {
     Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
     Task<bool> ValidateNotificationRequestAsync(HttpRequest request);

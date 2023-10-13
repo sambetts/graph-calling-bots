@@ -1,5 +1,5 @@
-using CallingTestBot.FunctionApp.Extensions;
 using CallingTestBot.FunctionApp;
+using CallingTestBot.FunctionApp.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 

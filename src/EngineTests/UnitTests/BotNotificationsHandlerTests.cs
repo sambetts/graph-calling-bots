@@ -327,7 +327,7 @@ public class BotNotificationsHandlerTests
             },
             UsersLeftGroupCall = (callState, usersLeft) =>
             {
-                userLeftCount+= usersLeft.Count;
+                userLeftCount += usersLeft.Count;
                 return Task.CompletedTask;
             },
             PlayPromptFinished = (callState) =>

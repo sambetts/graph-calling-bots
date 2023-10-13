@@ -1,16 +1,16 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder;
-using System.Threading.Tasks;
-using System.Threading;
-using CommonUtils;
-using Microsoft.Bot.Schema;
-using System.Collections.Generic;
-using Microsoft.Graph;
-using Attachment = Microsoft.Bot.Schema.Attachment;
+﻿using CommonUtils;
+using GroupCallingChatBot.Web.AdaptiveCards;
 using GroupCallingChatBot.Web.Dialogues.Utils;
 using GroupCallingChatBot.Web.Models;
-using GroupCallingChatBot.Web.AdaptiveCards;
 using GroupCalls.Common;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Schema;
+using Microsoft.Graph;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Attachment = Microsoft.Bot.Schema.Attachment;
 
 namespace GroupCallingChatBot.Web.Dialogues;
 
@@ -165,9 +165,9 @@ public class MainDialog : CancellableDialogue
                 if (!validInput)
                 {
                     validInput = DataValidation.IsValidNumber(addContactActionInfo.ContactId);
-                    meetingState.Attendees.Add(new AttendeeCallInfo 
-                    { 
-                        Id = addContactActionInfo.ContactId, 
+                    meetingState.Attendees.Add(new AttendeeCallInfo
+                    {
+                        Id = addContactActionInfo.ContactId,
                         Type = MeetingAttendeeType.Phone,
                         DisplayName = addContactActionInfo.ContactId
                     });

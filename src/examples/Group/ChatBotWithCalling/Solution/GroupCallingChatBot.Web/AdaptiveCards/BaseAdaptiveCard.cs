@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using AdaptiveCards;
+using Microsoft.Bot.Schema;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Reflection;
-using System;
-using Microsoft.Bot.Schema;
-using AdaptiveCards;
 
 namespace GroupCallingChatBot.Web.AdaptiveCards;
 

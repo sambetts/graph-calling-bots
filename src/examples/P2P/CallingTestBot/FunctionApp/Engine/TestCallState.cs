@@ -1,5 +1,5 @@
-﻿using Azure.Data.Tables;
-using Azure;
+﻿using Azure;
+using Azure.Data.Tables;
 
 namespace CallingTestBot.FunctionApp.Engine;
 
