@@ -15,7 +15,7 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
 
     public async Task LogNewCallEstablishing(string callId, string numberCalled)
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
         var newCallTestLog = new TestCallState { CallId = callId, CallConnectedOk = false, Timestamp = DateTime.UtcNow, NumberCalled = numberCalled };
         await _tableClient!.UpsertEntityAsync(newCallTestLog);
@@ -23,7 +23,7 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
 
     public async Task LogCallConnectedSuccesfully(string callId)
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
         var existingCallTestLog = await GetTestCallStateOrThrowIfNone(callId);
         existingCallTestLog.CallConnectedOk = true;
@@ -32,7 +32,7 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
 
     public async Task LogCallTerminated(string callId, ResultInfo resultInfo)
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
         var existingCallTestLog = await GetTestCallStateOrThrowIfNone(callId);
 
@@ -43,7 +43,7 @@ public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsL
 
     public async Task<TestCallState?> GetTestCallState(string callId)
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
         var results = _tableClient!.QueryAsync<TestCallState>(f => f.RowKey == callId);
         await foreach (var result in results)

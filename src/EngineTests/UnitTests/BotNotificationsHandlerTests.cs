@@ -4,8 +4,20 @@ using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.UnitTests.TestServices;
+using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
+
+public static class BotNotificationsHandlerTestExtensions
+{
+    // Shortcut to also send payload
+    public static async Task HandleNotificationsAndUpdateCallStateAsync(this BotNotificationsHandler<BaseActiveCallState> notificationsManager, CommsNotificationsPayload? notificationPayload)
+    {
+        var graphNotificationPayload = JsonSerializer.SerializeToDocument(notificationPayload);
+        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(notificationPayload, graphNotificationPayload);
+    }
+}
+
 
 [TestClass]
 public class BotNotificationsHandlerTests
@@ -228,7 +240,7 @@ public class BotNotificationsHandlerTests
         Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
         Assert.IsTrue(callTerminatedCount == 1);
 
-        Assert.IsTrue(await callStateManager.GetCount() == 0);
+        Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 0);
     }
 
     /// <summary>
@@ -260,7 +272,7 @@ public class BotNotificationsHandlerTests
 
         // Make sure no call state exists
         var callResourceUrl = NotificationsLibrary.P2PTest1CallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
-        await callStateManager.Remove(callResourceUrl);
+        await callStateManager.RemoveCurrentCall(callResourceUrl);
         Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
 
         // Insert initial state
@@ -431,6 +443,6 @@ public class BotNotificationsHandlerTests
         Assert.IsNull(await callStateManager.GetByNotificationResourceUrl(callResourceUrl));
         Assert.IsTrue(callTerminatedCount == 1);
 
-        Assert.IsTrue(await callStateManager.GetCount() == 0);
+        Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 0);
     }
 }

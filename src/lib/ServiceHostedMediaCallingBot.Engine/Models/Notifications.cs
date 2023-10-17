@@ -7,7 +7,6 @@ namespace ServiceHostedMediaCallingBot.Engine.Models;
 
 public class CommsNotificationsPayload
 {
-
     [JsonPropertyName("value")]
     public List<CallNotification> CommsNotifications { get; set; } = new();
 }

@@ -9,7 +9,7 @@ namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 public abstract class AbstractAzTablesStorageManager
 {
     protected readonly TableServiceClient _tableServiceClient;
-    protected TableClient? _tableClient;
+    protected TableClient? _tableClient = null;
 
     public bool Initialised => _tableClient != null;
 
@@ -18,9 +18,9 @@ public abstract class AbstractAzTablesStorageManager
         _tableServiceClient = new TableServiceClient(storageConnectionString);
     }
 
-    protected void InitCheck(TableClient? tableClient)
+    protected void InitCheck()
     {
-        if (tableClient == null) throw new InvalidOperationException($"{nameof(TableClient)} not initialized for read/write operations");
+        if (_tableClient == null) throw new InvalidOperationException($"{nameof(TableClient)} not initialized for read/write operations");
     }
 
     public abstract string TableName { get; }

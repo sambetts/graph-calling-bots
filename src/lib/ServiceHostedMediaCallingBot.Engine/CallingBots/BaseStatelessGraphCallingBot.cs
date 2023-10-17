@@ -159,7 +159,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             if (createdCallState != null)
             {
                 updateCacheCallback?.Invoke(createdCallState);
-                await _callStateManager.Update(createdCallState);
+                await _callStateManager.UpdateCurrentCallState(createdCallState);
             }
             else
             {
@@ -186,9 +186,10 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
     }
 
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications, string bodyRaw)
     {
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
+        var body = JsonDocument.Parse(bodyRaw);
+        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
     }
 
     #region Bot Events
@@ -323,6 +324,11 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             _logger.LogError($"Error response {response.StatusCode} calling Graph API url {urlMinusRoot}: {content}");
         }
         response.EnsureSuccessStatusCode();
+    }
+
+    public Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
+    {
+        throw new NotImplementedException();
     }
 
 

@@ -2,6 +2,8 @@
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
@@ -26,10 +28,11 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, JsonDocument body)
     {
         if (notificationPayload == null) return;
 
+        // Ensure processing is single-threaded to maintain processing order
         await _semaphore.WaitAsync();
 
         if (!_callStateManager.Initialised)
@@ -49,6 +52,9 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
             {
+                // Update call history
+                await _callStateManager.AddToCallHistory(callState, body);
+
                 // More call events
                 if (callnotification.AssociatedCall?.ToneInfo != null)
                 {
@@ -93,7 +99,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             // Processing ended. Update?
             if (updateCallState && callState != null)
             {
-                await _callStateManager.Update(callState);
+                await _callStateManager.UpdateCurrentCallState(callState);
             }
 
         }
@@ -167,7 +173,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             if (!string.IsNullOrEmpty(callState.CallId))
             {
                 _logger.LogInformation($"Call {callState.CallId} terminated");
-                var removeSuccess = await _callStateManager.Remove(callState.ResourceUrl);
+                var removeSuccess = await _callStateManager.RemoveCurrentCall(callState.ResourceUrl);
                 if (removeSuccess)
                     _logger.LogInformation($"Call {callState.CallId} state removed");
                 else

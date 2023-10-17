@@ -54,7 +54,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
                 await InviteToCallAsync(callState.CallId, callState.Invites);
 
                 callState.Invites.Clear();
-                await _callStateManager.Update(callState);
+                await _callStateManager.UpdateCurrentCallState(callState);
             }
         }
     }
