@@ -25,25 +25,19 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         var mediaInfoItem = new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
 
         // Work out who to call first & who to invite
-        var (initialAddList, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
+        var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
 
         // Create call for initial participants
-        var newCall = await InitAndCreateCallRequest(initialAddList, mediaInfoItem, meetingRequest.HasPSTN);
+        var newCall = await InitAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Start call
-        if (newCall != null)
+        var createdCall = await StartNewCall(newCall);
+
+        if (createdCall != null)
         {
-            var createdCall = await StartNewCall(newCall);
-
-            if (createdCall != null)
-            {
-                await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
-            }
-            return createdCall;
-
+            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
         }
-        
-        return null;
+        return createdCall;
     }
 
 

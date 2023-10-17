@@ -24,12 +24,13 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
         var target = new IdentitySet();
         target.SetPhone(new Identity { Id = phoneNumber, DisplayName = phoneNumber });
 
-        var mediaInfoItem = new MediaInfo { Uri = mediaUrl, ResourceId = Guid.NewGuid().ToString() };
 
+        var mediaInfoItem = new MediaInfo { Uri = mediaUrl, ResourceId = Guid.NewGuid().ToString() };
         var pstnCallRequest = await InitAndCreateCallRequest(new InvitationParticipantInfo { Identity = target }, mediaInfoItem, true);
 
         var createdCall = await StartNewCall(pstnCallRequest);
-        await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
+        if (createdCall != null)
+            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
 
         return createdCall;
     }
