@@ -14,14 +14,16 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
 {
     private readonly ILogger _logger;
     private readonly ICallStateManager<T> _callStateManager;
+    private readonly ICallHistoryManager<T> _callHistoryManager;
     private readonly NotificationCallbackInfo<T> _callbackInfo;
 
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-    public BotNotificationsHandler(ICallStateManager<T> callStateManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
+    public BotNotificationsHandler(ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
     {
         _logger = logger;
         _callStateManager = callStateManager;
+        _callHistoryManager = callHistoryManager;
         _callbackInfo = callbackInfo;
     }
 
@@ -39,6 +41,10 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         {
             await _callStateManager.Initialise();
         }
+        if (!_callHistoryManager.Initialised)
+        {
+            await _callHistoryManager.Initialise();
+        }
 
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
@@ -53,7 +59,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             if (!updateCallState && callState != null)
             {
                 // Update call history
-                await _callStateManager.AddToCallHistory(callState, body);
+                await _callHistoryManager.AddToCallHistory(callState, body);
 
                 // More call events
                 if (callnotification.AssociatedCall?.ToneInfo != null)

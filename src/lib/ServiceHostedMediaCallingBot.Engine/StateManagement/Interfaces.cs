@@ -20,9 +20,6 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
     Task<bool> RemoveCurrentCall(string resourceUrl);
     Task UpdateCurrentCallState(T callState);
     Task<int> GetCurrentCallCount();
-
-    Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload);
-    Task<CallHistoryEntity<T>?> GetCallHistory(T callState);
 }
 
 public interface ICallHistoryManager<T> : IAsyncInit where T : BaseActiveCallState

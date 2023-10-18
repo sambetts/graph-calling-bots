@@ -145,7 +145,7 @@ public class AzTablesCallHistoryManager<T> : AbstractAzTablesStorageManager, ICa
     {
         InitCheck();
 
-        var r = await _tableClient!.GetEntityIfExistsAsync<CallHistoryEntity<T>>(callState.CallId, CallHistoryEntity<T>.PARTITION_KEY);
+        var r = await _tableClient!.GetEntityIfExistsAsync<CallHistoryEntity<T>>(CallHistoryEntity<T>.PARTITION_KEY, callState.CallId);
         if (r.HasValue)
         {
             return r.Value;

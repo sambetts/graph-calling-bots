@@ -1,50 +1,43 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using ServiceHostedMediaCallingBot.UnitTests.TestServices;
 using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
 
 [TestClass]
-public class EngineTests
+public class EngineTests : BaseTests
 {
-    private ILogger _logger;
-    public EngineTests()
-    {
-        _logger = LoggerFactory.Create(config =>
-        {
-            config.AddTraceSource(new System.Diagnostics.SourceSwitch("SourceSwitch"));
-            config.AddConsole();
-        }).CreateLogger("Unit tests");
-    }
-
     [TestMethod]
     public async Task ConcurrentInMemoryCallStateManager()
     {
-        var callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
-        await Test(callStateManager);
+        await Test(_callStateManager, _historyManager);
     }
 
     [TestMethod]
     public async Task AzTablesCallStateManagerTests()
     {
         var callStateManager = new AzTablesCallStateManager<BaseActiveCallState>("UseDevelopmentStorage=true");
+        var historyManager = new AzTablesCallHistoryManager<BaseActiveCallState>("UseDevelopmentStorage=true");
 
         await callStateManager.Initialise();
         await callStateManager.RemoveAll();
-        await Test(callStateManager);
+        await Test(callStateManager, historyManager);
 
         // Test also a failed call
-        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager);
+        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, _historyManager);
     }
-    async Task Test<T>(ICallStateManager<T> callStateManager) where T : BaseActiveCallState, new()
+    async Task Test<T>(ICallStateManager<T> callStateManager, ICallHistoryManager<T> historyManager) where T : BaseActiveCallState, new()
     {
         if (!callStateManager.Initialised)
         {
             await callStateManager.Initialise();
         }
+        if (!historyManager.Initialised)
+        {
+            await historyManager.Initialise();
+        }
+
 
         // Check that we have no calls
         var nonExistentState = await callStateManager.GetByNotificationResourceUrl("whatever");
@@ -52,7 +45,7 @@ public class EngineTests
         Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 0);
 
         // History should be null
-        var historyNull = await callStateManager.GetCallHistory(new T { ResourceUrl = "/communications/calls/randomID/" });
+        var historyNull = await historyManager.GetCallHistory(new T { ResourceUrl = "/communications/calls/randomID/" });
         Assert.IsNull(historyNull);
 
         // Insert a call
@@ -60,8 +53,8 @@ public class EngineTests
         await callStateManager.AddCallStateOrUpdate((T)callState);
 
         // History check
-        await callStateManager.AddToCallHistory(callState, JsonDocument.Parse("{}"));
-        var history = await callStateManager.GetCallHistory(callState);
+        await historyManager.AddToCallHistory(callState, JsonDocument.Parse("{}"));
+        var history = await historyManager.GetCallHistory(callState);
         Assert.IsNotNull(history);
         Assert.IsNotNull(history.NotificationsHistory);
         Assert.IsTrue(history.NotificationsHistory.Count == 1);

@@ -12,8 +12,8 @@ namespace GroupCalls.Common;
 public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
 {
 
-    public GroupCallStartBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallStartBot> logger)
-        : base(botOptions, callStateManager, logger)
+    public GroupCallStartBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ICallHistoryManager<GroupCallActiveCallState> callHistoryManager, ILogger<GroupCallStartBot> logger)
+        : base(botOptions, callStateManager, callHistoryManager, logger)
     {
     }
 

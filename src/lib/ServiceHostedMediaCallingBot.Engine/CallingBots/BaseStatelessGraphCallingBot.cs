@@ -21,15 +21,17 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
+    private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
         _callStateManager = callStateManager;
+        _callHistoryManager = callHistoryManager;
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
@@ -46,7 +48,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             PlayPromptFinished = PlayPromptFinished,
             UsersJoinedGroupCall = UsersJoinedGroupCall
         };
-        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, callBacks, _logger);
+        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, _callHistoryManager, callBacks, _logger);
     }
 
     public async Task<bool> ValidateNotificationRequestAsync(HttpRequest request)
