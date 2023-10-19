@@ -95,9 +95,9 @@ public class CallHistoryEntity<T> : ITableEntity where T : BaseActiveCallState
 
 
     [IgnoreDataMember]
-    public JsonArray NotificationsHistory 
+    public JsonElement[] NotificationsHistory 
     { 
-        get => !string.IsNullOrEmpty(NotificationsHistoryJson) ? JsonSerializer.Deserialize<JsonArray>(NotificationsHistoryJson) ?? new JsonArray() : new JsonArray(); 
+        get => !string.IsNullOrEmpty(NotificationsHistoryJson) ? JsonSerializer.Deserialize<JsonElement[]>(NotificationsHistoryJson) ?? new JsonElement[0] : new JsonElement[0]; 
         set => NotificationsHistoryJson = JsonSerializer.Serialize(value); }
 
     public string NotificationsHistoryJson { get; set; } = null!;

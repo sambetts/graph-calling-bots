@@ -6,7 +6,7 @@ namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> where T : BaseActiveCallState
 {
-    private readonly Dictionary<string, JsonArray> _callHistory = new();
+    private readonly Dictionary<string, JsonElement[]> _callHistory = new();
 
     public Task Initialise()
     {
@@ -20,13 +20,15 @@ public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> wh
         {
             if (callState.HasValidCallId)
             {
+
+                var newHistoryArray = new JsonElement[1] { graphNotificationPayload.RootElement };
                 if (!_callHistory.ContainsKey(callState.CallId!))
                 {
-                    _callHistory[callState.CallId!] = new JsonArray { graphNotificationPayload };
+                    _callHistory[callState.CallId!] = newHistoryArray;
                 }
                 else
                 {
-                    _callHistory[callState.CallId!].Add(graphNotificationPayload);
+                    _callHistory[callState.CallId!] = _callHistory[callState.CallId!].Concat(newHistoryArray).ToArray();
                 }
             }
         }
@@ -50,5 +52,20 @@ public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> wh
             }
         }
         return Task.FromResult<CallHistoryEntity<T>?>(null);
+    }
+
+    Task ICallHistoryManager<T>.DeleteCallHistory(T callState)
+    {
+        lock (this)
+        {
+            if (callState.HasValidCallId)
+            {
+                if (_callHistory.ContainsKey(callState.CallId!))
+                {
+                    _callHistory.Remove(callState.CallId!);
+                }
+            }
+        }
+        return Task.CompletedTask;
     }
 }

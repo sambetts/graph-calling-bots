@@ -26,4 +26,6 @@ public interface ICallHistoryManager<T> : IAsyncInit where T : BaseActiveCallSta
 {
     Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload);
     Task<CallHistoryEntity<T>?> GetCallHistory(T callState);
+
+    Task DeleteCallHistory(T callState);
 }

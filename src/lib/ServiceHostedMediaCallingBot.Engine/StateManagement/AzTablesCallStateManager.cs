@@ -89,12 +89,12 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         var r = await GetCallHistory(callState);
         if (r != null)
         {
-            r.NotificationsHistory = new JsonArray { r.NotificationsHistory.Concat(new JsonArray { graphNotificationPayload }) };
+            r.NotificationsHistory = r.NotificationsHistory.Concat(new JsonElement[1] { graphNotificationPayload.RootElement }).ToArray();
         }
         else
         {
             r = new CallHistoryEntity<T>(callState);
-            r.NotificationsHistory = new JsonArray { graphNotificationPayload };
+            r.NotificationsHistory = new JsonElement[0];
         }
 
         await _tableClient!.UpsertEntityAsync(r);
@@ -127,15 +127,16 @@ public class AzTablesCallHistoryManager<T> : AbstractAzTablesStorageManager, ICa
     {
         InitCheck();
 
+        var newHistoryArray = new JsonElement[1] { graphNotificationPayload.RootElement };
         var r = await GetCallHistory(callState);
         if (r != null)
         {
-            r.NotificationsHistory = new JsonArray { r.NotificationsHistory.Concat(new JsonArray { graphNotificationPayload }) };
+            r.NotificationsHistory = r.NotificationsHistory.Concat(newHistoryArray).ToArray();
         }
         else
         {
             r = new CallHistoryEntity<T>(callState);
-            r.NotificationsHistory = new JsonArray { graphNotificationPayload };
+            r.NotificationsHistory = newHistoryArray;
         }
 
         await _tableClient!.UpsertEntityAsync(r);
@@ -152,5 +153,11 @@ public class AzTablesCallHistoryManager<T> : AbstractAzTablesStorageManager, ICa
         }
 
         return null;
+    }
+
+    public async Task DeleteCallHistory(T callState)
+    {
+        InitCheck();
+        await _tableClient!.DeleteEntityAsync(CallHistoryEntity<T>.PARTITION_KEY, callState.CallId);
     }
 }

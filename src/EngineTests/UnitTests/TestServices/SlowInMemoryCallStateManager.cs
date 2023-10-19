@@ -8,7 +8,6 @@ namespace ServiceHostedMediaCallingBot.UnitTests.TestServices;
 public class SlowInMemoryCallStateManager<T> : ICallStateManager<T> where T : BaseActiveCallState
 {
     private readonly Dictionary<string, T> _callStates = new();
-    private readonly Dictionary<string, JsonArray> _callHistory = new();
 
     public async Task AddCallStateOrUpdate(T callState)
     {
@@ -84,51 +83,9 @@ public class SlowInMemoryCallStateManager<T> : ICallStateManager<T> where T : Ba
         }
     }
 
-    public async Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload)
-    {
-        await Delay();
-        lock (this)
-        {
-            if (callState.HasValidCallId)
-            {
-                if (!_callHistory.ContainsKey(callState.CallId!))
-                {
-                    _callHistory[callState.CallId!] = new JsonArray { graphNotificationPayload };
-                }
-                else
-                {
-                    _callHistory[callState.CallId!].Add(graphNotificationPayload);
-                }
-            }
-        }
-    }
-
     async Task Delay()
     {
         await Task.Delay(100);
     }
 
-    public async Task<CallHistoryEntity<T>?> GetCallHistory(T callState)
-    {
-        await Delay();
-        lock (this)
-        {
-            if (callState.HasValidCallId)
-            {
-                if (!_callStates.ContainsKey(callState.CallId!))
-                {
-                    return null;
-                }
-                if (_callHistory.ContainsKey(callState.CallId!))
-                {
-                    return new CallHistoryEntity<T>(callState) { NotificationsHistory = _callHistory[callState.CallId!] };
-                }
-                else
-                {
-                    return new CallHistoryEntity<T>(callState);
-                }
-            }
-        }
-        return null;
-    }
 }
