@@ -9,12 +9,12 @@ public static class Extentions
         return callMediaState != null && callMediaState.Audio.HasValue && callMediaState.Audio.Value == MediaState.Active;
     }
 
-    public static List<Participant> GetJoinedParticipants(this List<Participant>? newPartipantList, IEnumerable<Participant>? oldList)
+    public static List<CallParticipant> GetJoinedParticipants(this List<CallParticipant>? newPartipantList, IEnumerable<CallParticipant>? oldList)
     {
-        if (newPartipantList == null) return new List<Participant>();
+        if (newPartipantList == null) return new List<CallParticipant>();
         if (oldList == null) return newPartipantList;
 
-        var joinedParticipants = new List<Participant>();
+        var joinedParticipants = new List<CallParticipant>();
 
         foreach (var newParticipant in newPartipantList)
         {
@@ -27,12 +27,12 @@ public static class Extentions
         return joinedParticipants;
     }
 
-    public static List<Participant> GetDisconnectedParticipants(this List<Participant>? newPartipantList, IEnumerable<Participant>? oldList)
+    public static List<CallParticipant> GetDisconnectedParticipants(this List<CallParticipant>? newPartipantList, IEnumerable<CallParticipant>? oldList)
     {
-        if (newPartipantList == null) return new List<Participant>();
-        if (oldList == null) return new List<Participant>();
+        if (newPartipantList == null) return new List<CallParticipant>();
+        if (oldList == null) return new List<CallParticipant>();
 
-        var disconnectedParticipants = new List<Participant>();
+        var disconnectedParticipants = new List<CallParticipant>();
 
         foreach (var oldParticipant in oldList)
         {

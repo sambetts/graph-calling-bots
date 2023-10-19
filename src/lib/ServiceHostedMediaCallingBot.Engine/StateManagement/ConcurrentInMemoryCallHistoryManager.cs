@@ -6,7 +6,7 @@ namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> where T : BaseActiveCallState
 {
-    private readonly Dictionary<string, JsonElement[]> _callHistory = new();
+    private readonly Dictionary<string, CallHistoryEntity<T>> _callHistory = new();
 
     public Task Initialise()
     {
@@ -20,15 +20,17 @@ public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> wh
         {
             if (callState.HasValidCallId)
             {
-
                 var newHistoryArray = new JsonElement[1] { graphNotificationPayload.RootElement };
+                var newCallStateList = new List<T> { callState };
+
                 if (!_callHistory.ContainsKey(callState.CallId!))
                 {
-                    _callHistory[callState.CallId!] = newHistoryArray;
+                    _callHistory.Add(callState.CallId!, new CallHistoryEntity<T>(callState) { NotificationsHistory = newHistoryArray, StateHistory = newCallStateList });
                 }
                 else
                 {
-                    _callHistory[callState.CallId!] = _callHistory[callState.CallId!].Concat(newHistoryArray).ToArray();
+                    _callHistory[callState.CallId!].NotificationsHistory = _callHistory[callState.CallId!].NotificationsHistory.Concat(newHistoryArray).ToArray();
+                    _callHistory[callState.CallId!].StateHistory = _callHistory[callState.CallId!].StateHistory.Concat(newCallStateList).ToList();
                 }
             }
         }
@@ -43,7 +45,7 @@ public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> wh
             {
                 if (_callHistory.ContainsKey(callState.CallId!))
                 {
-                    return Task.FromResult<CallHistoryEntity<T>?>( new CallHistoryEntity<T>(callState) { NotificationsHistory = _callHistory[callState.CallId!] });
+                    return Task.FromResult<CallHistoryEntity<T>?>( _callHistory[callState.CallId!]);
                 }
                 else
                 {

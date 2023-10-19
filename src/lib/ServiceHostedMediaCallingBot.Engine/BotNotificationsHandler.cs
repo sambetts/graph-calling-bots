@@ -3,7 +3,6 @@ using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
@@ -49,7 +48,6 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var callState = await _callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
-
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
@@ -58,8 +56,6 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
             {
-                // Update call history
-                await _callHistoryManager.AddToCallHistory(callState, body);
 
                 // More call events
                 if (callnotification.AssociatedCall?.ToneInfo != null)
@@ -108,6 +104,11 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
                 await _callStateManager.UpdateCurrentCallState(callState);
             }
 
+            // Update history even if no state changes
+            if (callState != null)
+            {
+                await _callHistoryManager.AddToCallHistory(callState, body);
+            }
         }
 
         _semaphore.Release();
@@ -119,16 +120,18 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
         {
             // Add to state manager if not already there
-            var newCallState = false;
+            var newCallStateCreated = false;
             if (callState == null)
             {
-                newCallState = true;
+                newCallStateCreated = true;
                 callState = new T();
             }
             callState.PopulateFromCallNotification(callNotification);
 
-            if (newCallState)
+            if (newCallStateCreated)
             {
+                // Normally we should have an existing state but just in case....
+                _logger.LogInformation($"Created call state for call {callState.CallId} (from Graph notification)");
                 await _callStateManager.AddCallStateOrUpdate(callState);
             }
             if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(callState);
@@ -230,6 +233,6 @@ public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
     public Func<string, ResultInfo, Task>? CallTerminated { get; set; }
     public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
-    public Func<T, List<Participant>, Task>? UsersJoinedGroupCall { get; set; }
-    public Func<T, List<Participant>, Task>? UsersLeftGroupCall { get; set; }
+    public Func<T, List<CallParticipant>, Task>? UsersJoinedGroupCall { get; set; }
+    public Func<T, List<CallParticipant>, Task>? UsersLeftGroupCall { get; set; }
 }

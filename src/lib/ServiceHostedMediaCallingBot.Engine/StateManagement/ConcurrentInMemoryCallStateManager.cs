@@ -6,7 +6,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 {
     private readonly Dictionary<string, T> _callStates = new();
 
-    public Task AddCallStateOrUpdate(T callState)
+    public virtual Task AddCallStateOrUpdate(T callState)
     {
         if (callState is null || callState.CallId == null)
         {
@@ -26,7 +26,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         return Task.CompletedTask;
     }
 
-    public Task<T?> GetByNotificationResourceUrl(string resourceUrl)
+    public virtual Task<T?> GetByNotificationResourceUrl(string resourceUrl)
     {
         var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult<T?>(null);
@@ -39,7 +39,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         }
     }
 
-    public Task<bool> RemoveCurrentCall(string resourceUrl)
+    public virtual Task<bool> RemoveCurrentCall(string resourceUrl)
     {
         var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult(false);
@@ -51,7 +51,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         }
     }
 
-    public Task UpdateCurrentCallState(T callState)
+    public virtual Task UpdateCurrentCallState(T callState)
     {
         if (callState is null || callState.CallId == null)
         {
@@ -74,12 +74,11 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
     }
     public bool Initialised => true;        // Nothing to initialise
 
-    public Task<int> GetCurrentCallCount()
+    public virtual Task<int> GetCurrentCallCount()
     {
         lock (this)
         {
             return Task.FromResult(_callStates.Count);
         }
     }
-
 }

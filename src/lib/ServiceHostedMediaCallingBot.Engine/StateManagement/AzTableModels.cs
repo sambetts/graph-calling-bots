@@ -89,7 +89,7 @@ public class CallHistoryEntity<T> : ITableEntity where T : BaseActiveCallState
     public ETag ETag { get; set; }
 
     [IgnoreDataMember]
-    public List<T>? StateHistory { get => JsonSerializer.Deserialize<List<T>>(StateHistoryJson); set => StateHistoryJson = JsonSerializer.Serialize(value); }
+    public List<T> StateHistory { get => JsonSerializer.Deserialize<List<T>>(StateHistoryJson) ?? new List<T>(); set => StateHistoryJson = JsonSerializer.Serialize(value); }
 
     public string StateHistoryJson { get; set; } = null!;
 

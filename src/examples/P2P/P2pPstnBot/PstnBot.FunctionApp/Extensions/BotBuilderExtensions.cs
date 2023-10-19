@@ -14,7 +14,7 @@ public static class BotBuilderExtensions
 
         // Use in-memory storage is no storage is configured
         if (!string.IsNullOrEmpty(config.Storage))
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>>(new AzTablesCallStateManager<BaseActiveCallState>(config.Storage));
+            services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
 
         else
             services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();

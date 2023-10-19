@@ -39,13 +39,19 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 
     public bool Equals(BaseActiveCallState? other)
     {
-        return other != null && other.ResourceUrl == ResourceUrl && other.CallId == CallId;
+        return other != null && other.ResourceUrl == ResourceUrl 
+            && other.CallId == CallId
+            && other.StateEnum == StateEnum
+            && other.BotMediaPlaylist.Select(p => p.Key).SequenceEqual(BotMediaPlaylist.Select(p => p.Key))
+            && other.BotMediaPlaylist.Select(p => p.Value).SequenceEqual(BotMediaPlaylist.Select(p => p.Value))
+            && other.JoinedParticipants.SequenceEqual(JoinedParticipants)
+            && other.TonesPressed.SequenceEqual(TonesPressed);
     }
 
     /// <summary>
     /// Sounds to play on call
     /// </summary>
-    public Dictionary<string, MediaPrompt> BotMediaPlaylist { get; set; } = new();
+    public Dictionary<string, CallMediaPrompt> BotMediaPlaylist { get; set; } = new();
 
     /// <summary>
     /// Connected, Establishing, etc
@@ -53,8 +59,8 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     public CallState? StateEnum { get; set; } = null;
 
     public List<Tone> TonesPressed { get; set; } = new();
-    public List<MediaPrompt> MediaPromptsPlaying { get; set; } = new();
+    public List<CallMediaPrompt> MediaPromptsPlaying { get; set; } = new();
 
-    public List<Participant>? JoinedParticipants { get; set; }
+    public List<CallParticipant> JoinedParticipants { get; set; } = new();
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
 }

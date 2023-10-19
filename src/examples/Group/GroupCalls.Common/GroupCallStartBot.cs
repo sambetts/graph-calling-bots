@@ -31,7 +31,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         var newCall = await InitAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Start call
-        var createdCall = await StartNewCall(newCall);
+        var createdCall = await VerifyMediaAndCreateNewCall(newCall, mediaInfoItem);
 
         if (createdCall != null)
         {
@@ -59,40 +59,16 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         }
     }
 
-    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<Participant> participants)
+    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<CallParticipant> participants)
     {
-        await CheckCall(callState);
+        await base.UsersJoinedGroupCall(callState, participants);
+        await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
     }
 
     protected async override Task CallConnectedWithP2PAudio(GroupCallActiveCallState callState)
     {
-        await CheckCall(callState);
+        await base.CallConnectedWithP2PAudio(callState);
+        await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
     }
 
-    async Task CheckCall(GroupCallActiveCallState callState)
-    {
-        // Don't play media if already playing
-        var alreadyPlaying = false;
-        foreach (var itemToPlay in callState.BotMediaPlaylist.Values)
-        {
-            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo.ResourceId).Contains(itemToPlay.MediaInfo.ResourceId))
-            {
-                alreadyPlaying = true;
-                break;
-            }
-        }
-
-        // But if not playing, play notification prompt again
-        if (!alreadyPlaying)
-        {
-            try
-            {
-                await PlayPromptAsync(callState, callState.BotMediaPlaylist.Select(m => m.Value));
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Error playing prompt");
-            }
-        }
-    }
 }

@@ -19,4 +19,13 @@ public class BaseTests
             config.AddConsole();
         }).CreateLogger("Unit tests");
     }
+
+    protected ILogger<T> GetLogger<T>()
+    {
+        return
+        LoggerFactory.Create(config =>
+        {
+            config.AddConsole();
+        }).CreateLogger<T>(); ;
+    }
 }

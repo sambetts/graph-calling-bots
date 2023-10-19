@@ -1,4 +1,6 @@
-﻿using Microsoft.Graph;
+﻿using Azure.Data.Tables;
+using Microsoft.Extensions.Logging;
+using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace CallingTestBot.FunctionApp.Engine;
@@ -8,7 +10,7 @@ namespace CallingTestBot.FunctionApp.Engine;
 /// </summary>
 public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsLogger
 {
-    public AzTablesBotTestsLogger(CallingTestBotConfig callingTestBotConfig) : base(callingTestBotConfig.Storage)
+    public AzTablesBotTestsLogger(TableServiceClient tableServiceClient, ILogger logger) : base(tableServiceClient, logger)
     {
     }
     public override string TableName => "TestCallState";

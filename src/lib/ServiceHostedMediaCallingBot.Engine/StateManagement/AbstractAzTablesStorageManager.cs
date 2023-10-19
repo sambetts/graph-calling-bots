@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using Microsoft.Extensions.Logging;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -9,13 +10,15 @@ namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 public abstract class AbstractAzTablesStorageManager
 {
     protected readonly TableServiceClient _tableServiceClient;
+    protected readonly ILogger _logger;
     protected TableClient? _tableClient = null;
 
     public bool Initialised => _tableClient != null;
 
-    public AbstractAzTablesStorageManager(string storageConnectionString)
+    public AbstractAzTablesStorageManager(TableServiceClient tableServiceClient, ILogger logger)
     {
-        _tableServiceClient = new TableServiceClient(storageConnectionString);
+        _tableServiceClient = tableServiceClient;
+        _logger = logger;
     }
 
     protected void InitCheck()
