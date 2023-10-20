@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using System.Text.Json;
 
 namespace PstnBot.Web.Controllers;
 
@@ -18,20 +19,24 @@ public class PlatformCallController : ControllerBase
 
     /// <summary>
     /// Handle a callback for an existing call.
-    /// </summary>
     [HttpPost]
     [Route(HttpRouteConstants.OnIncomingRequestRoute)]
-    public async Task<IActionResult> OnIncomingRequestAsync([FromBody] CommsNotificationsPayload notifications)
+    public async Task<IActionResult> OnIncomingRequestAsync([FromBody] JsonElement json)
     {
         var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
-            await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
-            return Accepted();
+            var rawText = json.GetRawText();
+            var notifications = JsonSerializer.Deserialize<CommsNotificationsPayload>(rawText);
+            if (notifications != null)
+            {
+                validRequest = await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawText);
+                if (validRequest)
+                {
+                    return Accepted();
+                }
+            }
         }
-        else
-        {
-            return BadRequest();
-        }
+        return BadRequest();
     }
 }

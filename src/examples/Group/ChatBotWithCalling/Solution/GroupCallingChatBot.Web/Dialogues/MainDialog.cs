@@ -83,8 +83,16 @@ public class MainDialog : CancellableDialogue
                 if (meetingState.Attendees.Count > 0)
                 {
                     // Start configured meeting
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Starting call. Have a nice meeting!"), cancellationToken);
-                    await _groupCallBot.StartGroupCall(meetingState);
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Starting call..."), cancellationToken);
+                    var createdCall = await _groupCallBot.StartGroupCall(meetingState);
+                    if (createdCall != null)
+                    {
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Your call ID is {createdCall.Id}. Have a nice meeting!"), cancellationToken);
+                    }
+                    else
+                    {
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Sorry, I couldn't start the call. Please try again."), cancellationToken);
+                    }
                     return await stepContext.EndDialogAsync(meetingState, cancellationToken);
                 }
                 else

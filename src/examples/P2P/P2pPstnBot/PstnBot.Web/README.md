@@ -12,7 +12,7 @@ Bot:AppInstanceObjectIdName | For PSTN calls only: object ID of the user account
 Bot:TenantId | Tenant ID of Azure AD application
 Bot:AppSecret | Bot app secret
 Bot:BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
-
+Bot:RelativeWavCallbackUrl | Relative URL of the WAV file to play. Example: "/audio/rickroll.wav" 
 
 ## Testing the Bots
 Expose the bot with NGrok:

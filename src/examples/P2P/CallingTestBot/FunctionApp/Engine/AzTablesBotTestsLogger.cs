@@ -10,7 +10,7 @@ namespace CallingTestBot.FunctionApp.Engine;
 /// </summary>
 public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsLogger
 {
-    public AzTablesBotTestsLogger(TableServiceClient tableServiceClient, ILogger logger) : base(tableServiceClient, logger)
+    public AzTablesBotTestsLogger(TableServiceClient tableServiceClient, ILogger<AzTablesBotTestsLogger> logger) : base(tableServiceClient, logger)
     {
     }
     public override string TableName => "TestCallState";

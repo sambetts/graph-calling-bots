@@ -1,6 +1,9 @@
 ﻿using GroupCalls.Common;
 using Microsoft.AspNetCore.Mvc;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using System.IO;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace GroupCallingChatBot.Web.Controllers;
@@ -22,17 +25,22 @@ public class PlatformCallController : ControllerBase
     /// </summary>
     [HttpPost]
     [Route(HttpRouteConstants.CallNotificationsRoute)]
-    public async Task<IActionResult> OnIncomingRequestAsync([FromBody] CommsNotificationsPayload notifications)
+    public async Task<IActionResult> OnIncomingRequestAsync([FromBody] JsonElement json)
     {
         var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
         if (validRequest)
         {
-            await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
-            return Accepted();
+            var rawText = json.GetRawText();
+            var notifications = JsonSerializer.Deserialize<CommsNotificationsPayload>(rawText);
+            if (notifications != null)
+            {
+                validRequest = await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawText);
+                if (validRequest)
+                {
+                    return Accepted();
+                }
+            }
         }
-        else
-        {
-            return BadRequest();
-        }
+        return BadRequest();
     }
 }

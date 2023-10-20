@@ -31,14 +31,14 @@ public class HttpFunctions
     [Function(nameof(CallNotification))]
     public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var notifications = await GetBody<CommsNotificationsPayload>(req);
+        var (notifications, rawBody) = await GetBody<CommsNotificationsPayload>(req);
 
         if (notifications != null)
         {
             _logger.LogDebug($"Processing Graph call notification");
             try
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawBody);
             }
             catch (Exception ex)
             {
@@ -60,7 +60,7 @@ public class HttpFunctions
     /// Send WAV file for call. Recommended: use CDN to deliver content.
     /// </summary>
     [Function(HttpRouteConstants.WavFileActionName)]
-    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
@@ -80,7 +80,7 @@ public class HttpFunctions
     [Function(nameof(StartCall))]
     public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var startCall = await GetBody<StartCallData>(req);
+        var (startCall, rawBody) = await GetBody<StartCallData>(req);
 
         if (startCall != null)
         {
@@ -112,12 +112,10 @@ public class HttpFunctions
         return response;
     }
 
-    async Task<T?> GetBody<T>(HttpRequestData req)
+    async Task<(T?, string)> GetBody<T>(HttpRequestData req)
     {
-
         var reqBodyContent = await req.ReadAsStringAsync();
-
-        T? notifications = default(T);
+        T? notifications = default;
         try
         {
             notifications = JsonSerializer.Deserialize<T>(reqBodyContent ?? string.Empty);
@@ -127,6 +125,6 @@ public class HttpFunctions
             // Ignore invalid JSON
         }
 
-        return notifications;
+        return (notifications, reqBodyContent ?? string.Empty);
     }
 }

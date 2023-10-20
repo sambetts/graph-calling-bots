@@ -11,6 +11,9 @@ using System.Security.Claims;
 
 namespace ServiceHostedMediaCallingBot.Engine.Http;
 
+/// <summary>
+/// Ensures call notifications from Graph are real and authenticated correctly.
+/// </summary>
 public class AuthenticationProvider : IRequestAuthenticationProvider
 {
 

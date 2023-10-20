@@ -51,6 +51,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, _callHistoryManager, callBacks, _logger);
     }
 
+    /// <summary>
+    /// Validate call notifications request again AuthenticationProvider
+    /// </summary>
     public async Task<bool> ValidateNotificationRequestAsync(HttpRequest request)
     {
         try
@@ -77,7 +80,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request. Also tests if the WAV file exists.
     /// </summary>
-    protected async Task<Call> InitAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
+    protected async Task<Call> TestCallMediaAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
     {
         if (!_callStateManager.Initialised)
         {
@@ -100,7 +103,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             CallbackUri = _botConfig.CallingEndpoint,
             Direction = CallDirection.Outgoing
         };
-        _logger.LogDebug($"Valided media info: {JsonSerializer.Serialize(defaultMedia)}");
+        _logger.LogDebug($"Validated media info: {JsonSerializer.Serialize(defaultMedia)}");
 
         // Set source as this bot if we're calling PSTN numbers
         if (addBotIdentityForPSTN)
@@ -183,10 +186,22 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
     }
 
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications, string bodyRaw)
+    public async Task<bool> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications, string bodyRaw)
     {
-        var body = JsonDocument.Parse(bodyRaw);
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
+        JsonDocument? body = null; 
+        try
+        {
+            body = JsonDocument.Parse(bodyRaw);
+        }
+        catch (JsonException)
+        {
+            // Ignore
+        }
+        if (body != null)
+        {
+            await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
+        }
+        return body != null;
     }
 
     #region Bot Events
@@ -227,15 +242,8 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     #region Bot Actions
 
-    protected async Task<Call?> VerifyMediaAndCreateNewCall(Call newCall, MediaInfo mediaInfoItem)
+    protected async Task<Call?> CreateNewCall(Call newCall)
     {
-        bool fileExists = await TestExists(mediaInfoItem.Uri);
-        if (!fileExists)
-        {
-            _logger.LogError($"Media file {mediaInfoItem.Uri} does not exist. Aborting call");
-            return null;
-        }
-
         _logger.LogInformation($"Creating new call with Graph API...");
         _logger.LogDebug($"Media info: {JsonSerializer.Serialize(newCall.MediaConfig)}");
         try
@@ -330,12 +338,6 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
         response.EnsureSuccessStatusCode();
     }
-
-    public Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
-    {
-        throw new NotImplementedException();
-    }
-
 
     #endregion
 }
