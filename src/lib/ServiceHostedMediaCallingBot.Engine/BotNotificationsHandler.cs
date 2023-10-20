@@ -2,45 +2,46 @@
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
 /// <summary>
-/// Turns Graph call notifications into callbacks
+/// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
 public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
 {
     private readonly ILogger _logger;
     private readonly ICallStateManager<T> _callStateManager;
+    private readonly ICallHistoryManager<T> _callHistoryManager;
     private readonly NotificationCallbackInfo<T> _callbackInfo;
 
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-    public BotNotificationsHandler(ICallStateManager<T> callStateManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
+    public BotNotificationsHandler(ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
     {
         _logger = logger;
         _callStateManager = callStateManager;
+        _callHistoryManager = callHistoryManager;
         _callbackInfo = callbackInfo;
     }
 
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, JsonDocument body)
     {
         if (notificationPayload == null) return;
 
+        // Ensure processing is single-threaded to maintain processing order
         await _semaphore.WaitAsync();
 
-        if (!_callStateManager.Initialised)
-        {
-            await _callStateManager.Initialise();
-        }
-
+        if (!_callStateManager.Initialised)     await _callStateManager.Initialise();
+        if (!_callHistoryManager.Initialised)   await _callHistoryManager.Initialise();
+        
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var callState = await _callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
-
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
@@ -93,9 +94,14 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             // Processing ended. Update?
             if (updateCallState && callState != null)
             {
-                await _callStateManager.Update(callState);
+                await _callStateManager.UpdateCurrentCallState(callState);
             }
 
+            // Update history even if no state changes
+            if (callState != null)
+            {
+                await _callHistoryManager.AddToCallHistory(callState, body);
+            }
         }
 
         _semaphore.Release();
@@ -107,16 +113,18 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
         {
             // Add to state manager if not already there
-            var newCallState = false;
+            var newCallStateCreated = false;
             if (callState == null)
             {
-                newCallState = true;
+                newCallStateCreated = true;
                 callState = new T();
             }
             callState.PopulateFromCallNotification(callNotification);
 
-            if (newCallState)
+            if (newCallStateCreated)
             {
+                // Normally we should have an existing state but just in case....
+                _logger.LogInformation($"Created call state for call {callState.CallId} (from Graph notification)");
                 await _callStateManager.AddCallStateOrUpdate(callState);
             }
             if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(callState);
@@ -167,7 +175,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             if (!string.IsNullOrEmpty(callState.CallId))
             {
                 _logger.LogInformation($"Call {callState.CallId} terminated");
-                var removeSuccess = await _callStateManager.Remove(callState.ResourceUrl);
+                var removeSuccess = await _callStateManager.RemoveCurrentCall(callState.ResourceUrl);
                 if (removeSuccess)
                     _logger.LogInformation($"Call {callState.CallId} state removed");
                 else
@@ -218,6 +226,6 @@ public class NotificationCallbackInfo<T> where T : BaseActiveCallState, new()
     public Func<string, ResultInfo, Task>? CallTerminated { get; set; }
     public Func<T, Tone, Task>? NewTonePressed { get; set; }
 
-    public Func<T, List<Participant>, Task>? UsersJoinedGroupCall { get; set; }
-    public Func<T, List<Participant>, Task>? UsersLeftGroupCall { get; set; }
+    public Func<T, List<CallParticipant>, Task>? UsersJoinedGroupCall { get; set; }
+    public Func<T, List<CallParticipant>, Task>? UsersLeftGroupCall { get; set; }
 }

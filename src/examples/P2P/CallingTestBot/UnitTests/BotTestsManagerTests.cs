@@ -1,5 +1,6 @@
 using CallingTestBot.FunctionApp;
 using CallingTestBot.FunctionApp.Engine;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 
 namespace CallingTestBot.UnitTests;
@@ -7,6 +8,17 @@ namespace CallingTestBot.UnitTests;
 [TestClass]
 public class BotTestsManagerTests
 {
+    protected ILogger _logger;
+
+    public BotTestsManagerTests()
+    {
+        _logger = LoggerFactory.Create(config =>
+        {
+            config.AddTraceSource(new System.Diagnostics.SourceSwitch("SourceSwitch"));
+            config.AddConsole();
+        }).CreateLogger("Unit tests");
+    }
+
     [TestMethod]
     public async Task SuccesfullCallFlowTest()
     {
@@ -49,7 +61,7 @@ public class BotTestsManagerTests
 
     AzTablesBotTestsLogger GetBotTestsLogger()
     {
-        return new AzTablesBotTestsLogger(new CallingTestBotConfig { Storage = "UseDevelopmentStorage=true" });      // Todo: make config bound
+        return new AzTablesBotTestsLogger(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"), _logger);      // Todo: make config bound
     }
 
     [TestMethod]

@@ -18,6 +18,33 @@ public class ModelTests
     }
 
     [TestMethod]
+    public void BaseActiveCallStateEqualsTests()
+    {
+        var state1 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9" };
+        var state2 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9" };
+
+        Assert.AreEqual(state1, state2);
+        state1.StateEnum = CallState.TransferAccepted;
+        Assert.AreNotEqual(state1, state2);
+
+        var state4 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } } };
+        var state5 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } } };
+
+        Assert.AreEqual(state4, state5);
+        var state6 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } } };
+        var state7 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } } };
+
+        Assert.AreEqual(state6, state7);
+
+        var state8 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } }, TonesPressed = new List<Tone> { Tone.Tone1 } };
+        var state9 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } }, TonesPressed = new List<Tone> { Tone.Tone1 } };
+
+        Assert.AreEqual(state8, state9);
+
+        Assert.AreNotEqual(state1, state4 );
+    }
+
+    [TestMethod]
     public void CallIdTests()
     {
         Assert.IsNull(new BaseActiveCallState().CallId);
@@ -32,18 +59,18 @@ public class ModelTests
     [TestMethod]
     public void GetJoinedParticipants()
     {
-        var oldList = new List<Participant>
+        var oldList = new List<CallParticipant>
         {
-            new Participant { Id = "1" },
-            new Participant { Id = "2" },
-            new Participant { Id = "3" },
+            new CallParticipant { Id = "1" },
+            new CallParticipant { Id = "2" },
+            new CallParticipant { Id = "3" },
         };
 
-        var newList = new List<Participant>
+        var newList = new List<CallParticipant>
         {
-            new Participant { Id = "1" },
-            new Participant { Id = "3" },
-            new Participant { Id = "4" },
+            new CallParticipant { Id = "1" },
+            new CallParticipant { Id = "3" },
+            new CallParticipant { Id = "4" },
         };
 
         var joined = newList.GetJoinedParticipants(oldList);
@@ -54,18 +81,18 @@ public class ModelTests
     [TestMethod]
     public void GetDisconnectedParticipants()
     {
-        var oldList = new List<Participant>
+        var oldList = new List<CallParticipant>
         {
-            new Participant { Id = "1" },
-            new Participant { Id = "2" },
-            new Participant { Id = "3" },
+            new CallParticipant { Id = "1" },
+            new CallParticipant { Id = "2" },
+            new CallParticipant { Id = "3" },
         };
 
-        var newList = new List<Participant>
+        var newList = new List<CallParticipant>
         {
-            new Participant { Id = "1" },
-            new Participant { Id = "3" },
-            new Participant { Id = "4" },
+            new CallParticipant { Id = "1" },
+            new CallParticipant { Id = "3" },
+            new CallParticipant { Id = "4" },
         };
 
         var disconnected = newList.GetDisconnectedParticipants(oldList);

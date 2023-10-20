@@ -25,19 +25,19 @@ public class HttpFunctions
     }
 
     /// <summary>
-    /// Handle Graph call notifications.
+    /// Handle Graph call notifications. Must be anonymous.
     /// </summary>
     [Function(nameof(CallNotification))]
     public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var notifications = await GetBody<CommsNotificationsPayload>(req);
+        var (notifications, body) = await GetBody<CommsNotificationsPayload>(req);
 
         if (notifications != null)
         {
             _logger.LogDebug($"Processing {notifications.CommsNotifications.Count} Graph call notification(s)");
             try
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
             }
             catch (Exception ex)
             {
@@ -56,7 +56,7 @@ public class HttpFunctions
     }
 
     /// <summary>
-    /// Send WAV file for call. Recommended: use CDN to deliver content.
+    /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
     /// </summary>
     [Function(HttpRouteConstants.WavFileActionName)]
     public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
@@ -82,10 +82,9 @@ public class HttpFunctions
     /// Start call triggered by HTTP request.
     /// </summary>
     [Function(nameof(StartCall))]
-    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
+    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
     {
-
-        var newCallReq = await GetBody<StartGroupCallData>(req);
+        var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
         {
             var call = await _callingBot.StartGroupCall(newCallReq);
@@ -114,11 +113,9 @@ public class HttpFunctions
         return response;
     }
 
-    async Task<T?> GetBody<T>(HttpRequestData req)
+    async Task<(T?, string)> GetBody<T>(HttpRequestData req)
     {
-
         var reqBodyContent = await req.ReadAsStringAsync();
-
         T? notifications = default;
         try
         {
@@ -129,6 +126,6 @@ public class HttpFunctions
             // Ignore invalid JSON
         }
 
-        return notifications;
+        return (notifications, reqBodyContent ?? string.Empty);
     }
 }

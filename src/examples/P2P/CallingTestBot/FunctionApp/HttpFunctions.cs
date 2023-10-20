@@ -34,7 +34,7 @@ public class HttpFunctions
     [Function(nameof(CallNotification))]
     public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var notifications = await GetBody<CommsNotificationsPayload>(req);
+        var (notifications, rawBody) = await GetBody<CommsNotificationsPayload>(req);
 
         if (notifications != null)
         {
@@ -42,7 +42,7 @@ public class HttpFunctions
             try
             {
                 // Process notifications and update call state. Events will be captured on bot class.
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawBody);
             }
             catch (Exception ex)
             {
@@ -65,7 +65,7 @@ public class HttpFunctions
     /// Send WAV file for call. Recommended: use CDN to deliver content.
     /// </summary>
     [Function(HttpRouteConstants.WavFileActionName)]
-    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
         _logger.LogInformation($"Sending WAV file HTTP response");
 
@@ -114,11 +114,9 @@ public class HttpFunctions
         return response;
     }
 
-    async Task<T?> GetBody<T>(HttpRequestData req)
+    async Task<(T?, string)> GetBody<T>(HttpRequestData req)
     {
-
         var reqBodyContent = await req.ReadAsStringAsync();
-
         T? notifications = default;
         try
         {
@@ -129,6 +127,6 @@ public class HttpFunctions
             // Ignore invalid JSON
         }
 
-        return notifications;
+        return (notifications, reqBodyContent ?? string.Empty);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace PstnBot.Web.Extensions;
 
@@ -15,6 +16,11 @@ public static class BotBuilderExtensions
         botOptionsAction(options);
         options.CallingEndpoint = options.BotBaseUrl + HttpRouteConstants.OnIncomingRequestRoute;
         services.AddSingleton(options);
+
+
+        // Just use in-memory storage for this example
+        services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
 
         return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();
     }

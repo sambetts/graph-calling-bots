@@ -1,7 +1,6 @@
-﻿using Azure;
-using Azure.Data.Tables;
+﻿using Azure.Data.Tables;
+using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.Models;
-using System.Runtime.Serialization;
 using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -13,26 +12,27 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
 {
     public override string TableName => "CallState";
 
-    public AzTablesCallStateManager(string storageConnectionString) : base(storageConnectionString)
+    public AzTablesCallStateManager(TableServiceClient tableServiceClient, ILogger<AzTablesCallStateManager<T>> logger) : base(tableServiceClient, logger)
     {
     }
 
     public async Task AddCallStateOrUpdate(T callState)
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
-        var entity = new TableCallState(callState);
-        await _tableClient!.UpsertEntityAsync(entity);
+        var entity = new CallStateEntity<T>(callState);
+        var r = await _tableClient!.UpsertEntityAsync(entity);
+        
     }
 
     public async Task<T?> GetByNotificationResourceUrl(string resourceUrl)
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
         var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId != null)
         {
-            var results = _tableClient!.QueryAsync<TableCallState>(f => f.RowKey == callId);
+            var results = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.RowKey == callId);
             await foreach (var result in results)
             {
                 return result.State;
@@ -42,19 +42,19 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         return null;
     }
 
-    public async Task<bool> Remove(string resourceUrl)
+    public async Task<bool> RemoveCurrentCall(string resourceUrl)
     {
-        InitCheck(_tableClient);
+        InitCheck();
         var callId = BaseActiveCallState.GetCallId(resourceUrl);
-        var r = await _tableClient!.DeleteEntityAsync(TableCallState.PARTITION_KEY, callId);
+        var r = await _tableClient!.DeleteEntityAsync(CallStateEntity<T>.PARTITION_KEY, callId);
         return !r.IsError;
     }
 
     public async Task RemoveAll()
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
-        var r = _tableClient!.QueryAsync<TableCallState>(f => f.PartitionKey == TableCallState.PARTITION_KEY);
+        var r = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.PartitionKey == CallStateEntity<T>.PARTITION_KEY);
 
         await foreach (var result in r)
         {
@@ -62,19 +62,19 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         }
     }
 
-    public async Task Update(T callState)
+    public async Task UpdateCurrentCallState(T callState)
     {
         // Uses Upsert so will update if exists, or insert if not
         await AddCallStateOrUpdate(callState);
     }
 
 
-    public async Task<int> GetCount()
+    public async Task<int> GetCurrentCallCount()
     {
-        InitCheck(_tableClient);
+        InitCheck();
 
         // There has to be a better way of doing this...
-        var r = _tableClient!.QueryAsync<TableCallState>(f => f.PartitionKey == TableCallState.PARTITION_KEY);
+        var r = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.PartitionKey == CallStateEntity<T>.PARTITION_KEY);
 
         int count = 0;
         await foreach (var result in r)
@@ -84,47 +84,34 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         return count;
     }
 
-    public class TableCallState : ITableEntity
+    public async Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload)
     {
-        public const string PARTITION_KEY = "CallState";
+        InitCheck();
 
-        public TableCallState()
+        var r = await GetCallHistory(callState);
+        if (r != null)
         {
+            r.NotificationsHistory = r.NotificationsHistory.Concat(new JsonElement[1] { graphNotificationPayload.RootElement }).ToArray();
         }
-        public TableCallState(T state)
+        else
         {
-            State = state;
-        }
-
-        public string PartitionKey
-        {
-            get
-            {
-                return PARTITION_KEY;
-            }
-            set
-            {
-                // ignore
-            }
+            r = new CallHistoryEntity<T>(callState);
+            r.NotificationsHistory = new JsonElement[0];
         }
 
-        public string RowKey
+        await _tableClient!.UpsertEntityAsync(r);
+    }
+
+    public async Task<CallHistoryEntity<T>?> GetCallHistory(T callState)
+    {
+        InitCheck();
+
+        var r = await _tableClient!.GetEntityIfExistsAsync<CallHistoryEntity<T>>(callState.CallId, CallHistoryEntity<T>.PARTITION_KEY);
+        if (r.HasValue)
         {
-            get
-            {
-                return State?.CallId ?? throw new ArgumentNullException(nameof(State.CallId));
-            }
-            set
-            {
-                // ignore
-            }
+            return r.Value;
         }
-        public DateTimeOffset? Timestamp { get; set; }
-        public ETag ETag { get; set; }
 
-        [IgnoreDataMember]
-        public T? State { get => JsonSerializer.Deserialize<T>(StateJson); set => StateJson = JsonSerializer.Serialize(value); }
-
-        public string StateJson { get; set; } = null!;
+        return null;
     }
 }

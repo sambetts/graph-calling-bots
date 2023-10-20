@@ -11,11 +11,8 @@ namespace GroupCalls.Common;
 /// </summary>
 public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
 {
-
-    public GroupCallStartBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ILogger<GroupCallStartBot> logger)
-        : base(botOptions, callStateManager, logger)
-    {
-    }
+    public GroupCallStartBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ICallHistoryManager<GroupCallActiveCallState> callHistoryManager, ILogger<GroupCallStartBot> logger)
+        : base(botOptions, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
     /// Start group call with required attendees.
@@ -27,19 +24,19 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         // Work out who to call first & who to invite
         var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
 
-        // Create call for initial participants
-        var newCall = await InitAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
+        // Create call for initial participants. Will throw error if media is invalid
+        var newCallDetails = await TestCallMediaAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Start call
-        var createdCall = await StartNewCall(newCall);
+        var createdCall = await CreateNewCall(newCallDetails);
 
         if (createdCall != null)
         {
+            // Remember initial state
             await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
         }
         return createdCall;
     }
-
 
     /// <summary>
     /// Due to how group calls work with PSTN numbers especially, we need to invite everyone else after the call is established.
@@ -54,45 +51,20 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
                 await InviteToCallAsync(callState.CallId, callState.Invites);
 
                 callState.Invites.Clear();
-                await _callStateManager.Update(callState);
+                await _callStateManager.UpdateCurrentCallState(callState);
             }
         }
     }
 
-    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<Participant> participants)
+    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<CallParticipant> participants)
     {
-        await CheckCall(callState);
+        await base.UsersJoinedGroupCall(callState, participants);
+        await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
     }
 
     protected async override Task CallConnectedWithP2PAudio(GroupCallActiveCallState callState)
     {
-        await CheckCall(callState);
-    }
-
-    async Task CheckCall(GroupCallActiveCallState callState)
-    {
-        // Don't play media if already playing
-        var alreadyPlaying = false;
-        foreach (var itemToPlay in callState.BotMediaPlaylist.Values)
-        {
-            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo.ResourceId).Contains(itemToPlay.MediaInfo.ResourceId))
-            {
-                alreadyPlaying = true;
-                break;
-            }
-        }
-
-        // But if not playing, play notification prompt again
-        if (!alreadyPlaying)
-        {
-            try
-            {
-                await PlayPromptAsync(callState, callState.BotMediaPlaylist.Select(m => m.Value));
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Error playing prompt");
-            }
-        }
+        await base.CallConnectedWithP2PAudio(callState);
+        await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
     }
 }

@@ -7,7 +7,6 @@ namespace ServiceHostedMediaCallingBot.Engine.Models;
 
 public class CommsNotificationsPayload
 {
-
     [JsonPropertyName("value")]
     public List<CallNotification> CommsNotifications { get; set; } = new();
 }
@@ -26,7 +25,7 @@ public class CallNotification
     public Call? AssociatedCall => GetTypedResourceObject<Call>("#microsoft.graph.call");
     public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResourceObject<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
 
-    public List<Participant>? JoinedParticipants => GetTypedResourceArray<Participant>();
+    public List<CallParticipant>? JoinedParticipants => GetTypedResourceArray<CallParticipant>();
 
     T? GetTypedResourceObject<T>(string odataType) where T : class
     {

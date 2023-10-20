@@ -13,8 +13,8 @@ public class RickrollPstnBot : PstnCallingBot<BaseActiveCallState>
     /// <summary>
     /// Initializes a new instance of the <see cref="RickrollPstnBot" /> class.
     /// </summary>
-    public RickrollPstnBot(SingleWavFileBotConfig botOptions, ILogger<RickrollPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager)
-        : base(botOptions, callStateManager, logger)
+    public RickrollPstnBot(SingleWavFileBotConfig botOptions, ILogger<RickrollPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> historyManager)
+        : base(botOptions, callStateManager, historyManager, logger)
     {
     }
 }

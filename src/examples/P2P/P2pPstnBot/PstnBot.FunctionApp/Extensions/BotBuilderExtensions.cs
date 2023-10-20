@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Azure.Data.Tables;
+using Microsoft.Extensions.DependencyInjection;
 using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
@@ -12,12 +13,16 @@ public static class BotBuilderExtensions
     {
         services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 
-        // Use in-memory storage is no storage is configured
-        if (!string.IsNullOrEmpty(config.Storage))
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>>(new AzTablesCallStateManager<BaseActiveCallState>(config.Storage));
+        // Configure the common config options for engine
+        services.AddSingleton(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
+        services.AddSingleton(new TableServiceClient(config.Storage));
 
-        else
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
+        // Add our own implementation of the config for specialised configuration option just for this bot
+        services.AddSingleton(config);
+
+        // Storage must be Azure Tables. Value isn't optional.
+        services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, AzTablesCallHistoryManager<BaseActiveCallState>>();
 
         return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();
     }

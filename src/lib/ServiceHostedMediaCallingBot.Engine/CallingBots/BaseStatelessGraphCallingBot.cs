@@ -21,15 +21,17 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
+    private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
         _callStateManager = callStateManager;
+        _callHistoryManager = callHistoryManager;
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
@@ -46,9 +48,12 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             PlayPromptFinished = PlayPromptFinished,
             UsersJoinedGroupCall = UsersJoinedGroupCall
         };
-        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, callBacks, _logger);
+        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, _callHistoryManager, callBacks, _logger);
     }
 
+    /// <summary>
+    /// Validate call notifications request again AuthenticationProvider
+    /// </summary>
     public async Task<bool> ValidateNotificationRequestAsync(HttpRequest request)
     {
         try
@@ -75,7 +80,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request. Also tests if the WAV file exists.
     /// </summary>
-    protected async Task<Call> InitAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
+    protected async Task<Call> TestCallMediaAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
     {
         if (!_callStateManager.Initialised)
         {
@@ -98,6 +103,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             CallbackUri = _botConfig.CallingEndpoint,
             Direction = CallDirection.Outgoing
         };
+        _logger.LogDebug($"Validated media info: {JsonSerializer.Serialize(defaultMedia)}");
 
         // Set source as this bot if we're calling PSTN numbers
         if (addBotIdentityForPSTN)
@@ -135,22 +141,16 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         {
             await _callStateManager.Initialise();
         }
-
-        bool fileExists = await TestExists(mediaInfoItem.Uri);
-        if (!fileExists)
-        {
-            _logger.LogError($"Media file {mediaInfoItem.Uri} does not exist. Aborting call");
-            return false;
-        }
-
         if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
         {
+            _logger.LogInformation($"Created call state for call {createdCall.Id}");
             await _callStateManager.AddCallStateOrUpdate(new CALLSTATETYPE
             {
+                StateEnum = createdCall.State,
                 ResourceUrl = $"/communications/calls/{createdCall.Id}",
-                BotMediaPlaylist = new Dictionary<string, MediaPrompt>
+                BotMediaPlaylist = new Dictionary<string, CallMediaPrompt>
                 {
-                    { DefaultNotificationPrompt, new MediaPrompt { MediaInfo = mediaInfoItem } }
+                    { DefaultNotificationPrompt, new CallMediaPrompt { MediaInfo = mediaInfoItem } }
                 }
             });
 
@@ -159,7 +159,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             if (createdCallState != null)
             {
                 updateCacheCallback?.Invoke(createdCallState);
-                await _callStateManager.Update(createdCallState);
+                await _callStateManager.UpdateCurrentCallState(createdCallState);
             }
             else
             {
@@ -186,9 +186,22 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
     }
 
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
+    public async Task<bool> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications, string bodyRaw)
     {
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
+        JsonDocument? body = null; 
+        try
+        {
+            body = JsonDocument.Parse(bodyRaw);
+        }
+        catch (JsonException)
+        {
+            // Ignore
+        }
+        if (body != null)
+        {
+            await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
+        }
+        return body != null;
     }
 
     #region Bot Events
@@ -214,14 +227,14 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     {
         return Task.CompletedTask;
     }
-    protected virtual Task UsersJoinedGroupCall(CALLSTATETYPE callState, List<Participant> participants)
+    protected virtual Task UsersJoinedGroupCall(CALLSTATETYPE callState, List<CallParticipant> participants)
     {
         return Task.CompletedTask;
     }
 
     protected virtual Task NewTonePressed(CALLSTATETYPE callState, Tone tone)
     {
-        _logger.LogInformation($"New tone pressed: {tone}");
+        _logger.LogInformation($"New tone pressed: {tone} on call {callState.CallId}");
         return Task.CompletedTask;
     }
 
@@ -229,9 +242,10 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     #region Bot Actions
 
-    protected async Task<Call?> StartNewCall(Call newCall)
+    protected async Task<Call?> CreateNewCall(Call newCall)
     {
         _logger.LogInformation($"Creating new call with Graph API...");
+        _logger.LogDebug($"Media info: {JsonSerializer.Serialize(newCall.MediaConfig)}");
         try
         {
             var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
@@ -249,7 +263,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<MediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<CallMediaPrompt> mediaPrompts)
     {
         if (mediaPrompts.Count() == 0)
         {
@@ -324,7 +338,6 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
         response.EnsureSuccessStatusCode();
     }
-
 
     #endregion
 }
