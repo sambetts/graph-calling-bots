@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph;
+using System.Text.Json.Serialization;
 
 namespace ServiceHostedMediaCallingBot.Engine.Models;
 
@@ -62,5 +63,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     public List<CallMediaPrompt> MediaPromptsPlaying { get; set; } = new();
 
     public List<CallParticipant> JoinedParticipants { get; set; } = new();
+    
+    [JsonIgnore]
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
 }
