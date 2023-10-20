@@ -93,7 +93,7 @@ public class EngineTests : BaseTests
         // Check that we have no calls
         var nonExistentState = await callStateManager.GetByNotificationResourceUrl("whatever");
         Assert.IsNull(nonExistentState);
-        Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 0);
+        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 0);
 
 
         // Insert a call
@@ -104,19 +104,19 @@ public class EngineTests : BaseTests
         var callState2 = await callStateManager.GetByNotificationResourceUrl(randoId);
         Assert.IsNotNull(callState2);
         Assert.AreEqual(callState2, callState);
-        Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 1);
+        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 1);
 
         // Update state
         callState2.StateEnum = CallState.Terminating;
         await callStateManager.UpdateCurrentCallState(callState2);
         var callState3 = await callStateManager.GetByNotificationResourceUrl(randoId);
         Assert.AreEqual(callState3!.StateEnum, CallState.Terminating);
-        Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 1);
+        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 1);
 
         // Delete a call
         await callStateManager.RemoveCurrentCall(callState.ResourceUrl);
         var nullCallState = await callStateManager.GetByNotificationResourceUrl(randoId);
         Assert.IsNull(nullCallState);
-        Assert.IsTrue(await callStateManager.GetCurrentCallCount() == 0);
+        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 0);
     }
 }

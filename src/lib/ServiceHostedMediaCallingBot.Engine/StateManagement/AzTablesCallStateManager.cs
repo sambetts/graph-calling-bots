@@ -67,23 +67,6 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         // Uses Upsert so will update if exists, or insert if not
         await AddCallStateOrUpdate(callState);
     }
-
-
-    public async Task<int> GetCurrentCallCount()
-    {
-        InitCheck();
-
-        // There has to be a better way of doing this...
-        var r = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.PartitionKey == CallStateEntity<T>.PARTITION_KEY);
-
-        int count = 0;
-        await foreach (var result in r)
-        {
-            count++;
-        }
-        return count;
-    }
-
     public async Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload)
     {
         InitCheck();
@@ -113,5 +96,22 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         }
 
         return null;
+    }
+
+    public async Task<List<T>> GetActiveCalls()
+    {
+        InitCheck();
+
+        var list = new List<T>();
+        var r = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.PartitionKey == CallStateEntity<T>.PARTITION_KEY);
+
+        await foreach (var result in r)
+        {
+            if (result.State != null)
+            {
+                list.Add(result.State);
+            }
+        }
+        return list;
     }
 }

@@ -28,10 +28,10 @@ public class SlowInMemoryCallStateManager<T> : ConcurrentInMemoryCallStateManage
         await base.UpdateCurrentCallState(callState);
     }
 
-    public override async Task<int> GetCurrentCallCount()
+    public override async Task<List<T>> GetActiveCalls()
     {
         await Delay();
-        return await base.GetCurrentCallCount();
+        return await base.GetActiveCalls();
     }
 
     async Task Delay()

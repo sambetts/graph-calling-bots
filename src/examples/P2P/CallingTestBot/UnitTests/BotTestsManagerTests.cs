@@ -61,7 +61,7 @@ public class BotTestsManagerTests
 
     AzTablesBotTestsLogger GetBotTestsLogger()
     {
-        return new AzTablesBotTestsLogger(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"), _logger);      // Todo: make config bound
+        return new AzTablesBotTestsLogger(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"), LoggerFactory.Create(config => config.AddConsole()).CreateLogger<AzTablesBotTestsLogger>());      
     }
 
     [TestMethod]

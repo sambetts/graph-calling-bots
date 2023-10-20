@@ -74,11 +74,13 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
     }
     public bool Initialised => true;        // Nothing to initialise
 
-    public virtual Task<int> GetCurrentCallCount()
+
+    public virtual Task<List<T>> GetActiveCalls()
     {
+
         lock (this)
         {
-            return Task.FromResult(_callStates.Count);
+            return Task.FromResult(_callStates.Select(s=> s.Value).ToList());
         }
     }
 }

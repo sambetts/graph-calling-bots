@@ -235,7 +235,7 @@ public class BotNotificationsHandlerTests : BaseTests
         Assert.IsTrue(callConnectedWithP2PAudioCount == 1);
         Assert.IsTrue(callTerminatedCount == 1);
 
-        Assert.IsTrue(await _callStateManager.GetCurrentCallCount() == 0);
+        Assert.IsTrue((await _callStateManager.GetActiveCalls()).Count == 0);
     }
 
     /// <summary>
@@ -437,6 +437,6 @@ public class BotNotificationsHandlerTests : BaseTests
         Assert.IsNull(await _callStateManager.GetByNotificationResourceUrl(callResourceUrl));
         Assert.IsTrue(callTerminatedCount == 1);
 
-        Assert.IsTrue(await _callStateManager.GetCurrentCallCount() == 0);
+        Assert.IsTrue((await _callStateManager.GetActiveCalls()).Count == 0);
     }
 }

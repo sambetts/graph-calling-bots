@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -17,11 +18,13 @@ public class HttpFunctions
 {
     private readonly ILogger _logger;
     private readonly GroupCallStartBot _callingBot;
+    private readonly ICallStateManager<GroupCallActiveCallState> _callStateManager;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallStartBot callingBot)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallStartBot callingBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;
+        _callStateManager = callStateManager;
     }
 
     /// <summary>
@@ -104,6 +107,15 @@ public class HttpFunctions
         {
             return SendBadRequest(req);
         }
+    }
+
+    [Function(nameof(GetActiveCalls))]
+    public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+    {
+        var calls = await _callStateManager.GetActiveCalls();
+        var response = req.CreateResponse(HttpStatusCode.OK);
+        await response.WriteAsJsonAsync(calls);
+        return response;
     }
 
     HttpResponseData SendBadRequest(HttpRequestData req)
