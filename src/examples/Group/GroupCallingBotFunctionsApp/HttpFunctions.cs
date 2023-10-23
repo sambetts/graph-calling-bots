@@ -85,7 +85,7 @@ public class HttpFunctions
     /// Start call triggered by HTTP request.
     /// </summary>
     [Function(nameof(StartCall))]
-    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
         var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
@@ -109,9 +109,12 @@ public class HttpFunctions
         }
     }
 
+
     [Function(nameof(GetActiveCalls))]
-    public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+    public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
     {
+        if (!_callStateManager.Initialised) await _callStateManager.Initialise();
+        
         var calls = await _callStateManager.GetActiveCalls();
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(calls);
