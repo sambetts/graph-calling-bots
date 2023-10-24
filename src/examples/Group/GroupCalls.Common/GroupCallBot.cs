@@ -9,9 +9,9 @@ namespace GroupCalls.Common;
 /// <summary>
 /// A bot that starts a call with a bunch of people, internal and external.
 /// </summary>
-public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
+public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
 {
-    public GroupCallStartBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ICallHistoryManager<GroupCallActiveCallState> callHistoryManager, ILogger<GroupCallStartBot> logger)
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ICallHistoryManager<GroupCallActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
         : base(botOptions, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
@@ -24,8 +24,16 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         // Work out who to call first & who to invite
         var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
 
-        // Create call for initial participants. Will throw error if media is invalid
+        // Create call for initial participants. Will throw error if media URL is invalid
         var newCallDetails = await TestCallMediaAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
+
+        // Add meeting info if this is a Teams meeting
+        if (meetingRequest.JoinMeetingInfo != null)
+        {
+            var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(meetingRequest.JoinMeetingInfo.JoinUrl);  
+            newCallDetails.MeetingInfo = joinInfo;
+            newCallDetails.ChatInfo = chatInfo;
+        }
 
         // Start call
         var createdCall = await CreateNewCall(newCallDetails);
@@ -33,7 +41,7 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         if (createdCall != null)
         {
             // Remember initial state
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.Invites = inviteNumberList);
+            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
         }
         return createdCall;
     }
@@ -46,11 +54,11 @@ public class GroupCallStartBot : PstnCallingBot<GroupCallActiveCallState>
         if (!string.IsNullOrEmpty(callState?.CallId))
         {
             // Invite everyone else
-            if (callState.Invites != null && callState.Invites.Count > 0)
+            if (callState.GroupCallInvites != null && callState.GroupCallInvites.Count > 0)
             {
-                await InviteToCallAsync(callState.CallId, callState.Invites);
+                await InviteToCallAsync(callState.CallId, callState.GroupCallInvites);
 
-                callState.Invites.Clear();
+                callState.GroupCallInvites.Clear();
                 await _callStateManager.UpdateCurrentCallState(callState);
             }
         }

@@ -26,6 +26,6 @@ public static class BotBuilderExtensions
         }
             
 
-        return services.AddSingleton<GroupCallStartBot>();
+        return services.AddSingleton<GroupCallBot>();
     }
 }

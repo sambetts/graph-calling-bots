@@ -17,10 +17,10 @@ namespace GroupCallingBot.FunctionApp;
 public class HttpFunctions
 {
     private readonly ILogger _logger;
-    private readonly GroupCallStartBot _callingBot;
+    private readonly GroupCallBot _callingBot;
     private readonly ICallStateManager<GroupCallActiveCallState> _callStateManager;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallStartBot callingBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _callingBot = callingBot;

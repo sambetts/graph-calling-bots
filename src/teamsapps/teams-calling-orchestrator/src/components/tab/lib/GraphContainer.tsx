@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
 import { useData } from "@microsoft/teamsfx-react";
-import { TeamsFxContext } from "../Context";
+import { TeamsFxContext } from "../../Context";
 import { ErrorCode, ErrorWithCode } from "@microsoft/teamsfx";
 import { Client, GraphError } from "@microsoft/microsoft-graph-client";
 import { TokenCredentialAuthenticationProvider } from "@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials";
 import { Button } from "@fluentui/react-components";
-import { SCOPES } from "../../constants";
+import { SCOPES } from "../../../constants";
 
 export const GraphContainer: React.FC<{ scopes: string, onGraphClientValidated: Function, children: React.ReactNode }> = (props) => {
 
@@ -20,7 +20,7 @@ export const GraphContainer: React.FC<{ scopes: string, onGraphClientValidated: 
     if (teamsUserCredential) {
       try {
         await teamsUserCredential.login(props.scopes);
-
+        await loadTestGraph();
         setErrorText(null);
         setGraphError(null);
 
@@ -38,11 +38,10 @@ export const GraphContainer: React.FC<{ scopes: string, onGraphClientValidated: 
     }
   }
 
-  // Test a Graph call
-  const { loading, data, error } = useData(async () => {
+  const loadTestGraph = async () =>
+  {
     if (teamsUserCredential) {
       try {
-
         const authProvider = new TokenCredentialAuthenticationProvider(teamsUserCredential, {
           scopes: SCOPES.split(" "),
         });
@@ -70,6 +69,13 @@ export const GraphContainer: React.FC<{ scopes: string, onGraphClientValidated: 
         }
       }
     }
+  }
+
+  // Test a Graph call
+  const { loading, data, error } = useData(async () => {
+    if (teamsUserCredential) {
+      await loadTestGraph();
+    }
     return;
   });
 
@@ -80,36 +86,35 @@ export const GraphContainer: React.FC<{ scopes: string, onGraphClientValidated: 
           {graphError.code === 'ErrorWithCode.UiRequiredError' ?
             <><div>We need your consent for Graph access. Permissions to request:</div>
               <ul>
-
                 {SCOPES.split(" ").map(s => {
-                  return <li>{s}</li>
+                  return <li key={s}>{s}</li>
                 })
                 }
               </ul>
 
               <div>Login below:</div>
-          <Button disabled={loading} onClick={authGraph}>Authorize</Button>
+              <Button disabled={loading} onClick={authGraph}>Authorize</Button>
+            </>
+            :
+            <p>Unknown error: {graphError.code}</p>
+          }
         </>
         :
-        <p>Unknown error: {graphError.code}</p>
-      }
-    </>
-        :
-<>
-  <div className="sections">
-    {teamsUserCredential && graphClient &&
-      <>
-        {props.children}
-      </>
-    }
-  </div>
-</>
+        <>
+          <div className="sections">
+            {teamsUserCredential && graphClient &&
+              <>
+                {props.children}
+              </>
+            }
+          </div>
+        </>
       }
 
-{
-  errorText &&
-  <pre>{errorText}</pre>
-}
+      {
+        errorText &&
+        <pre>{errorText}</pre>
+      }
     </>
   );
 }

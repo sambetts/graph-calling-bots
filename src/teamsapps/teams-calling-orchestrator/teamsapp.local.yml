@@ -49,6 +49,7 @@ provision:
         echo "::set-teamsfx-env FUNC_NAME=getUserProfile";
         echo "::set-teamsfx-env FUNC_ENDPOINT=http://localhost:7071";
         echo "::set-teamsfx-env BOT_ENDPOINT=http://localhost:7221/api/StartCall";
+        echo "::set-teamsfx-env BOT_DEFAULT_WAV=https://sambetts.eu.ngrok.io/api/WavFile";
         
   # Apply the AAD manifest to an existing AAD app. Will use the object id in
   # manifest file to determine which AAD app to update.
@@ -151,6 +152,7 @@ deploy:
         REACT_APP_FUNC_NAME: ${{FUNC_NAME}}
         REACT_APP_FUNC_ENDPOINT: ${{FUNC_ENDPOINT}}
         REACT_APP_BOT_ENDPOINT: ${{BOT_ENDPOINT}}
+        REACT_APP_BOT_DEFAULT_WAV: ${{BOT_DEFAULT_WAV}}
 
   # Generate runtime environment variables for backend
   - uses: file/createOrUpdateEnvironmentFile

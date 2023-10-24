@@ -41,7 +41,7 @@ public class MenuCard : BaseAdaptiveCard
 
             states.Add(new AdaptiveTextBlock
             {
-                Text = item.Type == MeetingAttendeeType.Phone ? "Calling" : "Teams",
+                Text = item.Type == GroupMeetingAttendeeType.Phone ? "Calling" : "Teams",
                 Size = AdaptiveTextSize.Small,
                 Weight = AdaptiveTextWeight.Bolder
             });

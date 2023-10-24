@@ -18,9 +18,9 @@ public class ModelTests
         {
             Attendees = new List<AttendeeCallInfo>
             {
-                new AttendeeCallInfo{ Type = MeetingAttendeeType.Teams, Id = "t1" },
-                new AttendeeCallInfo{ Type = MeetingAttendeeType.Teams, Id = "t2" },
-                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p1" }
+                new AttendeeCallInfo{ Type = GroupMeetingAttendeeType.Teams, Id = "t1" },
+                new AttendeeCallInfo{ Type = GroupMeetingAttendeeType.Teams, Id = "t2" },
+                new AttendeeCallInfo{ Type = GroupMeetingAttendeeType.Phone, Id = "p1" }
             }
         };
 
@@ -33,9 +33,9 @@ public class ModelTests
         {
             Attendees = new List<AttendeeCallInfo>
             {
-                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p1" },
-                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p2" },
-                new AttendeeCallInfo{ Type = MeetingAttendeeType.Phone, Id = "p3" },
+                new AttendeeCallInfo{ Type = GroupMeetingAttendeeType.Phone, Id = "p1" },
+                new AttendeeCallInfo{ Type = GroupMeetingAttendeeType.Phone, Id = "p2" },
+                new AttendeeCallInfo{ Type = GroupMeetingAttendeeType.Phone, Id = "p3" },
             }
         };
 

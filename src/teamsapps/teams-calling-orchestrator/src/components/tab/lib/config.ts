@@ -4,6 +4,7 @@ const config = {
   apiEndpoint: process.env.REACT_APP_FUNC_ENDPOINT,
   apiName: process.env.REACT_APP_FUNC_NAME,
   bot: process.env.REACT_APP_BOT_ENDPOINT,
+  defaultWavUrl: process.env.REACT_APP_BOT_DEFAULT_WAV,
 };
 
 export default config;

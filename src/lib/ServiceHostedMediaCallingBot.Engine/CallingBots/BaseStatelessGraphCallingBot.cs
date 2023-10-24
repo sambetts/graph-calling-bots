@@ -175,6 +175,11 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     private async Task<bool> TestExists(string uri)
     {
+        if (string.IsNullOrEmpty(uri))
+        {
+            throw new ArgumentException($"'{nameof(uri)}' cannot be null or empty.", nameof(uri));
+        }
+
         try
         {
             var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, uri));

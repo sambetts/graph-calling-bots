@@ -1,11 +1,19 @@
+import { MeetingInfo, ChatInfo } from "@microsoft/microsoft-graph-types";
 
 interface BotRequest{
-    Attendees : Attendee[]
+    Attendees : AttendeeCallInfo[],
+    JoinMeetingInfo?: JoinMeetingInfo;
+    MessageUrl: string
 }
 
-interface Attendee
+interface AttendeeCallInfo
 {
     Id: string,
-    DisplayId: string?,
+    DisplayName: string?,
     Type: number
+}
+
+interface JoinMeetingInfo
+{
+    JoinUrl? : string;
 }

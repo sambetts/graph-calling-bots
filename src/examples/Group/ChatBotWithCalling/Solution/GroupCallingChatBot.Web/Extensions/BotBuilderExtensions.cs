@@ -22,7 +22,7 @@ public static class BotBuilderExtensions
         services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
         services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>>(new ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState>());
 
-        return services.AddSingleton<GroupCallStartBot>();
+        return services.AddSingleton<GroupCallBot>();
     }
 
     public static IServiceCollection AddChatBot(this IServiceCollection services)

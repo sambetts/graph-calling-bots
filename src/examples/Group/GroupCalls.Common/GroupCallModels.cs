@@ -6,17 +6,23 @@ namespace GroupCalls.Common;
 
 public class StartGroupCallData
 {
+    /// <summary>
+    /// List of people to invite to the call.
+    /// </summary>
     public List<AttendeeCallInfo> Attendees { get; set; } = new();
-
-    public bool RepeatMessage { get; set; } = false;
 
     /// <summary>
     /// Absolute URL to WAV file to play to attendees.
     /// </summary>
     public string? MessageUrl { get; set; } = null;
 
+    /// <summary>
+    /// Info to join the meeting, if this is a Teams meeting.
+    /// </summary>
+    public JoinMeetingInfo? JoinMeetingInfo { get; set; } = null;
+
     [JsonIgnore]
-    public bool HasPSTN => this.Attendees.Any(a => a.Type == MeetingAttendeeType.Phone);
+    public bool HasPSTN => this.Attendees.Any(a => a.Type == GroupMeetingAttendeeType.Phone);
 
     /// <summary>
     /// Split the attendees into 2 lists, one for the initial call, and one for the invites.
@@ -60,21 +66,26 @@ public class StartGroupCallData
     }
 }
 
+public class JoinMeetingInfo
+{
+    public string? JoinUrl { get; set; } = null!;
+}
+
 public class AttendeeCallInfo
 {
     public string Id { get; set; } = null!;
     public string? DisplayName { get; set; } = null!;
-    public MeetingAttendeeType Type { get; set; }
+    public GroupMeetingAttendeeType Type { get; set; }
 
     public IdentitySet ToIdentity()
     {
-        if (this.Type == MeetingAttendeeType.Phone)
+        if (this.Type == GroupMeetingAttendeeType.Phone)
         {
             var i = new IdentitySet();
             i.SetPhone(new Identity { Id = Id, DisplayName = DisplayName });
             return i;
         }
-        else if (Type == MeetingAttendeeType.Teams)
+        else if (Type == GroupMeetingAttendeeType.Teams)
         {
             return new IdentitySet { User = new Identity { Id = this.Id } };
         }
@@ -85,7 +96,7 @@ public class AttendeeCallInfo
     }
 }
 
-public enum MeetingAttendeeType
+public enum GroupMeetingAttendeeType
 {
     Unknown,
     Phone,
@@ -97,5 +108,5 @@ public class GroupCallActiveCallState : BaseActiveCallState
     /// <summary>
     /// List of invitees to the call once call is established.
     /// </summary>
-    public List<InvitationParticipantInfo> Invites { get; set; } = new();
+    public List<InvitationParticipantInfo> GroupCallInvites { get; set; } = new();
 }
