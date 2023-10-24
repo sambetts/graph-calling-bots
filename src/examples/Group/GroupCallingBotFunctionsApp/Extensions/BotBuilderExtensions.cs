@@ -14,7 +14,7 @@ public static class BotBuilderExtensions
         services.AddSingleton(new TableServiceClient(config.Storage));
 
         // Use in-memory storage is no storage is configured
-        if (!string.IsNullOrEmpty(config.Storage))
+        if (false)
         {
             services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, AzTablesCallStateManager<GroupCallActiveCallState>>();
             services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>, AzTablesCallHistoryManager<GroupCallActiveCallState>>();

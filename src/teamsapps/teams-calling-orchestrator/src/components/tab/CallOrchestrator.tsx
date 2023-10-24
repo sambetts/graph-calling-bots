@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Client } from "@microsoft/microsoft-graph-client";
 import { app } from "@microsoft/teams-js";
 
@@ -13,16 +13,22 @@ import { BotRequest } from "../../models";
 import { TabSelector } from "./TabSelector";
 import { UNSELECTED_OPTION } from "./lib/controlconstants";
 import { ChannelSelector } from "./ChannelSelector";
+import newMeetingJson from './NewMeetingAdaptiveCard.json';
+import { TeamsFxContext } from "../Context";
+import { UserInfo } from "@microsoft/teamsfx";
 
 export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInfo }) {
 
   const [tagMembers, setTagMembers] = useState<TeamworkTagMember[] | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [selectedTagId, setSelectedTagId] = useState<string>(UNSELECTED_OPTION);
   const [selectedChannelId, setSelectedChannelId] = useState<string>(UNSELECTED_OPTION);
   const [loadingMembers, setLoadingMembers] = useState<boolean>(false);
+  const [teamsChannelPostCreated, setTeamsChannelPostCreated] = useState<boolean>(false);
   const [defaultWavFileUrl, setDefaultWavFileUrl] = useState<string | undefined>("asdf");
   const [createdCall, setCreatedCall] = useState<Call | undefined>(undefined);
   const [createdMeeting, setCreatedMeeting] = useState<OnlineMeeting | undefined>(undefined);
+  const { teamsUserCredential } = useContext(TeamsFxContext);
 
   const UNSELECTED = "-1";
 
@@ -76,33 +82,52 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
     }
   };
 
-
-  // Post call
+  // Post call to Team channel
   React.useEffect(() => {
 
     if (selectedChannelId != UNSELECTED && createdMeeting) {
 
+      // Replace vars
+      const bodyString = (JSON.stringify(newMeetingJson ?? "")
+        .replace("${{MEETING_URL}}", createdMeeting?.joinWebUrl ?? "")
+        .replace("${{CREATED_BY}}", userInfo?.displayName ?? "")
+        .replace("${{CREATED_ON}}", new Date().toISOString().split('.')[0] + "Z")   // Remove milliseconds from ISO output as it breaks Adaptive cards DATE function
+
+      );
+
       // https://learn.microsoft.com/en-us/graph/api/channel-post-messages?view=graph-rest-1.0&tabs=http
       const msg = {
-        "body": {
-          "content": "Join: " + createdMeeting.joinWebUrl
-        }
+        body: {
+          contentType: "html",
+          content: "<attachment id=\"04b151bb-2f88-4f5b-9615-30b2a59d9adf\"></attachment>"
+        },
+        attachments:
+          [
+            {
+              id: "04b151bb-2f88-4f5b-9615-30b2a59d9adf",
+              contentType: "application/vnd.microsoft.card.adaptive",
+              content: bodyString
+            }
+          ]
       };
 
+      // Post message
       props.graphClient.api(`/teams/${props.team.groupId}/channels/${selectedChannelId}/messages`).post(msg)
         .then((r: ChatMessage) => {
-          alert('Msg posted');
+          setTeamsChannelPostCreated(true);
         })
         .catch(er => alert("Couldn't post call to channel: " + selectedChannelId));
     }
 
   }, [createdCall]);
 
-  // Set default WAV
+  // Set default WAV and load user info
   React.useEffect(() => {
 
     // On 1st laod
     setDefaultWavFileUrl(config.defaultWavUrl);
+
+    teamsUserCredential?.getUserInfo().then((userInfo: UserInfo) => setUserInfo(userInfo))
   }, []);
 
   // Load members for selected tag
@@ -153,7 +178,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
 
             <ul>
               {tagMembers.map(m => {
-                return <li>{m.displayName}</li>
+                return <li key={m.id}>{m.displayName}</li>
               })}
             </ul>
           </div>
@@ -171,6 +196,10 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
               {JSON.stringify(createdCall, null, 2)}
             </pre>
           </>
+        }
+
+        {teamsChannelPostCreated &&
+          <p>Teams channel post created</p>
         }
       </div >
     </>

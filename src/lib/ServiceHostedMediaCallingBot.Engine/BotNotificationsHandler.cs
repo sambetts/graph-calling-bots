@@ -138,7 +138,8 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
 
         if (callState == null)
         {
-            _logger.LogWarning($"Unexpected null call-state for call in state '{callNotification?.AssociatedCall?.State}'");
+            // A notification about a call we know nothing about
+            _logger.LogWarning($"Received notification for call we have no call-state for: '{callNotification?.ResourceUrl}'");
             return false;
         }
 
