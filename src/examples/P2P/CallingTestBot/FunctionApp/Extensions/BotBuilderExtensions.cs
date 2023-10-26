@@ -1,6 +1,8 @@
 ﻿using Azure.Data.Tables;
 using CallingTestBot.FunctionApp.Engine;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -16,11 +18,13 @@ public static class BotBuilderExtensions
         services.AddSingleton(new TableServiceClient(config.Storage));
 
         // Add our own implementation of the config for specialised configuration option just for this bot
-        services.AddSingleton(config);
+        services.AddSingleton<ICosmosConfig>(config);
 
         // Storage must be Azure Tables. Value isn't optional.
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
-        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, AzTablesCallHistoryManager<BaseActiveCallState>>();
+
+        var cosmosClient = new CosmosClient(config.CosmosDb);
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
 
         services.AddSingleton<IBotTestsLogger, AzTablesBotTestsLogger>();
         return services.AddSingleton<IPstnCallingBot, TestCallPstnBot>();

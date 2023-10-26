@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using GroupCalls.Common;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -11,20 +12,29 @@ public static class BotBuilderExtensions
     internal static IServiceCollection AddCallingBot(this IServiceCollection services, FunctionsAppCallingBotConfig config)
     {
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
-        services.AddSingleton(new TableServiceClient(config.Storage));
 
         // Use in-memory storage is no storage is configured
-        if (false)
+        if (!string.IsNullOrEmpty(config.Storage))
         {
+            services.AddSingleton(new TableServiceClient(config.Storage));
+
             services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, AzTablesCallStateManager<GroupCallActiveCallState>>();
-            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>, AzTablesCallHistoryManager<GroupCallActiveCallState>>();
         }
         else
         {
             services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
+        }
+
+        if (!string.IsNullOrEmpty(config.CosmosDb))
+        {
+            services.AddSingleton(new CosmosClient(config.CosmosDb));
+            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>, CosmosCallHistoryManager<GroupCallActiveCallState>>();
+        }
+        else
+        {
             services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState>>();
         }
-            
+        services.AddSingleton<ICosmosConfig>(config);
 
         return services.AddSingleton<GroupCallBot>();
     }

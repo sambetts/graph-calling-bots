@@ -1,10 +1,11 @@
 ﻿using CommonUtils.Config;
 using Microsoft.Extensions.Configuration;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace CallingTestBot.FunctionApp;
 
-public class CallingTestBotConfig : PropertyBoundConfig
+public class CallingTestBotConfig : PropertyBoundConfig, ICosmosConfig
 {
     public CallingTestBotConfig()
     {
@@ -24,6 +25,10 @@ public class CallingTestBotConfig : PropertyBoundConfig
     [ConfigValue]
     public string Storage { get; set; } = null!;
 
+
+    [ConfigValue(true)]
+    public string CosmosDb { get; set; } = null!;
+
     [ConfigValue]
     public string AppInstanceObjectId { get; set; } = null!;
 
@@ -33,6 +38,12 @@ public class CallingTestBotConfig : PropertyBoundConfig
 
     [ConfigValue]
     public string TestNumber { get; set; } = null!;
+
+    [ConfigValue(true)]
+    public string DatabaseName { get; set; } = null!;
+
+    [ConfigValue(true)]
+    public string ContainerName { get; set; } = null!;
 
     public SingleWavFileBotConfig ToRemoteMediaCallingBotConfiguration(string relativeUrlCallingEndPoint)
     {

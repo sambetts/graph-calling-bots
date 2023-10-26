@@ -1,3 +1,4 @@
+using Microsoft.Azure.Cosmos;
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -18,10 +19,10 @@ public class EngineTests : BaseTests
         await HistoryTest(_historyManager);
     }
     [TestMethod]
-    public async Task AzTablesCallHistoryManager()
+    public async Task CosmosCallHistoryManager()
     {
-        await HistoryTest(new AzTablesCallHistoryManager<BaseActiveCallState>(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"), 
-            GetLogger<AzTablesCallHistoryManager<BaseActiveCallState>>()));
+        await HistoryTest(new CosmosCallHistoryManager<BaseActiveCallState>(new CosmosClient(_config.CosmosDb), _config, 
+            GetLogger<CosmosCallHistoryManager<BaseActiveCallState>>()));
     }
 
     private async Task HistoryTest(ICallHistoryManager<BaseActiveCallState> historyManager)
@@ -38,29 +39,43 @@ public class EngineTests : BaseTests
         Assert.IsNull(historyNull);
 
         // Add a call to history
-        await historyManager.AddToCallHistory(callStateRandomId, JsonDocument.Parse("{}"));
+        await historyManager.AddToCallHistory(callStateRandomId, JsonDocument.Parse(JsonSerializer.Serialize(new RandoObject())).RootElement);
 
         // Get call history. Should not be null
         var history = await historyManager.GetCallHistory(callStateRandomId);
         Assert.IsNotNull(history);
         Assert.IsNotNull(history.NotificationsHistory);
-        Assert.IsTrue(history.NotificationsHistory.Length == 1);
+        Assert.IsTrue(history.NotificationsHistory.Count == 1);
         Assert.IsTrue(history.StateHistory.Count == 1);
         Assert.IsTrue(history.StateHistory[0].StateEnum == CallState.Establishing);
 
         // Update state and history
         callStateRandomId.StateEnum = CallState.Established;
-        await historyManager.AddToCallHistory(callStateRandomId, JsonDocument.Parse("{}"));
+        await historyManager.AddToCallHistory(callStateRandomId, JsonDocument.Parse(JsonSerializer.Serialize(new RandoObject())).RootElement);
 
         history = await historyManager.GetCallHistory(callStateRandomId);
-        Assert.IsTrue(history!.NotificationsHistory.Length == 2);
+        Assert.IsTrue(history!.NotificationsHistory.Count == 2);
         Assert.IsTrue(history.StateHistory.Count == 2);
+
+        // Verify the history
+        foreach (var item in history.NotificationsHistory)
+        {
+            var randoObj = JsonSerializer.Deserialize<RandoObject>(JsonSerializer.Serialize(item.Payload));
+            Assert.IsNotNull(randoObj?.RandoVal);
+            Assert.IsTrue(randoObj.RandoVal > 0);
+            Assert.IsTrue(item.Timestamp > DateTime.MinValue);
+        }
         Assert.IsTrue(history.StateHistory[1].StateEnum == CallState.Established);
 
         await historyManager.DeleteCallHistory(callStateRandomId);
         historyNull = await historyManager.GetCallHistory(callStateRandomId);
         Assert.IsNull(historyNull);
     }
+    public class RandoObject
+    {
+        public long RandoVal { get; set; } = DateTime.Now.Ticks;
+    }
+
 
     [TestMethod]
     public async Task ConcurrentInMemoryCallStateManager()

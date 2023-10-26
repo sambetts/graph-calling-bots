@@ -1,6 +1,4 @@
 ﻿using ServiceHostedMediaCallingBot.Engine.Models;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -14,13 +12,13 @@ public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> wh
     }
     public bool Initialised => true;        // Nothing to initialise
 
-    public Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload)
+    public Task AddToCallHistory(T callState, object graphNotificationPayload)
     {
         lock (this)
         {
             if (callState.HasValidCallId)
             {
-                var newHistoryArray = new JsonElement[1] { graphNotificationPayload.RootElement };
+                var newHistoryArray = new List<NotificationHistory> { new NotificationHistory { Payload = graphNotificationPayload, Timestamp = DateTime.Now } };
                 var newCallStateList = new List<T> { callState };
 
                 if (!_callHistory.ContainsKey(callState.CallId!))
@@ -29,7 +27,7 @@ public class ConcurrentInMemoryCallHistoryManager<T> : ICallHistoryManager<T> wh
                 }
                 else
                 {
-                    _callHistory[callState.CallId!].NotificationsHistory = _callHistory[callState.CallId!].NotificationsHistory.Concat(newHistoryArray).ToArray();
+                    _callHistory[callState.CallId!].NotificationsHistory = _callHistory[callState.CallId!].NotificationsHistory.Concat(newHistoryArray).ToList();
                     _callHistory[callState.CallId!].StateHistory = _callHistory[callState.CallId!].StateHistory.Concat(newCallStateList).ToList();
                 }
             }

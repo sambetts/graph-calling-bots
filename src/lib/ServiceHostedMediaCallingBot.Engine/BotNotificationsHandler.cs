@@ -100,7 +100,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             // Update history even if no state changes
             if (callState != null)
             {
-                await _callHistoryManager.AddToCallHistory(callState, body);
+                await _callHistoryManager.AddToCallHistory(callState, body.RootElement);
             }
         }
 

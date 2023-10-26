@@ -1,7 +1,6 @@
 ﻿using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.Models;
-using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -66,36 +65,6 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
     {
         // Uses Upsert so will update if exists, or insert if not
         await AddCallStateOrUpdate(callState);
-    }
-    public async Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload)
-    {
-        InitCheck();
-
-        var r = await GetCallHistory(callState);
-        if (r != null)
-        {
-            r.NotificationsHistory = r.NotificationsHistory.Concat(new JsonElement[1] { graphNotificationPayload.RootElement }).ToArray();
-        }
-        else
-        {
-            r = new CallHistoryEntity<T>(callState);
-            r.NotificationsHistory = new JsonElement[0];
-        }
-
-        await _tableClient!.UpsertEntityAsync(r);
-    }
-
-    public async Task<CallHistoryEntity<T>?> GetCallHistory(T callState)
-    {
-        InitCheck();
-
-        var r = await _tableClient!.GetEntityIfExistsAsync<CallHistoryEntity<T>>(callState.CallId, CallHistoryEntity<T>.PARTITION_KEY);
-        if (r.HasValue)
-        {
-            return r.Value;
-        }
-
-        return null;
     }
 
     public async Task<List<T>> GetActiveCalls()
