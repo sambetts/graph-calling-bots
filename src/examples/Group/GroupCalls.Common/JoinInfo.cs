@@ -38,7 +38,7 @@ public class JoinInfo
 
         using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(match.Groups["context"].Value)))
         {
-            var ctxt = (Context)new DataContractJsonSerializer(typeof(Context)).ReadObject(stream);
+            var ctxt = (Context)new DataContractJsonSerializer(typeof(Context)).ReadObject(stream)!;
             var chatInfo = new ChatInfo
             {
                 ThreadId = match.Groups["thread"].Value,
@@ -69,18 +69,18 @@ public class JoinInfo
         /// Gets or sets the Tenant Id.
         /// </summary>
         [DataMember]
-        public string Tid { get; set; }
+        public string Tid { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the AAD object id of the user.
         /// </summary>
         [DataMember]
-        public string Oid { get; set; }
+        public string Oid { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the chat message id.
         /// </summary>
         [DataMember]
-        public string MessageId { get; set; }
+        public string MessageId { get; set; } = null!;
     }
 }

@@ -28,7 +28,7 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         var newCallDetails = await TestCallMediaAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
 
         // Add meeting info if this is a Teams meeting
-        if (meetingRequest.JoinMeetingInfo != null)
+        if (meetingRequest.JoinMeetingInfo?.JoinUrl != null)
         {
             var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(meetingRequest.JoinMeetingInfo.JoinUrl);  
             newCallDetails.MeetingInfo = joinInfo;
