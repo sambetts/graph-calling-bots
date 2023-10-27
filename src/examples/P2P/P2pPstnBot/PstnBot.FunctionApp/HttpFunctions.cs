@@ -38,7 +38,7 @@ public class HttpFunctions
             _logger.LogDebug($"Processing Graph call notification");
             try
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawBody);
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             }
             catch (Exception ex)
             {

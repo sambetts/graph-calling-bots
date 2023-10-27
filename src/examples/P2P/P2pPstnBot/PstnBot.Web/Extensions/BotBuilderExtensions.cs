@@ -20,7 +20,7 @@ public static class BotBuilderExtensions
 
         // Just use in-memory storage for this example
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
-        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState, CallNotification>>();
 
         return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();
     }

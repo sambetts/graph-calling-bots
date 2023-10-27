@@ -22,7 +22,7 @@ public static class BotBuilderExtensions
 
         // Storage must be Azure Tables. Value isn't optional.
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
-        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, AzTablesCallHistoryManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>, CosmosCallHistoryManager<BaseActiveCallState, CallNotification>>();
 
         return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();
     }
