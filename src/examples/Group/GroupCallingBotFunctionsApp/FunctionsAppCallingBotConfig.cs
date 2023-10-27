@@ -1,11 +1,12 @@
 ﻿using CommonUtils.Config;
 using Microsoft.Extensions.Configuration;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace GroupCallingBot.FunctionApp;
 
 
-internal class FunctionsAppCallingBotConfig : PropertyBoundConfig
+internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 {
     public FunctionsAppCallingBotConfig(IConfiguration config) : base(config) { }
 
@@ -20,6 +21,17 @@ internal class FunctionsAppCallingBotConfig : PropertyBoundConfig
 
     [ConfigValue(true)]
     public string Storage { get; set; } = null!;
+
+
+    [ConfigValue(true)]
+    public string CosmosDb { get; set; } = null!;
+
+
+    [ConfigValue(true)]
+    public string DatabaseName { get; set; } = null!;
+
+    [ConfigValue(true)]
+    public string ContainerName { get; set; } = null!;
 
     [ConfigValue]
     public string AppInstanceObjectId { get; set; } = null!;

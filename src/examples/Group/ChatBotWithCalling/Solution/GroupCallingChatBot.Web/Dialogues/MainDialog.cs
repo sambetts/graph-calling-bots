@@ -22,10 +22,10 @@ public class MainDialog : CancellableDialogue
 {
     private readonly UserState _userState;
     private readonly TeamsChatbotBotConfig _config;
-    private readonly GroupCallStartBot _groupCallBot;
+    private readonly GroupCallBot _groupCallBot;
     private readonly GraphServiceClient _graphServiceClient;
 
-    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallStartBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallBot groupCallBot, GraphServiceClient graphServiceClient) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {
@@ -158,7 +158,7 @@ public class MainDialog : CancellableDialogue
                         {
                             Id = userId,
                             DisplayName = addContactActionInfo.ContactId,
-                            Type = MeetingAttendeeType.Teams
+                            Type = GroupMeetingAttendeeType.Teams
                         });
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Teams user added"), cancellationToken);
                     }
@@ -177,7 +177,7 @@ public class MainDialog : CancellableDialogue
                     meetingState.Attendees.Add(new AttendeeCallInfo
                     {
                         Id = addContactActionInfo.ContactId,
-                        Type = MeetingAttendeeType.Phone,
+                        Type = GroupMeetingAttendeeType.Phone,
                         DisplayName = addContactActionInfo.ContactId
                     });
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Number added"), cancellationToken);

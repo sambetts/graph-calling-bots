@@ -25,18 +25,16 @@
     "accentColor": "#FFFFFF",
     "bots": [],
     "composeExtensions": [],
-    "configurableTabs": [],
-    "staticTabs": [
+    "configurableTabs": [
         {
-            "entityId": "index",
-            "name": "Call Orchestrator",
-            "contentUrl": "${{TAB_ENDPOINT}}/index.html#/tab",
-            "websiteUrl": "${{TAB_ENDPOINT}}/index.html#/tab",
+            "configurationUrl": "${{TAB_ENDPOINT}}/index.html#/config",
+            "canUpdateConfiguration": true,
             "scopes": [
                 "team"
             ]
         }
     ],
+    "staticTabs": [],
     "permissions": [
         "identity",
         "messageTeamMembers"

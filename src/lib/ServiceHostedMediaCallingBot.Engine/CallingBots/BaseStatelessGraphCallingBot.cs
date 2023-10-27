@@ -14,19 +14,20 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// A simple, stateless bot that can make outbound calls, and play prompts.
 /// State is held in the call state manager.
 /// </summary>
-public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot where CALLSTATETYPE : BaseActiveCallState, new()
+public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot 
+    where CALLSTATETYPE : BaseActiveCallState, new()
 {
     public const string DefaultNotificationPrompt = "DefaultNotificationPrompt";
 
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
-    private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
+    private readonly ICallHistoryManager<CALLSTATETYPE, CallNotification> _callHistoryManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
@@ -175,6 +176,11 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     private async Task<bool> TestExists(string uri)
     {
+        if (string.IsNullOrEmpty(uri))
+        {
+            throw new ArgumentException($"'{nameof(uri)}' cannot be null or empty.", nameof(uri));
+        }
+
         try
         {
             var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, uri));
@@ -186,22 +192,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
     }
 
-    public async Task<bool> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications, string bodyRaw)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
-        JsonDocument? body = null; 
-        try
-        {
-            body = JsonDocument.Parse(bodyRaw);
-        }
-        catch (JsonException)
-        {
-            // Ignore
-        }
-        if (body != null)
-        {
-            await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
-        }
-        return body != null;
+        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
     }
 
     #region Bot Events

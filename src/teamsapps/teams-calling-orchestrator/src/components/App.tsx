@@ -14,6 +14,7 @@ import TermsOfUse from "./TermsOfUse";
 import Tab from "./Tab";
 import { TeamsFxContext } from "./Context";
 import config from "./tab/lib/config";
+import TabConfig from "./TabConfig";
 
 /**
  * The main app which handles the initialization and routing
@@ -47,6 +48,7 @@ export default function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/termsofuse" element={<TermsOfUse />} />
               <Route path="/tab" element={<Tab />} />
+              <Route path="/config" element={<TabConfig />} />
               <Route path="*" element={<Navigate to={"/tab"} />}></Route>
             </Routes>
           )}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Client } from "@microsoft/microsoft-graph-client";
 import { SCOPES } from "../../constants";
-import { GraphContainer } from "./GraphContainer";
+import { GraphContainer } from "./lib/GraphContainer";
 import { app } from "@microsoft/teams-js";
 import { useData } from "@microsoft/teamsfx-react";
 import {
@@ -25,7 +25,7 @@ export function AppPageContents() {
       <div className="narrow page-padding">
         <h1 className="center">Call Orchestrator</h1>
         <Image src="hello.png" />
-        <p className="center">Start a new call with people in this channel - everyone with a tag</p>
+
         {teamInfo === undefined ?
           <div>
             Loading...

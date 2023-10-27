@@ -2,23 +2,23 @@
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
 /// <summary>
 /// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
-public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
+public class BotNotificationsHandler<CALLSTATETYPE> 
+    where CALLSTATETYPE : BaseActiveCallState, new()
 {
     private readonly ILogger _logger;
-    private readonly ICallStateManager<T> _callStateManager;
-    private readonly ICallHistoryManager<T> _callHistoryManager;
-    private readonly NotificationCallbackInfo<T> _callbackInfo;
+    private readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
+    private readonly ICallHistoryManager<CALLSTATETYPE, CallNotification> _callHistoryManager;
+    private readonly NotificationCallbackInfo<CALLSTATETYPE> _callbackInfo;
 
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-    public BotNotificationsHandler(ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager, NotificationCallbackInfo<T> callbackInfo, ILogger logger)
+    public BotNotificationsHandler(ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
     {
         _logger = logger;
         _callStateManager = callStateManager;
@@ -29,7 +29,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, JsonDocument body)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload)
     {
         if (notificationPayload == null) return;
 
@@ -100,14 +100,14 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             // Update history even if no state changes
             if (callState != null)
             {
-                await _callHistoryManager.AddToCallHistory(callState, body);
+                await _callHistoryManager.AddToCallHistory(callState, callnotification);
             }
         }
 
         _semaphore.Release();
     }
 
-    private async Task<bool> HandleCallChangeTypeUpdate(T? callState, CallNotification callNotification)
+    private async Task<bool> HandleCallChangeTypeUpdate(CALLSTATETYPE? callState, CallNotification callNotification)
     {
         // Not seen this call before. Is this notification for a new call?
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
@@ -117,7 +117,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
             if (callState == null)
             {
                 newCallStateCreated = true;
-                callState = new T();
+                callState = new CALLSTATETYPE();
             }
             callState.PopulateFromCallNotification(callNotification);
 
@@ -138,7 +138,8 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
 
         if (callState == null)
         {
-            _logger.LogWarning($"Unexpected null call-state for call in state '{callNotification?.AssociatedCall?.State}'");
+            // A notification about a call we know nothing about
+            _logger.LogWarning($"Received notification for call we have no call-state for: '{callNotification?.ResourceUrl}'");
             return false;
         }
 
@@ -198,7 +199,7 @@ public class BotNotificationsHandler<T> where T : BaseActiveCallState, new()
         return false;
     }
 
-    async Task HandleToneNotificationAsync(ToneInfo toneInfo, T callState)
+    async Task HandleToneNotificationAsync(ToneInfo toneInfo, CALLSTATETYPE callState)
     {
         if (toneInfo.Tone != null)
         {

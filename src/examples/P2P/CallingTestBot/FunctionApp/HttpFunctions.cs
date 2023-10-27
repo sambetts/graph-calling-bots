@@ -42,7 +42,7 @@ public class HttpFunctions
             try
             {
                 // Process notifications and update call state. Events will be captured on bot class.
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawBody);
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             }
             catch (Exception ex)
             {

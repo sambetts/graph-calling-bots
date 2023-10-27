@@ -1,4 +1,5 @@
-﻿using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using Newtonsoft.Json.Linq;
+using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -22,10 +23,19 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
     Task<List<T>> GetActiveCalls();
 }
 
-public interface ICallHistoryManager<T> : IAsyncInit where T : BaseActiveCallState
+public interface ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : IAsyncInit 
+    where CALLSTATETYPE : BaseActiveCallState
+    where HISTORYPAYLOADTYPE : class
 {
-    Task AddToCallHistory(T callState, JsonDocument graphNotificationPayload);
-    Task<CallHistoryEntity<T>?> GetCallHistory(T callState);
+    Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload);
+    Task<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState);
 
-    Task DeleteCallHistory(T callState);
+    Task DeleteCallHistory(CALLSTATETYPE callState);
+}
+
+public interface ICosmosConfig
+{
+    public string CosmosDb { get; set; }
+    public string DatabaseName { get; set; }
+    public string ContainerName { get; set; }
 }
