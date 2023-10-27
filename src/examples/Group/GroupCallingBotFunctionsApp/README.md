@@ -16,6 +16,8 @@ MicrosoftAppPassword | Bot app secret
 BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
 Storage (optional) | Azure storage account connection string. Will use in-memory provider if not configured. Example: UseDevelopmentStorage=true
 CosmosDb (optional) | Cosmos DB connection string. Will use in-memory provider if not configured. Example: AccountEndpoint=https://callingbot.documents.azure.com:443/;AccountKey=xxxxxx==;
+DatabaseName | Cosmos DB name if cosmos is used. Example: CallingBot
+ContainerName | Cosmos DB container name if cosmos is used. Example: CallsLogs
 
 ## Testing the Bot
 Expose the bot with NGrok:
