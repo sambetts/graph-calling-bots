@@ -24,7 +24,7 @@ public static class BotBuilderExtensions
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
 
         var cosmosClient = new CosmosClient(config.CosmosDb);
-        services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>, CosmosCallHistoryManager<BaseActiveCallState, CallNotification>>();
 
         services.AddSingleton<IBotTestsLogger, AzTablesBotTestsLogger>();
         return services.AddSingleton<IPstnCallingBot, TestCallPstnBot>();

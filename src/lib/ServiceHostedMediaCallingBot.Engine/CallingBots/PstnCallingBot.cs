@@ -10,7 +10,7 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// </summary>
 public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPstnCallingBot where T : BaseActiveCallState, new()
 {
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager, ILogger logger)
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger)
         : base(botConfig, callStateManager, callHistoryManager, logger)
     {
     }

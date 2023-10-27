@@ -22,9 +22,16 @@ public class CallNotification
     [JsonPropertyName("resourceData")]
     public JsonElement? NotificationResource { get; set; }
 
+    [JsonExtensionData]
+    public Dictionary<string, object> AdditionalData { get; set; } = new();
+
+    [JsonIgnore]
     public Call? AssociatedCall => GetTypedResourceObject<Call>("#microsoft.graph.call");
+
+    [JsonIgnore]
     public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResourceObject<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
 
+    [JsonIgnore]
     public List<CallParticipant>? JoinedParticipants => GetTypedResourceArray<CallParticipant>();
 
     T? GetTypedResourceObject<T>(string odataType) where T : class

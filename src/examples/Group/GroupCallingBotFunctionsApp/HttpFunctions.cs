@@ -40,7 +40,7 @@ public class HttpFunctions
             _logger.LogDebug($"Processing {notifications.CommsNotifications.Count} Graph call notification(s)");
             try
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, body);
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             }
             catch (Exception ex)
             {

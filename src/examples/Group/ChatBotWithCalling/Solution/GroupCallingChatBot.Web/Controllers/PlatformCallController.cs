@@ -34,11 +34,10 @@ public class PlatformCallController : ControllerBase
             var notifications = JsonSerializer.Deserialize<CommsNotificationsPayload>(rawText);
             if (notifications != null)
             {
-                validRequest = await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications, rawText);
-                if (validRequest)
-                {
-                    return Accepted();
-                }
+                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
+
+                return Accepted();
+
             }
         }
         return BadRequest();

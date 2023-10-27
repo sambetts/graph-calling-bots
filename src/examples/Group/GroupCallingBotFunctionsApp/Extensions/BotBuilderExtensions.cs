@@ -28,11 +28,11 @@ public static class BotBuilderExtensions
         if (!string.IsNullOrEmpty(config.CosmosDb))
         {
             services.AddSingleton(new CosmosClient(config.CosmosDb));
-            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>, CosmosCallHistoryManager<GroupCallActiveCallState>>();
+            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, CosmosCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
         }
         else
         {
-            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState>>();
+            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
         }
         services.AddSingleton<ICosmosConfig>(config);
 

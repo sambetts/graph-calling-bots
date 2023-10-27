@@ -4,20 +4,8 @@ using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.UnitTests.TestServices;
-using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
-
-public static class BotNotificationsHandlerTestExtensions
-{
-    // Shortcut to also send payload
-    public static async Task HandleNotificationsAndUpdateCallStateAsync(this BotNotificationsHandler<BaseActiveCallState> notificationsManager, CommsNotificationsPayload? notificationPayload)
-    {
-        var graphNotificationPayload = JsonSerializer.SerializeToDocument(notificationPayload);
-        await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(notificationPayload, graphNotificationPayload);
-    }
-}
-
 
 [TestClass]
 public class BotNotificationsHandlerTests : BaseTests
@@ -105,7 +93,7 @@ public class BotNotificationsHandlerTests : BaseTests
         await FailedCallTest(_logger, _callStateManager, _historyManager);
     }
 
-    public static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> _callStateManager, ICallHistoryManager<BaseActiveCallState> historyManager)
+    public static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> _callStateManager, ICallHistoryManager<BaseActiveCallState, CallNotification> historyManager)
     {
         var callEstablishingCount = 0;
         var callConnectedCount = 0;

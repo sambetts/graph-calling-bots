@@ -48,25 +48,26 @@ public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
 }
 
 
-public class CallHistoryEntity<T> where T : BaseActiveCallState
+public class CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> where CALLSTATETYPE : BaseActiveCallState
+    where HISTORYPAYLOADTYPE : class
 {
     public CallHistoryEntity()
     {
     }
-    public CallHistoryEntity(T initialState) : this()
+    public CallHistoryEntity(CALLSTATETYPE initialState) : this()
     {
-        StateHistory = new List<T> {initialState};
+        StateHistory = new List<CALLSTATETYPE> {initialState};
     }
 
     public DateTimeOffset? Timestamp { get; set; } = DateTime.UtcNow;
 
-    public List<T> StateHistory { get; set; } = new();
+    public List<CALLSTATETYPE> StateHistory { get; set; } = new();
 
-    public List<NotificationHistory> NotificationsHistory { get; set; } = new();
+    public List<NotificationHistory<HISTORYPAYLOADTYPE>> NotificationsHistory { get; set; } = new();
 }
 
-public class NotificationHistory
+public class NotificationHistory<HISTORYPAYLOADTYPE> where HISTORYPAYLOADTYPE : class
 {
-    public object? Payload { get; set; }
+    public HISTORYPAYLOADTYPE? Payload { get; set; }
     public DateTime Timestamp { get; set; }
 }
