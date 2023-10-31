@@ -37,7 +37,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
   }
 
   const startCall = () => {
-    if (tagMembers && config.bot && defaultWavFileUrl) {
+    if (tagMembers && config.bot) {
       let req: BotRequest = { Attendees: [], MessageUrl: defaultWavFileUrl };
 
       // Online meeting details?
@@ -85,7 +85,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
   // Post call to Team channel
   React.useEffect(() => {
 
-    if (selectedChannelId != UNSELECTED && createdMeeting) {
+    if (selectedChannelId !== UNSELECTED && createdMeeting) {
 
       // Replace vars
       const bodyString = (JSON.stringify(newMeetingJson ?? "")
@@ -147,7 +147,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
         .catch(err => alert("Couldn't load members for tag: " + selectedTagId));
     }
 
-  }, [selectedTagId]);
+  }, [selectedTagId, props.graphClient, props.team.groupId]);
 
   return (
     <>
@@ -169,7 +169,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
           <Spinner />
         }
 
-        <h3>Initial Message</h3>
+        <h3>Initial Message (Optional)</h3>
         <Input onChange={v => setDefaultWavFileUrl(v.currentTarget.value)} value={defaultWavFileUrl} type="url" style={{ width: 300 }}></Input>
 
         {tagMembers &&
@@ -178,7 +178,7 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
 
             <ul>
               {tagMembers.map(m => {
-                return <li key={m.id}>{m.displayName}</li>
+                return <li key={m.id}>{m.displayName} ({m.userId})</li>
               })}
             </ul>
           </div>
@@ -198,8 +198,11 @@ export function CallOrchestrator(props: { graphClient: Client, team: app.TeamInf
           </>
         }
 
-        {teamsChannelPostCreated &&
+        {teamsChannelPostCreated && 
           <p>Teams channel post created</p>
+        }
+        {teamsChannelPostCreated && createdMeeting?.joinWebUrl &&
+          <p>Join meeting <a href={createdMeeting.joinWebUrl}>here</a></p>
         }
       </div >
     </>

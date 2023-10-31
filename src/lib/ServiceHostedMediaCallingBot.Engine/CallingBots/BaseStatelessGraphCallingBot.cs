@@ -81,30 +81,39 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request. Also tests if the WAV file exists.
     /// </summary>
-    protected async Task<Call> TestCallMediaAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo defaultMedia, bool addBotIdentityForPSTN)
+    protected async Task<Call> TestCallMediaAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo? defaultMedia, bool addBotIdentityForPSTN)
     {
         if (!_callStateManager.Initialised)
         {
             await _callStateManager.Initialise();
         }
 
-        bool fileExists = await TestExists(defaultMedia.Uri);
-        if (!fileExists)
+        var defaultMediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo>() };
+        if (!string.IsNullOrEmpty(defaultMedia?.Uri))
         {
-            _logger.LogError($"Media file {defaultMedia.Uri} does not exist. Aborting call");
-            throw new ArgumentOutOfRangeException(nameof(defaultMedia), $"Media file {defaultMedia.Uri} does not exist. Aborting call");
+            bool fileExists = await TestExists(defaultMedia.Uri);
+            if (!fileExists)
+            {
+                _logger.LogError($"Media file {defaultMedia.Uri} does not exist. Aborting call");
+                throw new ArgumentOutOfRangeException(nameof(defaultMedia), $"Media file {defaultMedia.Uri} does not exist. Aborting call");
+            }
+            defaultMediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo> { defaultMedia } };
+            _logger.LogDebug($"Validated media info: {JsonSerializer.Serialize(defaultMedia)}");
+        }
+        else
+        {
+            _logger.LogInformation($"No media URI found for call. Won't play any initial message via bot.");
         }
 
         // Create call for initial participants
         var newCall = new Call
         {
-            MediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo> { defaultMedia } },
+            MediaConfig = defaultMediaConfig,
             RequestedModalities = new List<Modality> { Modality.Audio },
             TenantId = _botConfig.TenantId,
             CallbackUri = _botConfig.CallingEndpoint,
             Direction = CallDirection.Outgoing
         };
-        _logger.LogDebug($"Validated media info: {JsonSerializer.Serialize(defaultMedia)}");
 
         // Set source as this bot if we're calling PSTN numbers
         if (addBotIdentityForPSTN)
@@ -136,7 +145,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo mediaInfoItem, Action<CALLSTATETYPE>? updateCacheCallback)
+    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo? mediaInfoItem, Action<CALLSTATETYPE>? updateCacheCallback)
     {
         if (!_callStateManager.Initialised)
         {
@@ -145,15 +154,22 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
         {
             _logger.LogInformation($"Created call state for call {createdCall.Id}");
-            await _callStateManager.AddCallStateOrUpdate(new CALLSTATETYPE
+
+            var initialCallState = new CALLSTATETYPE
             {
-                StateEnum = createdCall.State,
                 ResourceUrl = $"/communications/calls/{createdCall.Id}",
-                BotMediaPlaylist = new Dictionary<string, CallMediaPrompt>
+                StateEnum = createdCall.State
+            };
+
+            // Is there anything to play?
+            if (mediaInfoItem != null)
+            {
+                initialCallState.BotMediaPlaylist = new Dictionary<string, CallMediaPrompt>
                 {
                     { DefaultNotificationPrompt, new CallMediaPrompt { MediaInfo = mediaInfoItem } }
-                }
-            });
+                };
+            }
+            await _callStateManager.AddCallStateOrUpdate(initialCallState);
 
             // Get state and save invite list for when call is established
             var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");

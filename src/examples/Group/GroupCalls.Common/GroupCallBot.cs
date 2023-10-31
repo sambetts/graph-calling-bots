@@ -19,7 +19,7 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
     /// </summary>
     public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
-        var mediaInfoItem = new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
+        MediaInfo? mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
 
         // Work out who to call first & who to invite
         var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
@@ -33,6 +33,10 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
             var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(meetingRequest.JoinMeetingInfo.JoinUrl);  
             newCallDetails.MeetingInfo = joinInfo;
             newCallDetails.ChatInfo = chatInfo;
+
+            // If this is a call for an OnlineMeeting, we can't initially call someone with the new call as the call is technically already in progress.
+            // So we need to invite them instead.
+            inviteNumberList.Add(initialAdd);
         }
 
         // Start call
@@ -61,6 +65,14 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
                 callState.GroupCallInvites.Clear();
                 await _callStateManager.UpdateCurrentCallState(callState);
             }
+            else
+            {
+                _logger.LogInformation("Call established but no invites found");
+            }
+        }
+        else
+        {
+            _logger.LogWarning("Call established but no call ID found");
         }
     }
 

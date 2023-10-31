@@ -44,7 +44,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
         }
 
         // But if not playing, play notification prompt again
-        if (!alreadyPlaying)
+        if (!alreadyPlaying && callState.BotMediaPlaylist.Count > 0)
         {
             try
             {
