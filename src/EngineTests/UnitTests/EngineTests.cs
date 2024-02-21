@@ -1,9 +1,8 @@
 using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
-using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
 
@@ -24,6 +23,17 @@ public class EngineTests : BaseTests
     {
         await HistoryTest(new CosmosCallHistoryManager<BaseActiveCallState, CallNotification>(new CosmosClient(_config.CosmosDb), _config, 
             GetLogger<CosmosCallHistoryManager<BaseActiveCallState, CallNotification>>()));
+    }
+
+    [TestMethod]
+    public async Task SqlCallHistoryManager()
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<CallHistoryContext<BaseActiveCallState, CallNotification>>();
+        optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ServiceHostedMediaCallingBotUnitTests;Trusted_Connection=True;MultipleActiveResultSets=true");
+
+        var context = new CallHistoryContext<BaseActiveCallState, CallNotification>(optionsBuilder.Options);
+        await HistoryTest(new SqlCallHistoryManager<BaseActiveCallState, CallNotification>(context, 
+            GetLogger<SqlCallHistoryManager<BaseActiveCallState, CallNotification>>()));
     }
 
     private async Task HistoryTest(ICallHistoryManager<BaseActiveCallState, CallNotification> historyManager)

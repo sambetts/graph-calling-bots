@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.Models;
-using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
