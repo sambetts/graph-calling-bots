@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -23,6 +24,7 @@ public class CallNotification
     public JsonElement? NotificationResource { get; set; }
 
     [JsonExtensionData]
+    [NotMapped]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
 
     [JsonIgnore]

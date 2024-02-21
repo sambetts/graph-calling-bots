@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
 
