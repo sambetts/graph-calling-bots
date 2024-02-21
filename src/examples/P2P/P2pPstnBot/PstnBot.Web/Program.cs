@@ -1,7 +1,4 @@
-using Azure.Data.Tables;
 using PstnBot.Web.Extensions;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 

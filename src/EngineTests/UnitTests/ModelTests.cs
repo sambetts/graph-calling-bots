@@ -41,7 +41,7 @@ public class ModelTests
 
         Assert.AreEqual(state8, state9);
 
-        Assert.AreNotEqual(state1, state4 );
+        Assert.AreNotEqual(state1, state4);
     }
 
     [TestMethod]

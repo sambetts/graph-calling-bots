@@ -15,15 +15,15 @@ public abstract class StatsCosmosDoc
 /// <summary>
 /// Class to encapsulate CallHistoryEntity<T> in a Cosmos DB way. 
 /// </summary>
-public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosmosDoc 
-    where CALLSTATETYPE : BaseActiveCallState     
+public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosmosDoc
+    where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class
 {
     public CallHistoryCosmosDoc() : this(null) { }
-    public CallHistoryCosmosDoc(CALLSTATETYPE? callState) 
-    { 
+    public CallHistoryCosmosDoc(CALLSTATETYPE? callState)
+    {
         this.CallId = callState?.CallId ?? string.Empty;
-        this.LastUpdated = DateTime.UtcNow; 
+        this.LastUpdated = DateTime.UtcNow;
     }
 
     public string CallId { get; set; }
@@ -35,7 +35,7 @@ public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosm
 }
 
 
-public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
+public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
     where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class
 {
@@ -58,9 +58,9 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
 
     public async Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload)
     {
-        var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>> { new NotificationHistory<HISTORYPAYLOADTYPE> 
-        { 
-            Payload = graphNotificationPayload, Timestamp = DateTime.Now } 
+        var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>> { new NotificationHistory<HISTORYPAYLOADTYPE>
+        {
+            Payload = graphNotificationPayload, Timestamp = DateTime.Now }
         };
         var newCallStateList = new List<CALLSTATETYPE> { callState };
         var callHistoryRecordFound = await GetCallHistory(callState);
@@ -82,11 +82,11 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
         {
             _logger.LogInformation($"Creating new call history for call {callState.CallId}");
             var callHistoryRecordNew = new CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState);
-            callHistoryRecordNew.CallHistory = new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
-            { 
-                NotificationsHistory = newHistoryArray, 
-                StateHistory = newCallStateList, 
-                Timestamp = DateTime.UtcNow 
+            callHistoryRecordNew.CallHistory = new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+            {
+                NotificationsHistory = newHistoryArray,
+                StateHistory = newCallStateList,
+                Timestamp = DateTime.UtcNow
             };
             await _historyContainer.UpsertItemAsync(callHistoryRecordNew);
 

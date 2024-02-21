@@ -1,4 +1,3 @@
-using CallingTestBot.FunctionApp;
 using CallingTestBot.FunctionApp.Engine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
@@ -61,7 +60,7 @@ public class BotTestsManagerTests
 
     AzTablesBotTestsLogger GetBotTestsLogger()
     {
-        return new AzTablesBotTestsLogger(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"), LoggerFactory.Create(config => config.AddConsole()).CreateLogger<AzTablesBotTestsLogger>());      
+        return new AzTablesBotTestsLogger(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"), LoggerFactory.Create(config => config.AddConsole()).CreateLogger<AzTablesBotTestsLogger>());
     }
 
     [TestMethod]

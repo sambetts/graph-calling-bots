@@ -1,7 +1,7 @@
-﻿using Azure.Data.Tables;
-using Azure;
-using System.Runtime.Serialization;
+﻿using Azure;
+using Azure.Data.Tables;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using System.Runtime.Serialization;
 using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -42,17 +42,17 @@ public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
     public ETag ETag { get; set; }
 
     [IgnoreDataMember]
-    public T? State 
-    { 
-        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson) : default; 
-        set => StateJson = JsonSerializer.Serialize(value); 
+    public T? State
+    {
+        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson) : default;
+        set => StateJson = JsonSerializer.Serialize(value);
     }
 
     public string StateJson { get; set; } = null!;
 }
 
 
-public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
+public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>
     where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class
 {
@@ -61,7 +61,7 @@ public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOA
     }
     public CallStateAndNotificationsHistoryEntity(CALLSTATETYPE initialState) : this()
     {
-        StateHistory = new List<CALLSTATETYPE> {initialState};
+        StateHistory = new List<CALLSTATETYPE> { initialState };
     }
 
     public DateTimeOffset? Timestamp { get; set; } = DateTime.UtcNow;

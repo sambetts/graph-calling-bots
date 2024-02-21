@@ -8,7 +8,7 @@ namespace ServiceHostedMediaCallingBot.Engine;
 /// <summary>
 /// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
-public class BotNotificationsHandler<CALLSTATETYPE> 
+public class BotNotificationsHandler<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     private readonly ILogger _logger;
@@ -36,9 +36,9 @@ public class BotNotificationsHandler<CALLSTATETYPE>
         // Ensure processing is single-threaded to maintain processing order
         await _semaphore.WaitAsync();
 
-        if (!_callStateManager.Initialised)     await _callStateManager.Initialise();
-        if (!_callHistoryManager.Initialised)   await _callHistoryManager.Initialise();
-        
+        if (!_callStateManager.Initialised) await _callStateManager.Initialise();
+        if (!_callHistoryManager.Initialised) await _callHistoryManager.Initialise();
+
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var callState = await _callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);

@@ -2,8 +2,8 @@
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
-    where CALLSTATETYPE : BaseActiveCallState 
+public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+    where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class
 {
     private readonly Dictionary<string, CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>> _callHistory = new();
@@ -20,9 +20,9 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
         {
             if (callState.HasValidCallId)
             {
-                var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>> 
-                { 
-                    new NotificationHistory<HISTORYPAYLOADTYPE> { Payload = graphNotificationPayload, Timestamp = DateTime.Now } 
+                var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>>
+                {
+                    new NotificationHistory<HISTORYPAYLOADTYPE> { Payload = graphNotificationPayload, Timestamp = DateTime.Now }
                 };
                 var newCallStateList = new List<CALLSTATETYPE> { callState };
 
@@ -48,7 +48,7 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
             {
                 if (_callHistory.ContainsKey(callState.CallId!))
                 {
-                    return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>( _callHistory[callState.CallId!]);
+                    return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(_callHistory[callState.CallId!]);
                 }
                 else
                 {

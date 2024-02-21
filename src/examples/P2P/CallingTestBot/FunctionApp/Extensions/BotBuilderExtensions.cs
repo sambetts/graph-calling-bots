@@ -2,7 +2,6 @@
 using CallingTestBot.FunctionApp.Engine;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;

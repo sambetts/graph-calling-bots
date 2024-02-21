@@ -47,7 +47,7 @@ public static class BotBuilderExtensions
                 services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
             }
         }
-        
+
         services.AddSingleton<ICosmosConfig>(config);
 
         return services.AddSingleton<GroupCallBot>();

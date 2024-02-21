@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.UnitTests.TestServices;

@@ -1,6 +1,5 @@
 ﻿using CommonUtils.Config;
 using Microsoft.Extensions.Configuration;
-using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;

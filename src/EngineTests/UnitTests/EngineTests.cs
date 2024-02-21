@@ -22,7 +22,7 @@ public class EngineTests : BaseTests
     [TestMethod]
     public async Task CosmosCallHistoryManager()
     {
-        await HistoryTest(new CosmosCallHistoryManager<BaseActiveCallState, CallNotification>(new CosmosClient(_config.CosmosDb), _config, 
+        await HistoryTest(new CosmosCallHistoryManager<BaseActiveCallState, CallNotification>(new CosmosClient(_config.CosmosDb), _config,
             GetLogger<CosmosCallHistoryManager<BaseActiveCallState, CallNotification>>()));
     }
 
@@ -33,7 +33,7 @@ public class EngineTests : BaseTests
         optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ServiceHostedMediaCallingBotUnitTests;Trusted_Connection=True;MultipleActiveResultSets=true");
 
         var context = new CallHistorySqlContext<BaseActiveCallState, CallNotification>(optionsBuilder.Options);
-        await HistoryTest(new SqlCallHistoryManager<BaseActiveCallState, CallNotification>(context, 
+        await HistoryTest(new SqlCallHistoryManager<BaseActiveCallState, CallNotification>(context,
             GetLogger<SqlCallHistoryManager<BaseActiveCallState, CallNotification>>()));
     }
 

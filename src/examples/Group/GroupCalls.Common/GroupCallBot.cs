@@ -30,7 +30,7 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         // Add meeting info if this is a Teams meeting
         if (meetingRequest.JoinMeetingInfo?.JoinUrl != null)
         {
-            var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(meetingRequest.JoinMeetingInfo.JoinUrl);  
+            var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(meetingRequest.JoinMeetingInfo.JoinUrl);
             newCallDetails.MeetingInfo = joinInfo;
             newCallDetails.ChatInfo = chatInfo;
 

@@ -22,7 +22,7 @@ public class SlowInMemoryCallStateManager<T> : ConcurrentInMemoryCallStateManage
     }
 
     public override async Task UpdateCurrentCallState(T callState)
-    { 
+    {
         await Delay();
 
         await base.UpdateCurrentCallState(callState);

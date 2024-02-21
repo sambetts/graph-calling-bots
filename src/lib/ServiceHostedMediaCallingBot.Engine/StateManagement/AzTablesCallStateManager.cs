@@ -21,7 +21,7 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
 
         var entity = new CallStateEntity<T>(callState);
         var r = await _tableClient!.UpsertEntityAsync(entity);
-        
+
     }
 
     public async Task<T?> GetByNotificationResourceUrl(string resourceUrl)

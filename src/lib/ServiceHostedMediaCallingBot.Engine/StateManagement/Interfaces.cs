@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using System.Text.Json;
+﻿using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -23,7 +21,7 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
     Task<List<T>> GetActiveCalls();
 }
 
-public interface ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : IAsyncInit 
+public interface ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : IAsyncInit
     where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class
 {

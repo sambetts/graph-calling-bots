@@ -114,7 +114,7 @@ public class HttpFunctions
     public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
     {
         if (!_callStateManager.Initialised) await _callStateManager.Initialise();
-        
+
         var calls = await _callStateManager.GetActiveCalls();
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(calls);

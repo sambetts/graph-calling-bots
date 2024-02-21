@@ -40,7 +40,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 
     public bool Equals(BaseActiveCallState? other)
     {
-        return other != null && other.ResourceUrl == ResourceUrl 
+        return other != null && other.ResourceUrl == ResourceUrl
             && other.CallId == CallId
             && other.StateEnum == StateEnum
             && other.BotMediaPlaylist.Select(p => p.Key).SequenceEqual(BotMediaPlaylist.Select(p => p.Key))
@@ -63,7 +63,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     public List<CallMediaPrompt> MediaPromptsPlaying { get; set; } = new();
 
     public List<CallParticipant> JoinedParticipants { get; set; } = new();
-    
+
     [JsonIgnore]
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
 }

@@ -80,7 +80,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 
         lock (this)
         {
-            return Task.FromResult(_callStates.Select(s=> s.Value).ToList());
+            return Task.FromResult(_callStates.Select(s => s.Value).ToList());
         }
     }
 }

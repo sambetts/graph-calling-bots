@@ -14,7 +14,7 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// A simple, stateless bot that can make outbound calls, and play prompts.
 /// State is held in the call state manager.
 /// </summary>
-public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot 
+public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     public const string DefaultNotificationPrompt = "DefaultNotificationPrompt";
