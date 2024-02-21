@@ -6,7 +6,7 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
     where CALLSTATETYPE : BaseActiveCallState 
     where HISTORYPAYLOADTYPE : class
 {
-    private readonly Dictionary<string, CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>> _callHistory = new();
+    private readonly Dictionary<string, CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>> _callHistory = new();
 
     public Task Initialise()
     {
@@ -28,7 +28,7 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
 
                 if (!_callHistory.ContainsKey(callState.CallId!))
                 {
-                    _callHistory.Add(callState.CallId!, new CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState) { NotificationsHistory = newHistoryArray, StateHistory = newCallStateList });
+                    _callHistory.Add(callState.CallId!, new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState) { NotificationsHistory = newHistoryArray, StateHistory = newCallStateList });
                 }
                 else
                 {
@@ -40,7 +40,7 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
         return Task.CompletedTask;
     }
 
-    public Task<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
+    public Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
     {
         lock (this)
         {
@@ -48,15 +48,15 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
             {
                 if (_callHistory.ContainsKey(callState.CallId!))
                 {
-                    return Task.FromResult<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>( _callHistory[callState.CallId!]);
+                    return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>( _callHistory[callState.CallId!]);
                 }
                 else
                 {
-                    Task.FromResult<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(new CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState));
+                    Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState));
                 }
             }
         }
-        return Task.FromResult<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(null);
+        return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(null);
     }
 
     Task ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>.DeleteCallHistory(CALLSTATETYPE callState)

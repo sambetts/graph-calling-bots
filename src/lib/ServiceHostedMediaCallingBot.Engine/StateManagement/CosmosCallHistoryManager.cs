@@ -27,7 +27,7 @@ public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosm
     }
 
     public string CallId { get; set; }
-    public CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> CallHistory { get; set; } = null!;
+    public CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> CallHistory { get; set; } = null!;
 
     public override string id { get => CallId; set => CallId = value; }
 
@@ -82,7 +82,7 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
         {
             _logger.LogInformation($"Creating new call history for call {callState.CallId}");
             var callHistoryRecordNew = new CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState);
-            callHistoryRecordNew.CallHistory = new CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
+            callHistoryRecordNew.CallHistory = new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
             { 
                 NotificationsHistory = newHistoryArray, 
                 StateHistory = newCallStateList, 
@@ -93,9 +93,9 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
         }
     }
 
-    public async Task<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
+    public async Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
     {
-        CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>? r = null;
+        CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>? r = null;
         try
         {
             var result = await _historyContainer.ReadItemAsync<CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>>(callState.CallId, new PartitionKey(callState.CallId));
@@ -114,7 +114,7 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
 
     public async Task DeleteCallHistory(CALLSTATETYPE callState)
     {
-        await _historyContainer.DeleteItemAsync<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>>(callState.CallId, new PartitionKey(callState.CallId));
+        await _historyContainer.DeleteItemAsync<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>>(callState.CallId, new PartitionKey(callState.CallId));
     }
 
     public async Task Initialise()

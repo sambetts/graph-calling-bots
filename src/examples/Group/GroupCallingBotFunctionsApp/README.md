@@ -16,8 +16,11 @@ MicrosoftAppPassword | Bot app secret
 BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
 Storage (optional) | Azure storage account connection string. Will use in-memory provider if not configured. Example: UseDevelopmentStorage=true
 CosmosDb (optional) | Cosmos DB connection string. Will use in-memory provider if not configured. Example: AccountEndpoint=https://callingbot.documents.azure.com:443/;AccountKey=xxxxxx==;
-DatabaseName | Cosmos DB name if cosmos is used. Example: CallingBot
-ContainerName | Cosmos DB container name if cosmos is used. Example: CallsLogs
+DatabaseName (optional) | Cosmos DB name if cosmos is used. Example: CallingBot
+ContainerName (optional) | Cosmos DB container name if cosmos is used. Example: CallsLogs
+SqlCallHistory (optional) | SQL Server connection string if SQL is used for storing call history. Example: Server=tcp:callingbot.database.windows.net,1433;Initial Catalog=CallingBot;Persist Security Info=False;User ID=callingbot;Password=xxxxxx;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+
+Note: the order of preference for call-history logger is: SQL, Cosmos, InMemory. If you have both SQL and Cosmos configured, it will use SQL. If you have neither, it will use InMemory.
 
 ## Testing the Bot
 Expose the bot with NGrok:

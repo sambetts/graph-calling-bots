@@ -29,10 +29,10 @@ public class EngineTests : BaseTests
     [TestMethod]
     public async Task SqlCallHistoryManager()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<CallHistoryContext<BaseActiveCallState, CallNotification>>();
+        var optionsBuilder = new DbContextOptionsBuilder<CallHistorySqlContext<BaseActiveCallState, CallNotification>>();
         optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=ServiceHostedMediaCallingBotUnitTests;Trusted_Connection=True;MultipleActiveResultSets=true");
 
-        var context = new CallHistoryContext<BaseActiveCallState, CallNotification>(optionsBuilder.Options);
+        var context = new CallHistorySqlContext<BaseActiveCallState, CallNotification>(optionsBuilder.Options);
         await HistoryTest(new SqlCallHistoryManager<BaseActiveCallState, CallNotification>(context, 
             GetLogger<SqlCallHistoryManager<BaseActiveCallState, CallNotification>>()));
     }

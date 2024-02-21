@@ -1,9 +1,11 @@
 ﻿using Azure.Data.Tables;
 using GroupCalls.Common;
 using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
 
 namespace GroupCallingBot.FunctionApp.Extensions;
 
@@ -25,15 +27,27 @@ public static class BotBuilderExtensions
             services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
         }
 
-        if (!string.IsNullOrEmpty(config.CosmosDb))
+        // Prefer SQL storage if configured, then CosmosDb, otherwise use in-memory storage
+        if (!string.IsNullOrEmpty(config.SqlCallHistory))
         {
-            services.AddSingleton(new CosmosClient(config.CosmosDb));
-            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, CosmosCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+            services.AddDbContext<CallHistorySqlContext<GroupCallActiveCallState, CallNotification>>(options => options
+                .UseSqlServer(config.SqlCallHistory)
+            );
+            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, SqlCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
         }
         else
         {
-            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+            if (!string.IsNullOrEmpty(config.CosmosDb))
+            {
+                services.AddSingleton(new CosmosClient(config.CosmosDb));
+                services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, CosmosCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+            }
+            else
+            {
+                services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+            }
         }
+        
         services.AddSingleton<ICosmosConfig>(config);
 
         return services.AddSingleton<GroupCallBot>();

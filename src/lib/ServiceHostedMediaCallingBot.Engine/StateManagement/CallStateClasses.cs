@@ -42,28 +42,33 @@ public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
     public ETag ETag { get; set; }
 
     [IgnoreDataMember]
-    public T? State { get => JsonSerializer.Deserialize<T>(StateJson); set => StateJson = JsonSerializer.Serialize(value); }
+    public T? State 
+    { 
+        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson) : default; 
+        set => StateJson = JsonSerializer.Serialize(value); 
+    }
 
     public string StateJson { get; set; } = null!;
 }
 
 
-public class CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> where CALLSTATETYPE : BaseActiveCallState
+public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> 
+    where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class
 {
-    public CallHistoryEntity()
+    public CallStateAndNotificationsHistoryEntity()
     {
     }
-    public CallHistoryEntity(CALLSTATETYPE initialState) : this()
+    public CallStateAndNotificationsHistoryEntity(CALLSTATETYPE initialState) : this()
     {
         StateHistory = new List<CALLSTATETYPE> {initialState};
     }
 
     public DateTimeOffset? Timestamp { get; set; } = DateTime.UtcNow;
 
-    public List<CALLSTATETYPE> StateHistory { get; set; } = new();
+    public virtual List<CALLSTATETYPE> StateHistory { get; set; } = new();
 
-    public List<NotificationHistory<HISTORYPAYLOADTYPE>> NotificationsHistory { get; set; } = new();
+    public virtual List<NotificationHistory<HISTORYPAYLOADTYPE>> NotificationsHistory { get; set; } = new();
 }
 
 public class NotificationHistory<HISTORYPAYLOADTYPE> where HISTORYPAYLOADTYPE : class

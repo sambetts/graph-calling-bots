@@ -28,7 +28,7 @@ public interface ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : IAsync
     where HISTORYPAYLOADTYPE : class
 {
     Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload);
-    Task<CallHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState);
+    Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState);
 
     Task DeleteCallHistory(CALLSTATETYPE callState);
 }

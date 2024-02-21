@@ -27,6 +27,11 @@ internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
     public string CosmosDb { get; set; } = null!;
 
 
+
+    [ConfigValue(true)]
+    public string SqlCallHistory { get; set; } = null!;
+
+
     [ConfigValue(true)]
     public string DatabaseName { get; set; } = null!;
 
