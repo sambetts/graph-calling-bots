@@ -22,6 +22,8 @@ SqlCallHistory (optional) | SQL Server connection string if SQL is used for stor
 
 Note: the order of preference for call-history logger is: SQL, Cosmos, InMemory. If you have both SQL and Cosmos configured, it will use SQL. If you have neither, it will use InMemory.
 
+For SQL logging, the account in the connection string needs owner rights to the database as it'll create the schema (only) if the database is empty. 
+
 ## Testing the Bot
 Expose the bot with NGrok:
 ```
