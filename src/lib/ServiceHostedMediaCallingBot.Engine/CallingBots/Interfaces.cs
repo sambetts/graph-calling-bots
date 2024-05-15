@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;

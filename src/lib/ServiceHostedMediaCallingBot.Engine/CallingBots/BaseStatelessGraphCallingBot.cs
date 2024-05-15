@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Client.Authentication;
+using Microsoft.Graph.Contracts;
+using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.Http;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -109,7 +111,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         var newCall = new Call
         {
             MediaConfig = defaultMediaConfig,
-            RequestedModalities = new List<Modality> { Modality.Audio },
+            RequestedModalities = new List<Modality?> { Modality.Audio },
             TenantId = _botConfig.TenantId,
             CallbackUri = _botConfig.CallingEndpoint,
             Direction = CallDirection.Outgoing

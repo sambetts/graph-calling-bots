@@ -142,7 +142,7 @@ public class MainDialog : CancellableDialogue
                     var userId = string.Empty;
                     try
                     {
-                        var user = await _graphServiceClient.Users[addContactActionInfo.ContactId].Request().GetAsync();
+                        var user = await _graphServiceClient.Users[addContactActionInfo.ContactId].GetAsync();
                         userId = user.Id;
                     }
                     catch (ServiceException ex)

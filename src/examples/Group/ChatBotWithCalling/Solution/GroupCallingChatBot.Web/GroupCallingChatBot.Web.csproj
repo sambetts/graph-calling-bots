@@ -20,12 +20,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="AdaptiveCards" Version="3.1.0" />
-		<PackageReference Include="Azure.Data.Tables" Version="12.8.1" />
-		<PackageReference Include="Azure.Identity" Version="1.10.4" />
+		<PackageReference Include="Azure.Data.Tables" Version="12.8.3" />
+		<PackageReference Include="Azure.Identity" Version="1.11.2" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.12" />
-		<PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.21.0" />
-		<PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.0" />
+		<PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.3" />
+		<PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.3" />
 	</ItemGroup>
 
 	<ItemGroup>
