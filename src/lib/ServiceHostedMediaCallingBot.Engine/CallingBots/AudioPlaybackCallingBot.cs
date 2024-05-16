@@ -35,7 +35,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
         var alreadyPlaying = false;
         foreach (var itemToPlay in callState.BotMediaPlaylist.Values)
         {
-            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo.ResourceId).Contains(itemToPlay.MediaInfo.ResourceId))
+            if (callState.MediaPromptsPlaying.Where(p=> p.MediaInfo != null).Select(p => p.MediaInfo!.ResourceId).Contains(itemToPlay.MediaInfo!.ResourceId))
             {
                 alreadyPlaying = true;
                 break;
