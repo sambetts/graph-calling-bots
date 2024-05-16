@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -61,7 +62,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
                 {
                     // Tone finished playing
                     _logger.LogInformation($"Call {callState.CallId} finished playing tone");
-                    var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
+                    var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo != null && p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
                     if (playingTone.Any())
                     {
                         callState.MediaPromptsPlaying.Remove(playingTone.First());

@@ -139,11 +139,11 @@ public class MainDialog : CancellableDialogue
                 if (validInput)
                 {
                     // Lookup object ID in Azure AD for email address
-                    var userId = string.Empty;
+                    string? userId = null;
                     try
                     {
-                        var user = await _graphServiceClient.Users[addContactActionInfo.ContactId].Request().GetAsync();
-                        userId = user.Id;
+                        var user = await _graphServiceClient.Users[addContactActionInfo.ContactId].GetAsync();
+                        userId = user?.Id;
                     }
                     catch (ServiceException ex)
                     {
@@ -152,7 +152,7 @@ public class MainDialog : CancellableDialogue
                     }
 
                     // Have we got a user id?   
-                    if (validInput)
+                    if (validInput && userId != null)
                     {
                         meetingState.Attendees.Add(new AttendeeCallInfo
                         {

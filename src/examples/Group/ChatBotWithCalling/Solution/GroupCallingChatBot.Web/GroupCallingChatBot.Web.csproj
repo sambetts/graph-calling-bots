@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<UserSecretsId>e691e9cd-a655-4472-bf34-67aeabc1c96c</UserSecretsId>
@@ -20,12 +20,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="AdaptiveCards" Version="3.1.0" />
-		<PackageReference Include="Azure.Data.Tables" Version="12.8.1" />
-		<PackageReference Include="Azure.Identity" Version="1.11.2" />
+		<PackageReference Include="Azure.Data.Tables" Version="12.8.3" />
+		<PackageReference Include="Azure.Identity" Version="1.11.3" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.12" />
-		<PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.21.0" />
-		<PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.5" />
+		<PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.22.3" />
+		<PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.3" />
 	</ItemGroup>
 
 	<ItemGroup>

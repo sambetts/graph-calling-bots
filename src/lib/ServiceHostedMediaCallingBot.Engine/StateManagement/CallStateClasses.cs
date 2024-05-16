@@ -3,6 +3,7 @@ using Azure.Data.Tables;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -44,7 +45,7 @@ public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
     [IgnoreDataMember]
     public T? State
     {
-        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson) : default;
+        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter () } }) : default;
         set => StateJson = JsonSerializer.Serialize(value);
     }
 

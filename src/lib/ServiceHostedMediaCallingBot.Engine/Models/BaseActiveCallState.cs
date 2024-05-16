@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using System.Text.Json.Serialization;
 
 namespace ServiceHostedMediaCallingBot.Engine.Models;
@@ -52,7 +53,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     /// <summary>
     /// Sounds to play on call
     /// </summary>
-    public Dictionary<string, CallMediaPrompt> BotMediaPlaylist { get; set; } = new();
+    public Dictionary<string, EquatableMediaPrompt> BotMediaPlaylist { get; set; } = new();
 
     /// <summary>
     /// Connected, Establishing, etc
@@ -60,7 +61,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     public CallState? StateEnum { get; set; } = null;
 
     public List<Tone> TonesPressed { get; set; } = new();
-    public List<CallMediaPrompt> MediaPromptsPlaying { get; set; } = new();
+    public List<MediaPrompt> MediaPromptsPlaying { get; set; } = new();
 
     public List<CallParticipant> JoinedParticipants { get; set; } = new();
 

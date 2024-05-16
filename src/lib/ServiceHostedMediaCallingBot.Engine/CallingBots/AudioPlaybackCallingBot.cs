@@ -28,14 +28,13 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
         await base.CallConnectedWithP2PAudio(callState);
     }
 
-
     protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(T callState)
     {
         // Don't play media if already playing
         var alreadyPlaying = false;
         foreach (var itemToPlay in callState.BotMediaPlaylist.Values)
         {
-            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo.ResourceId).Contains(itemToPlay.MediaInfo.ResourceId))
+            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(itemToPlay.MediaInfo!.ResourceId))
             {
                 alreadyPlaying = true;
                 break;

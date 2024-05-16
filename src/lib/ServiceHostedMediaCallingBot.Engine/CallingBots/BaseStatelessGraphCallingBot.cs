@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Communications.Calls.Item.PlayPrompt;
 using Microsoft.Graph.Communications.Client.Authentication;
+using Microsoft.Graph.Contracts;
+using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.Http;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -26,6 +30,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
+    private readonly GraphServiceClient _graphServiceClient;
 
     public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
     {
@@ -34,6 +39,12 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         _callStateManager = callStateManager;
         _callHistoryManager = callHistoryManager;
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
+
+        string[] scopes = { "https://graph.microsoft.com/.default" };
+
+        var clientSecretCredential = new ClientSecretCredential(_botConfig.TenantId, _botConfig.AppId, _botConfig.AppSecret);
+
+        _graphServiceClient = new GraphServiceClient(clientSecretCredential, scopes);
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
@@ -109,7 +120,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         var newCall = new Call
         {
             MediaConfig = defaultMediaConfig,
-            RequestedModalities = new List<Modality> { Modality.Audio },
+            RequestedModalities = new List<Modality?> { Modality.Audio },
             TenantId = _botConfig.TenantId,
             CallbackUri = _botConfig.CallingEndpoint,
             Direction = CallDirection.Outgoing
@@ -164,9 +175,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             // Is there anything to play?
             if (mediaInfoItem != null)
             {
-                initialCallState.BotMediaPlaylist = new Dictionary<string, CallMediaPrompt>
+                initialCallState.BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
                 {
-                    { DefaultNotificationPrompt, new CallMediaPrompt { MediaInfo = mediaInfoItem } }
+                    { DefaultNotificationPrompt, new EquatableMediaPrompt { MediaInfo = mediaInfoItem } }
                 };
             }
             await _callStateManager.AddCallStateOrUpdate(initialCallState);
@@ -257,9 +268,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         _logger.LogDebug($"Media info: {JsonSerializer.Serialize(newCall.MediaConfig)}");
         try
         {
-            var callCreated = await PostDataAndReturnResult<Call>("/communications/calls", newCall);
+            var callCreated = await _graphServiceClient.Communications.Calls.PostAsync(newCall);
 
-            _logger.LogInformation($"Call {callCreated.Id} created");
+            _logger.LogInformation($"Call {callCreated?.Id} created");
             return callCreated;
         }
         catch (HttpRequestException ex)
@@ -272,7 +283,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<CallMediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<EquatableMediaPrompt> mediaPrompts)
     {
         if (mediaPrompts.Count() == 0)
         {
@@ -282,8 +293,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
 
         callState.MediaPromptsPlaying.AddRange(mediaPrompts);
-
-        return await PostDataAndReturnResult<PlayPromptOperation>($"/communications/calls/{callState.CallId}/playPrompt", new PlayPromptRequest { Prompts = mediaPrompts });
+        return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(new PlayPromptPostRequestBody { Prompts = mediaPrompts.Cast<Prompt>().ToList() });
     }
 
     protected async Task SubscribeToToneAsync(string callId)

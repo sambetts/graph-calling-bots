@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
@@ -27,17 +28,17 @@ public class ModelTests
         state1.StateEnum = CallState.TransferAccepted;
         Assert.AreNotEqual(state1, state2);
 
-        var state4 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } } };
-        var state5 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } } };
+        var state4 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new EquatableMediaPrompt() } } };
+        var state5 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new EquatableMediaPrompt() } } };
 
         Assert.AreEqual(state4, state5);
-        var state6 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } } };
-        var state7 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } } };
+        var state6 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new EquatableMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } } };
+        var state7 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new EquatableMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } } };
 
         Assert.AreEqual(state6, state7);
 
-        var state8 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } }, TonesPressed = new List<Tone> { Tone.Tone1 } };
-        var state9 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new CallMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } }, TonesPressed = new List<Tone> { Tone.Tone1 } };
+        var state8 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new EquatableMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } }, TonesPressed = new List<Tone> { Tone.Tone1 } };
+        var state9 = new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9", BotMediaPlaylist = { { "1", new EquatableMediaPrompt() } }, JoinedParticipants = { new CallParticipant { Id = "1" } }, TonesPressed = new List<Tone> { Tone.Tone1 } };
 
         Assert.AreEqual(state8, state9);
 

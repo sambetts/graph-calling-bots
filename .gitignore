@@ -71,3 +71,7 @@
 /src/examples/Group/GroupCallingBotFunctionsApp/Properties/PublishProfiles
 /src/examples/Group/GroupCalls.Common/bin/Debug/net7.0
 /src/examples/Group/GroupCallingBotFunctionsApp/Properties/ServiceDependencies/GroupCallingBotFunctionApp - Zip Deploy/profile.arm.json
+/src/examples/P2P/P2pPstnBot/PstnBot.Shared/bin/Debug/net8.0
+/src/examples/P2P/P2pPstnBot/PstnBot.Web/bin/Debug/net8.0
+/src/lib/ServiceHostedMediaCallingBot.Engine/bin/Debug/net8.0
+/src/examples/Group/GroupCalls.Common/bin/Debug/net8.0

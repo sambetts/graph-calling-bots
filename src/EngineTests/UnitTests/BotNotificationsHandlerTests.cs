@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -205,7 +206,7 @@ public class BotNotificationsHandlerTests : BaseTests
         var callState = await _callStateManager.GetByNotificationResourceUrl(callResourceUrl);
 
         // Add a media prompt to the call state
-        callState!.MediaPromptsPlaying.Add(new CallMediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.P2PTest1PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
+        callState!.MediaPromptsPlaying.Add(new EquatableMediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.P2PTest1PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
         await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1PlayPromptFinish);
         Assert.IsTrue(callPlayPromptFinished == 1);
 
@@ -346,7 +347,7 @@ public class BotNotificationsHandlerTests : BaseTests
         var callState = await _callStateManager.GetByNotificationResourceUrl(callResourceUrl);
 
         // Add a media prompt to the call state
-        callState!.MediaPromptsPlaying.Add(new CallMediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.P2PTest1PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
+        callState!.MediaPromptsPlaying.Add(new EquatableMediaPrompt { MediaInfo = new MediaInfo { ResourceId = NotificationsLibrary.P2PTest1PlayPromptFinish!.CommsNotifications[0]!.AssociatedPlayPromptOperation!.Id } });
         await notificationsManager.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.P2PTest1PlayPromptFinish);
         Assert.IsTrue(callPlayPromptFinished == 1);
 
