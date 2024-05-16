@@ -8,9 +8,9 @@ namespace ServiceHostedMediaCallingBot.Engine.Models;
 /// To implement IEqutable, we need to override the default implementation of these classes
 /// </summary>
 
-public class CallMediaPrompt : MediaPrompt, IEquatable<CallMediaPrompt>
+public class EquatableMediaPrompt : MediaPrompt, IEquatable<EquatableMediaPrompt>
 {
-    public bool Equals(CallMediaPrompt? other)
+    public bool Equals(EquatableMediaPrompt? other)
     {
         return other != null && JsonSerializer.Serialize(other) == JsonSerializer.Serialize(this);
     }

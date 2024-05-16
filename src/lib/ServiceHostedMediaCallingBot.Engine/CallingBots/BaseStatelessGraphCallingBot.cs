@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Communications.Calls.Item.PlayPrompt;
 using Microsoft.Graph.Communications.Client.Authentication;
 using Microsoft.Graph.Contracts;
 using Microsoft.Graph.Models;
@@ -174,9 +175,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             // Is there anything to play?
             if (mediaInfoItem != null)
             {
-                initialCallState.BotMediaPlaylist = new Dictionary<string, CallMediaPrompt>
+                initialCallState.BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
                 {
-                    { DefaultNotificationPrompt, new CallMediaPrompt { MediaInfo = mediaInfoItem } }
+                    { DefaultNotificationPrompt, new EquatableMediaPrompt { MediaInfo = mediaInfoItem } }
                 };
             }
             await _callStateManager.AddCallStateOrUpdate(initialCallState);
@@ -282,7 +283,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<CallMediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<EquatableMediaPrompt> mediaPrompts)
     {
         if (mediaPrompts.Count() == 0)
         {
@@ -292,8 +293,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
 
         callState.MediaPromptsPlaying.AddRange(mediaPrompts);
-
-        return await PostDataAndReturnResult<PlayPromptOperation>($"/communications/calls/{callState.CallId}/playPrompt", new PlayPromptRequest { Prompts = mediaPrompts });
+        return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(new PlayPromptPostRequestBody { Prompts = mediaPrompts.Cast<Prompt>().ToList() });
     }
 
     protected async Task SubscribeToToneAsync(string callId)
