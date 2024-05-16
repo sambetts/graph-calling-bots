@@ -4,6 +4,8 @@ using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
@@ -41,6 +43,11 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         }
 
         // Start call
+        var options = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        var json = JsonSerializer.Serialize(newCallDetails, options);
         var createdCall = await CreateNewCall(newCallDetails);
 
         if (createdCall != null)
