@@ -10,6 +10,7 @@ var host = new HostBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddCommandLine(args)
+            .AddUserSecrets<Program>()
             .Build();
     })
     .ConfigureServices(configureDelegate: (hostContext, services) =>
