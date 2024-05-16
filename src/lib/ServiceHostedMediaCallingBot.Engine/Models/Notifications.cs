@@ -1,5 +1,7 @@
 ﻿using Microsoft.Graph;
+using Microsoft.Graph.Communications.Common;
 using Microsoft.Graph.Models;
+using Microsoft.Kiota.Serialization.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -37,7 +39,7 @@ public class CallNotification
     [JsonIgnore]
     public List<CallParticipant>? JoinedParticipants => GetTypedResourceArray<CallParticipant>();
 
-    T? GetTypedResourceObject<T>(string odataType) where T : class
+    T? GetTypedResourceObject<T>(string odataType) where T : Entity
     {
         if (NotificationResource != null)
         {
@@ -49,7 +51,11 @@ public class CallNotification
                 var obj = JsonNode.Parse(s);
                 if (obj != null && obj["@odata.type"]?.GetValue<string>() == odataType)
                 {
-                    return JsonSerializer.Deserialize<T>(s);
+                    // Deduced from https://github.com/microsoftgraph/msgraph-sdk-dotnet/blob/f7f01eeb125d8ed0cb023852b587eb30a0bb39f8/tests/Microsoft.Graph.DotnetCore.Test/Models/ModelSerializationTests.cs#L36
+                    var jsonParseNode = new JsonParseNode(JsonDocument.Parse(s).RootElement);
+                    var r = jsonParseNode.GetObjectValue(Entity.CreateFromDiscriminatorValue);
+
+                    return r as T;
                 }
             }
         }
