@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using PstnBot.Shared;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;

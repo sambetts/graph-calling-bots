@@ -45,7 +45,7 @@ public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
     [IgnoreDataMember]
     public T? State
     {
-        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter () } }) : default;
+        get => StateJson != null ? JsonSerializer.Deserialize<T>(StateJson, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }) : default;
         set => StateJson = JsonSerializer.Serialize(value);
     }
 

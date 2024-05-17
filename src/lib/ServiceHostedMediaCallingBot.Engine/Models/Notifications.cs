@@ -1,6 +1,4 @@
-﻿using Microsoft.Graph;
-using Microsoft.Graph.Communications.Common;
-using Microsoft.Graph.Models;
+﻿using Microsoft.Graph.Models;
 using Microsoft.Kiota.Serialization.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;

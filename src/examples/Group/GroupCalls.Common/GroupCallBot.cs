@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
@@ -22,7 +19,8 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
     /// </summary>
     public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
-        MediaInfo? mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
+        // Work out what audio to play, if anything
+        var mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
 
         // Work out who to call first & who to invite
         var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
@@ -43,11 +41,6 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         }
 
         // Start call
-        var options = new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-        var json = JsonSerializer.Serialize(newCallDetails, options);
         var createdCall = await CreateNewCall(newCallDetails);
 
         if (createdCall != null)

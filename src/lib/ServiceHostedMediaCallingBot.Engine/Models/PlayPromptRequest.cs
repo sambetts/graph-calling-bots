@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph;
-using Microsoft.Graph.Models;
+﻿using Microsoft.Graph.Models;
 using System.Text.Json.Serialization;
 
 namespace ServiceHostedMediaCallingBot.Engine.Models;
