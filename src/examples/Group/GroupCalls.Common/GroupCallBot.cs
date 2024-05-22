@@ -3,6 +3,7 @@ using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
+using System.Text.Json;
 
 namespace GroupCalls.Common;
 
@@ -19,61 +20,85 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
     /// </summary>
     public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
     {
+        if (!meetingRequest.IsValid)
+        {
+            var exampleRequest = new StartGroupCallData 
+            { 
+                OrganizerUserId = Guid.NewGuid().ToString(), 
+                Attendees = new List<AttendeeCallInfo> { new AttendeeCallInfo { DisplayName = "Teams user", Id = Guid.NewGuid().ToString(), Type = GroupMeetingAttendeeType.Teams } },
+                MessageUrl = "https://example.com/audio.wav"
+            };
+            _logger.LogError($"Invalid meeting request. Required request: {JsonSerializer.Serialize(exampleRequest)}");
+            return null;
+        }
+
         // Work out what audio to play, if anything
         var mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
 
-        // Work out who to call first & who to invite
+        if (mediaInfoItem?.Uri != null)
+        {
+            var validMedia = await TestMediaExists(mediaInfoItem.Uri);
+            if (!validMedia)
+            {
+                _logger.LogError("Media URL is invalid");
+                return null;
+            }
+        }
+
         var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
 
-        // Create call for initial participants. Will throw error if media URL is invalid
-        var newCallDetails = await TestCallMediaAndCreateCallRequest(initialAdd, mediaInfoItem, meetingRequest.HasPSTN);
+        var groupCallReq = await CreateCallRequest(initialAdd, null, meetingRequest.HasPSTN, false);
 
-        // Add meeting info if this is a Teams meeting
-        if (meetingRequest.JoinMeetingInfo?.JoinUrl != null)
+        // Create a meeting for the group call as organizer. Requires the OnlineMeetings.ReadWrite.All permission.
+        _logger.LogInformation($"Creating online meeting for group call for user '{meetingRequest.OrganizerUserId}'");
+        var groupCallMeeting = await _graphServiceClient.Users[meetingRequest.OrganizerUserId].OnlineMeetings.PostAsync(new OnlineMeeting
         {
-            var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(meetingRequest.JoinMeetingInfo.JoinUrl);
-            newCallDetails.MeetingInfo = joinInfo;
-            newCallDetails.ChatInfo = chatInfo;
+            StartDateTime = DateTimeOffset.UtcNow,
+            EndDateTime = DateTimeOffset.UtcNow.AddHours(1),
+        });
 
-            // If this is a call for an OnlineMeeting, we can't initially call someone with the new call as the call is technically already in progress.
-            // So we need to invite them instead.
-            inviteNumberList.Add(initialAdd);
-        }
+        var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(groupCallMeeting.JoinWebUrl);
+        groupCallReq.MeetingInfo = joinInfo;
+        groupCallReq.ChatInfo = chatInfo;
 
-        // Start call
-        var createdCall = await CreateNewCall(newCallDetails);
+        var createdGroupCall = await CreateNewCall(groupCallReq);
 
-        if (createdCall != null)
+        if (createdGroupCall != null)
         {
             // Remember initial state
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
+            await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
         }
-        return createdCall;
+
+        // Call each attendee seperately and invite them to a common call
+        foreach (var attendee in meetingRequest.Attendees)
+        {
+            var newTarget = new InvitationParticipantInfo
+            {
+                Identity = attendee.ToIdentity()
+            };
+
+            var singleAttendeeCallReq = await CreateCallRequest(newTarget, mediaInfoItem, attendee.Type == GroupMeetingAttendeeType.Phone, false);
+
+
+            // Start call
+            var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
+
+            if (singleAttendeeCall != null)
+            {
+                // Remember initial state
+                await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
+            }
+        }
+
+        return createdGroupCall;
     }
 
-    /// <summary>
-    /// Due to how group calls work with PSTN numbers especially, we need to invite everyone else after the call is established.
-    /// </summary>
-    protected async override Task CallEstablished(GroupCallActiveCallState callState)
+    protected override async Task NewTonePressed(GroupCallActiveCallState callState, Tone tone)
     {
-        if (!string.IsNullOrEmpty(callState?.CallId))
+        await base.NewTonePressed(callState, tone);
+        if (tone == Tone.Tone1)
         {
-            // Invite everyone else
-            if (callState.GroupCallInvites != null && callState.GroupCallInvites.Count > 0)
-            {
-                await InviteToCallAsync(callState.CallId, callState.GroupCallInvites);
-
-                callState.GroupCallInvites.Clear();
-                await _callStateManager.UpdateCurrentCallState(callState);
-            }
-            else
-            {
-                _logger.LogInformation("Call established but no invites found");
-            }
-        }
-        else
-        {
-            _logger.LogWarning("Call established but no call ID found");
+            await _graphServiceClient.Communications.cal(callState);
         }
     }
 

@@ -30,7 +30,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
-    private readonly GraphServiceClient _graphServiceClient;
+    protected readonly GraphServiceClient _graphServiceClient;
 
     public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
     {
@@ -90,9 +90,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     }
 
     /// <summary>
-    /// A common way to init the ICallStateManager and create a call request. Also tests if the WAV file exists.
+    /// A common way to init the ICallStateManager and create a call request. Also optionally tests if the WAV file exists.
     /// </summary>
-    protected async Task<Call> TestCallMediaAndCreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo? defaultMedia, bool addBotIdentityForPSTN)
+    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo? defaultMedia, bool addBotIdentityForPSTN, bool testMedia)
     {
         if (!_callStateManager.Initialised)
         {
@@ -100,20 +100,21 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
 
         var defaultMediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo>() };
-        if (!string.IsNullOrEmpty(defaultMedia?.Uri))
+        if (testMedia && !string.IsNullOrEmpty(defaultMedia?.Uri))
         {
-            bool fileExists = await TestExists(defaultMedia.Uri);
+            bool fileExists = await TestMediaExists(defaultMedia.Uri);
             if (!fileExists)
             {
-                _logger.LogError($"Media file {defaultMedia.Uri} does not exist. Aborting call");
                 throw new ArgumentOutOfRangeException(nameof(defaultMedia), $"Media file {defaultMedia.Uri} does not exist. Aborting call");
             }
             defaultMediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo> { defaultMedia } };
-            _logger.LogDebug($"Validated media info: {JsonSerializer.Serialize(defaultMedia)}");
         }
         else
         {
-            _logger.LogInformation($"No media URI found for call. Won't play any initial message via bot.");
+            if (testMedia)
+            {
+                _logger.LogInformation($"No media URI found for call. Won't play any initial message via bot.");
+            }
         }
 
         // Create call for initial participants
@@ -201,7 +202,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         }
     }
 
-    private async Task<bool> TestExists(string uri)
+    protected async Task<bool> TestMediaExists(string uri)
     {
         if (string.IsNullOrEmpty(uri))
         {
@@ -211,6 +212,14 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
         try
         {
             var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, uri));
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogDebug($"Validated media url: {uri}");
+            }
+            else
+            {
+                _logger.LogError($"Media file {uri} does not exist.");
+            }
             return response.IsSuccessStatusCode;
         }
         catch (HttpRequestException)
@@ -262,13 +271,16 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     #region Bot Actions
 
-    protected async Task<Call?> CreateNewCall(Call newCall)
+    /// <summary>
+    /// Create call with Graph API; logs error if fails.
+    /// </summary>
+    protected async Task<Call?> CreateNewCall(Call newCallRequest)
     {
         _logger.LogInformation($"Creating new call with Graph API...");
-        _logger.LogDebug($"Media info: {JsonSerializer.Serialize(newCall.MediaConfig)}");
+        _logger.LogDebug($"Media info: {JsonSerializer.Serialize(newCallRequest.MediaConfig)}");
         try
         {
-            var callCreated = await _graphServiceClient.Communications.Calls.PostAsync(newCall);
+            var callCreated = await _graphServiceClient.Communications.Calls.PostAsync(newCallRequest);
 
             _logger.LogInformation($"Call {callCreated?.Id} created");
             return callCreated;

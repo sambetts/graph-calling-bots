@@ -18,9 +18,9 @@ public class StartGroupCallData
     public string? MessageUrl { get; set; } = null;
 
     /// <summary>
-    /// Info to join the meeting, if this is a Teams meeting.
+    /// Id of the organizer of the group call.
     /// </summary>
-    public JoinMeetingInfo? JoinMeetingInfo { get; set; } = null;
+    public string OrganizerUserId { get; set; } = null!;
 
     [JsonIgnore]
     public bool HasPSTN => this.Attendees.Any(a => a.Type == GroupMeetingAttendeeType.Phone);
@@ -65,6 +65,9 @@ public class StartGroupCallData
 
         return (initialAdd, inviteNumberList);
     }
+
+    [JsonIgnore]
+    public bool IsValid => !string.IsNullOrEmpty(OrganizerUserId) && Attendees.Count > 0;
 }
 
 public class JoinMeetingInfo

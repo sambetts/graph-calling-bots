@@ -27,7 +27,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
 
 
         var mediaInfoItem = new MediaInfo { Uri = mediaUrl, ResourceId = Guid.NewGuid().ToString() };
-        var pstnCallRequest = await TestCallMediaAndCreateCallRequest(new InvitationParticipantInfo { Identity = target }, mediaInfoItem, true);
+        var pstnCallRequest = await CreateCallRequest(new InvitationParticipantInfo { Identity = target }, mediaInfoItem, true, true);
 
         var createdCall = await CreateNewCall(pstnCallRequest);
         if (createdCall != null)
