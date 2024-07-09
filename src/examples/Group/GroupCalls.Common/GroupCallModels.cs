@@ -114,3 +114,8 @@ public class GroupCallActiveCallState : BaseActiveCallState
     /// </summary>
     public List<InvitationParticipantInfo> GroupCallInvites { get; set; } = new();
 }
+
+public class GroupCallInviteActiveCallState : BaseActiveCallState
+{
+    public string GroupCallId { get; set; } = null!;
+}
