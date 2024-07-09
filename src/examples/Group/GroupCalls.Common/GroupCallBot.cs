@@ -93,14 +93,6 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         return createdGroupCall;
     }
 
-    protected override async Task NewTonePressed(GroupCallActiveCallState callState, Tone tone)
-    {
-        await base.NewTonePressed(callState, tone);
-        if (tone == Tone.Tone1)
-        {
-            await _graphServiceClient.Communications.cal(callState);
-        }
-    }
 
     protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<CallParticipant> participants)
     {

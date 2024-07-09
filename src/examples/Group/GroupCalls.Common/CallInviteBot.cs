@@ -3,7 +3,6 @@ using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Text.Json;
 
 namespace GroupCalls.Common;
 
@@ -12,10 +11,7 @@ public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
     public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallInviteActiveCallState> callStateManager, ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger)
         : base(botOptions, callStateManager, callHistoryManager, logger) { }
 
-    /// <summary>
-    /// Start group call with required attendees.
-    /// </summary>
-    internal async Task<Call?> InviteToGroupCall(StartGroupCallData meetingRequest, InvitationParticipantInfo initialAdd, Call createdGroupCall)
+    internal async Task<Call?> CallCandidateForGroupCall(StartGroupCallData meetingRequest, Call createdGroupCall)
     {
         if (createdGroupCall == null || createdGroupCall.Id == null)
         {
@@ -28,43 +24,46 @@ public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
         // Remember initial state
         await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, mediaInfoItem, createdCallState => createdCallState.GroupCallId = createdGroupCall.Id);
 
-            var newTarget = new InvitationParticipantInfo
-            {
-                Identity = attendee.ToIdentity()
-            };
+        var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
+        var newTarget = new InvitationParticipantInfo
+        {
+            Identity = initialAdd.Identity
+        };
 
-            var singleAttendeeCallReq = await CreateCallRequest(newTarget, mediaInfoItem, attendee.Type == GroupMeetingAttendeeType.Phone, false);
+        var singleAttendeeCallReq = await CreateCallRequest(newTarget, mediaInfoItem, meetingRequest.HasPSTN, false);
 
 
-            // Start call
-            var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
+        // Start call
+        var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
 
-            if (singleAttendeeCall != null)
-            {
-                // Remember initial state
-                await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
-            }
-        
+        if (singleAttendeeCall != null)
+        {
+            // Remember initial state
+            await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, mediaInfoItem, 
+                createdCallState => createdCallState.GroupCallId = createdGroupCall.Id);
+        }
+
 
         return createdGroupCall;
     }
 
-    protected override async Task NewTonePressed(GroupCallActiveCallState callState, Tone tone)
+    protected async override Task NewTonePressed(GroupCallInviteActiveCallState callState, Tone tone)
     {
         await base.NewTonePressed(callState, tone);
         if (tone == Tone.Tone1)
         {
-            await _graphServiceClient.Communications.cal(callState);
+            // Transfer
+            await _graphServiceClient.Communications.Calls[callState.GroupCallId].Transfer.PostAsync(callState);
         }
     }
 
-    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<CallParticipant> participants)
+    protected async override Task UsersJoinedGroupCall(GroupCallInviteActiveCallState callState, List<CallParticipant> participants)
     {
         await base.UsersJoinedGroupCall(callState, participants);
         await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
     }
 
-    protected async override Task CallConnectedWithP2PAudio(GroupCallActiveCallState callState)
+    protected async override Task CallConnectedWithP2PAudio(GroupCallInviteActiveCallState callState)
     {
         await base.CallConnectedWithP2PAudio(callState);
         await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
