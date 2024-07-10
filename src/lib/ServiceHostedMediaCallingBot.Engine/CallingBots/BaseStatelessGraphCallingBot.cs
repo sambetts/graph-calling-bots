@@ -92,7 +92,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request. Also optionally tests if the WAV file exists.
     /// </summary>
-    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo initialAdd, MediaInfo? defaultMedia, bool addBotIdentityForPSTN, bool testMedia)
+    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, MediaInfo? defaultMedia, bool addBotIdentityForPSTN, bool testMedia)
     {
         if (!_callStateManager.Initialised)
         {
@@ -142,7 +142,11 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
             });
         }
 
-        newCall.Targets = new List<InvitationParticipantInfo> { initialAdd };
+        newCall.Targets = new List<InvitationParticipantInfo>();
+        if (initialAdd != null)
+        {
+            newCall.Targets.Add(initialAdd);
+        }
 
         return newCall;
     }
@@ -263,7 +267,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     protected virtual Task NewTonePressed(CALLSTATETYPE callState, Tone tone)
     {
-        _logger.LogInformation($"New tone pressed: {tone} on call {callState.CallId}");
+        _logger.LogInformation($"{this.GetType().Name}: New tone pressed: {tone} on call {callState.CallId}");
         return Task.CompletedTask;
     }
 

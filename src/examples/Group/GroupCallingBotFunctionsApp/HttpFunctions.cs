@@ -17,13 +17,15 @@ namespace GroupCallingBot.FunctionApp;
 public class HttpFunctions
 {
     private readonly ILogger _logger;
-    private readonly GroupCallBot _callingBot;
+    private readonly GroupCallBot _groupCallingBot;
+    private readonly CallInviteBot _callInviteBot;
     private readonly ICallStateManager<GroupCallActiveCallState> _callStateManager;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, CallInviteBot callInviteBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
-        _callingBot = callingBot;
+        _groupCallingBot = callingBot;
+        _callInviteBot = callInviteBot;
         _callStateManager = callStateManager;
     }
 
@@ -40,7 +42,7 @@ public class HttpFunctions
             _logger.LogDebug($"Processing {notifications.CommsNotifications.Count} Graph call notification(s)");
             try
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
+                await _groupCallingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
             }
             catch (Exception ex)
             {
@@ -90,21 +92,44 @@ public class HttpFunctions
         var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
         {
-            var call = await _callingBot.StartGroupCall(newCallReq);
-
-            if (call != null)
+            var groupCall = await _groupCallingBot.StartGroupCall(newCallReq);
+            if (groupCall != null)
             {
-                var response = req.CreateResponse(HttpStatusCode.Accepted);
-                await response.WriteAsJsonAsync(call);
-                return response;
+                LogBotLogic($"Started group call with ID {groupCall.Id}");
+
+                if (groupCall != null)
+                {
+                    foreach (var attendee in newCallReq.Attendees)
+                    {
+                        var inviteCall = await _callInviteBot.CallCandidateForGroupCall(attendee, newCallReq, groupCall);
+                        if (inviteCall == null)
+                        {
+                            _logger.LogError($"Failed to invite {attendee.DisplayName} ({attendee.Id})");
+                        }
+                        else
+                        {
+                            LogBotLogic($"Invited '{attendee.DisplayName}' ({attendee.Id}) on new P2P call {inviteCall.Id}");
+                        }
+                    }
+
+                    var response = req.CreateResponse(HttpStatusCode.Accepted);
+                    await response.WriteAsJsonAsync(groupCall);
+                    return response;
+                }
+                else
+                {
+                    return req.CreateResponse(HttpStatusCode.BadRequest);
+                }
             }
             else
             {
-                return req.CreateResponse(HttpStatusCode.BadRequest);
+                _logger.LogError("Failed to start group call");
+                return req.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
         else
         {
+            _logger.LogError($"Unrecognized request body: {responseBodyRaw}");
             return SendBadRequest(req);
         }
     }
@@ -119,6 +144,11 @@ public class HttpFunctions
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(calls);
         return response;
+    }
+
+    void LogBotLogic(string msg)
+    { 
+        _logger.LogInformation("-" + msg);
     }
 
     HttpResponseData SendBadRequest(HttpRequestData req)

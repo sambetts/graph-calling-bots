@@ -22,6 +22,7 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
     {
         if (!meetingRequest.IsValid)
         {
+            // Invalid group call request. Send example valid request. 
             var exampleRequest = new StartGroupCallData 
             { 
                 OrganizerUserId = Guid.NewGuid().ToString(), 
@@ -45,22 +46,28 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
             }
         }
 
-        var (initialAdd, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
+        // Create group call with nobody in. We'll transfer people into it later.
+        var (_, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
 
-        var groupCallReq = await CreateCallRequest(initialAdd, null, meetingRequest.HasPSTN, false);
+        var groupCallReq = await CreateCallRequest(null, null, meetingRequest.HasPSTN, false);
 
         // Create a meeting for the group call as organizer. Requires the OnlineMeetings.ReadWrite.All permission.
-        _logger.LogInformation($"Creating online meeting for group call for user '{meetingRequest.OrganizerUserId}'");
+        _logger.LogInformation($"Creating online meeting for group call for organiser '{meetingRequest.OrganizerUserId}'");
         var groupCallMeeting = await _graphServiceClient.Users[meetingRequest.OrganizerUserId].OnlineMeetings.PostAsync(new OnlineMeeting
         {
             StartDateTime = DateTimeOffset.UtcNow,
             EndDateTime = DateTimeOffset.UtcNow.AddHours(1),
         });
 
-        var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(groupCallMeeting.JoinWebUrl);
-        groupCallReq.MeetingInfo = joinInfo;
-        groupCallReq.ChatInfo = chatInfo;
+        // Configure meeeting for the group call
+        if (groupCallMeeting?.JoinWebUrl != null)
+        {
+            var (chatInfo, joinInfo) = JoinInfo.ParseJoinURL(groupCallMeeting.JoinWebUrl);
+            groupCallReq.MeetingInfo = joinInfo;
+            groupCallReq.ChatInfo = chatInfo;
+        }
 
+        // Create group call
         var createdGroupCall = await CreateNewCall(groupCallReq);
 
         if (createdGroupCall != null)
@@ -69,26 +76,7 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
             await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
         }
 
-        // Call each attendee seperately and invite them to a common call
-        foreach (var attendee in meetingRequest.Attendees)
-        {
-            var newTarget = new InvitationParticipantInfo
-            {
-                Identity = attendee.ToIdentity()
-            };
-
-            var singleAttendeeCallReq = await CreateCallRequest(newTarget, mediaInfoItem, attendee.Type == GroupMeetingAttendeeType.Phone, false);
-
-
-            // Start call
-            var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
-
-            if (singleAttendeeCall != null)
-            {
-                // Remember initial state
-                await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
-            }
-        }
+        _logger.LogInformation($"Group call created.");
 
         return createdGroupCall;
     }

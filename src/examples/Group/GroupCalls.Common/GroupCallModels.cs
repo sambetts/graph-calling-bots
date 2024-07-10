@@ -118,4 +118,5 @@ public class GroupCallActiveCallState : BaseActiveCallState
 public class GroupCallInviteActiveCallState : BaseActiveCallState
 {
     public string GroupCallId { get; set; } = null!;
+    public IdentitySet AtendeeIdentity { get; set; } = null!;
 }
