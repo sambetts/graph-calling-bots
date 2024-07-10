@@ -234,7 +234,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications);
+        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, this);
     }
 
     #region Bot Events

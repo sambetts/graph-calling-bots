@@ -107,7 +107,7 @@ public class EngineTests : BaseTests
         await TestCallStateManager(callStateManager);
 
         // Test also a failed call
-        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, _historyManager);
+        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, _historyManager, new UnitTestBot(new RemoteMediaCallingBotConfiguration(), callStateManager, _historyManager, _logger));
     }
     async Task TestCallStateManager<T>(ICallStateManager<T> callStateManager) where T : BaseActiveCallState, new()
     {

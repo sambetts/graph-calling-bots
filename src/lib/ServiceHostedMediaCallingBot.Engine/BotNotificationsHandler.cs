@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
+using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -29,8 +30,9 @@ public class BotNotificationsHandler<CALLSTATETYPE>
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, BaseStatelessGraphCallingBot<CALLSTATETYPE> bot)
     {
+        var botType = bot.GetType().Name;
         if (notificationPayload == null) return;
 
         // Ensure processing is single-threaded to maintain processing order
@@ -45,7 +47,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
-            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification);
+            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification, botType);
 
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
@@ -55,12 +57,12 @@ public class BotNotificationsHandler<CALLSTATETYPE>
                 {
                     // Is this notification for a tone on a call we're tracking?
                     updateCallState = true;
-                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState);
+                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState, botType);
                 }
                 else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
                 {
                     // Tone finished playing
-                    _logger.LogInformation($"Call {callState.CallId} finished playing tone");
+                    _logger.LogInformation($"{botType}: Call {callState.CallId} finished playing tone");
                     var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo != null && p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
                     if (playingTone.Any())
                     {
@@ -75,7 +77,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
                     if (newPartipants.Count > 0)
                     {
                         // User joined group call
-                        _logger.LogInformation($"{newPartipants.Count} user(s) joined group call {callState.CallId}");
+                        _logger.LogInformation($"{botType}: {newPartipants.Count} user(s) joined group call {callState.CallId}");
                         if (_callbackInfo.UsersJoinedGroupCall != null) await _callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
                     }
 
@@ -83,7 +85,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
                     if (diconnectedPartipants.Count > 0)
                     {
                         // User left group call
-                        _logger.LogInformation($"{diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
+                        _logger.LogInformation($"{botType}: {diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
                         if (_callbackInfo.UsersLeftGroupCall != null) await _callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
                     }
 
@@ -107,7 +109,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
         _semaphore.Release();
     }
 
-    private async Task<bool> HandleCallChangeTypeUpdate(CALLSTATETYPE? callState, CallNotification callNotification)
+    private async Task<bool> HandleCallChangeTypeUpdate(CALLSTATETYPE? callState, CallNotification callNotification, string botType)
     {
         // Not seen this call before. Is this notification for a new call?
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
@@ -124,12 +126,12 @@ public class BotNotificationsHandler<CALLSTATETYPE>
             if (newCallStateCreated)
             {
                 // Normally we should have an existing state but just in case....
-                _logger.LogInformation($"Created call state for call {callState.CallId} (from Graph notification)");
+                _logger.LogInformation($"{botType}: Created call state for call {callState.CallId} (from Graph notification)");
                 await _callStateManager.AddCallStateOrUpdate(callState);
             }
             if (_callbackInfo.CallEstablishing != null) await _callbackInfo.CallEstablishing(callState);
 
-            _logger.LogInformation($"Call {callState.CallId} is connecting");
+            _logger.LogInformation($"{botType}: Call {callState.CallId} is connecting");
 
             // Update call-state
             callState.StateEnum = callNotification.AssociatedCall.State;
@@ -139,7 +141,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
         if (callState == null)
         {
             // A notification about a call we know nothing about
-            _logger.LogWarning($"Received notification for call we have no call-state for: '{callNotification?.ResourceUrl}'");
+            _logger.LogWarning($"{botType}: Received notification for call we have no call-state for: '{callNotification?.ResourceUrl}'");
             return false;
         }
 
@@ -151,7 +153,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
             if (callNotification.AssociatedCall != null && callState.StateEnum != callNotification.AssociatedCall.State && callNotification.AssociatedCall.State == CallState.Established)
             {
                 // Call state changed to established from previous state
-                _logger.LogInformation($"Call {callState.CallId} established");
+                _logger.LogInformation($"{botType}: Call {callState.CallId} established");
                 callState.StateEnum = callNotification.AssociatedCall.State;
                 if (_callbackInfo.CallEstablished != null) await _callbackInfo.CallEstablished(callState);
 
@@ -162,7 +164,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
             {
                 // Audio is now active. THREADING FUN:
                 // We can be here before we've set the call state to established above if the second notification arrives before we save state on the "call established" notification
-                _logger.LogInformation($"Call {callState.CallId} connected with P2P audio");
+                _logger.LogInformation($"{botType}: Call {callState.CallId} connected with P2P audio");
                 if (_callbackInfo.CallConnectedWithP2PAudio != null) await _callbackInfo.CallConnectedWithP2PAudio(callState);
 
                 callState.MediaState = callNotification.AssociatedCall.MediaState;
@@ -175,35 +177,35 @@ public class BotNotificationsHandler<CALLSTATETYPE>
             // Hang up and remove state
             if (!string.IsNullOrEmpty(callState.CallId))
             {
-                _logger.LogInformation($"Call {callState.CallId} terminated");
+                _logger.LogInformation($"{botType}: Call {callState.CallId} terminated");
                 var removeSuccess = await _callStateManager.RemoveCurrentCall(callState.ResourceUrl);
                 if (removeSuccess)
-                    _logger.LogInformation($"Call {callState.CallId} state removed");
+                    _logger.LogInformation($"{botType}: Call {callState.CallId} state removed");
                 else
-                    _logger.LogWarning($"Call {callState.CallId} state could not be removed");
+                    _logger.LogWarning($"{botType}: Call {callState.CallId} state could not be removed");
 
                 if (_callbackInfo.CallTerminated != null && callNotification.AssociatedCall?.ResultInfo != null)
                     await _callbackInfo.CallTerminated(callState.CallId, callNotification.AssociatedCall.ResultInfo);
                 else
                 {
                     if (callNotification.AssociatedCall?.ResultInfo == null)
-                        _logger.LogWarning($"Call {callState.CallId} terminated with no result info");
+                        _logger.LogWarning($"{botType}: Call {callState.CallId} terminated with no result info");
                 }
             }
             else
             {
-                _logger.LogWarning($"Unknown call finished");
+                _logger.LogWarning($"{botType}: Unknown call finished");
             }
         }
 
         return false;
     }
 
-    async Task HandleToneNotificationAsync(ToneInfo toneInfo, CALLSTATETYPE callState)
+    async Task HandleToneNotificationAsync(ToneInfo toneInfo, CALLSTATETYPE callState, string botType)
     {
         if (toneInfo.Tone != null)
         {
-            _logger.LogTrace($"Received tone {toneInfo.Tone.Value} on call {callState.CallId}");
+            _logger.LogTrace($"{botType}: Received tone {toneInfo.Tone.Value} on call {callState.CallId}");
             callState.TonesPressed.Add(toneInfo.Tone.Value);
 
             if (_callbackInfo.NewTonePressed != null)
@@ -213,7 +215,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>
         }
         else
         {
-            _logger.LogWarning($"Received notification for unknown tone on call {callState.CallId}");
+            _logger.LogWarning($"{botType}: Received notification for unknown tone on call {callState.CallId}");
         }
     }
 }
