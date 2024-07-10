@@ -29,14 +29,14 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
             { 
                 OrganizerUserId = Guid.NewGuid().ToString(), 
                 Attendees = new List<AttendeeCallInfo> { new AttendeeCallInfo { DisplayName = "Teams user", Id = Guid.NewGuid().ToString(), Type = GroupMeetingAttendeeType.Teams } },
-                MessageUrl = "https://example.com/audio.wav"
+                MessageInviteUrl = "https://example.com/audio.wav"
             };
             _logger.LogError($"Invalid meeting request. Required request: {JsonSerializer.Serialize(exampleRequest)}");
             return null;
         }
 
         // Work out what audio to play, if anything
-        var mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
+        var mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageInviteUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageInviteUrl, ResourceId = Guid.NewGuid().ToString() };
 
         if (mediaInfoItem?.Uri != null)
         {

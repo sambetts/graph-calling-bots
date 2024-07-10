@@ -79,15 +79,38 @@ public class HttpFunctions
     /// <summary>
     /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
     /// </summary>
-    [Function(HttpRouteConstants.WavFileActionName)]
-    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
+    [Function(HttpRouteConstants.WavFileInviteToCallActionName)]
+    public async Task<HttpResponseData> WavFileInviteToCall([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
-        _logger.LogInformation($"Sending WAV file HTTP response");
+        _logger.LogInformation($"Sending InviteToCall WAV file HTTP response");
 
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
         {
-            using (var localWavStream = Resources.ReadResource("GroupCallingBot.FunctionApp.groupcall.wav", Assembly.GetExecutingAssembly()))
+            using (var localWavStream = Resources.ReadResource("GroupCallingBot.FunctionApp.WAVs.invite.wav", Assembly.GetExecutingAssembly()))
+            {
+                localWavStream.CopyTo(memoryStream);
+
+                var response = req.CreateResponse(HttpStatusCode.OK);
+                await response.WriteBytesAsync(memoryStream.ToArray());
+                response.Headers.Add("Content-Type", "audio/wav");
+                return response;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
+    /// </summary>
+    [Function(HttpRouteConstants.WavFileTransferingActionName)]
+    public async Task<HttpResponseData> WavFileTransfering([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
+    {
+        _logger.LogInformation($"Sending transfering WAV file HTTP response");
+
+        // Use embedded WAV file to avoid external dependencies. Not recommended for production.
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var localWavStream = Resources.ReadResource("GroupCallingBot.FunctionApp.WAVs.transfering.wav", Assembly.GetExecutingAssembly()))
             {
                 localWavStream.CopyTo(memoryStream);
 

@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
+/// <summary>
+/// Configuration for the group call bot. Who to call, and what to play.
+/// </summary>
 public class StartGroupCallData
 {
     /// <summary>
@@ -13,9 +16,15 @@ public class StartGroupCallData
     public List<AttendeeCallInfo> Attendees { get; set; } = new();
 
     /// <summary>
-    /// Absolute URL to WAV file to play to attendees.
+    /// Absolute URL to WAV file to play to attendees when the bot 1st calls.
     /// </summary>
-    public string? MessageUrl { get; set; } = null;
+    public string? MessageInviteUrl { get; set; } = null;
+
+
+    /// <summary>
+    /// Absolute URL to WAV file to play to attendees when the user confirms they want to join the group call.
+    /// </summary>
+    public string? MessageTransferingUrl { get; set; } = null;
 
     /// <summary>
     /// Id of the organizer of the group call.
@@ -68,11 +77,6 @@ public class StartGroupCallData
 
     [JsonIgnore]
     public bool IsValid => !string.IsNullOrEmpty(OrganizerUserId) && Attendees.Count > 0;
-}
-
-public class JoinMeetingInfo
-{
-    public string? JoinUrl { get; set; } = null!;
 }
 
 public class AttendeeCallInfo

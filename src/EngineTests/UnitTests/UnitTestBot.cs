@@ -9,7 +9,7 @@ namespace ServiceHostedMediaCallingBot.UnitTests;
 /// <summary>
 /// Does nothing; just for testing.
 /// </summary>
-internal class UnitTestBot : BaseStatelessGraphCallingBot<BaseActiveCallState>
+internal class UnitTestBot : BaseGraphCallingBot<BaseActiveCallState>
 {
     public UnitTestBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState,
         CallNotification> callHistoryManager, ILogger logger, ILogger<BotCallRedirector> botCallRedirectorLogger) 

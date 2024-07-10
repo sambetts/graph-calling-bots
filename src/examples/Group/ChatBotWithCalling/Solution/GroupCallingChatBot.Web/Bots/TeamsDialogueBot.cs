@@ -42,7 +42,7 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
 
     public static StartGroupCallData GetDefaultStartGroupCallData(TeamsChatbotBotConfig botConfig)
     {
-        return new StartGroupCallData { MessageUrl = $"{botConfig.BotBaseUrl}/audio/rickroll.wav" };
+        return new StartGroupCallData { MessageInviteUrl = $"{botConfig.BotBaseUrl}/audio/rickroll.wav" };
     }
 }
 

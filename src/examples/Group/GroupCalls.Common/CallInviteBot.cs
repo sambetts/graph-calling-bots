@@ -1,15 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Communications.Calls.Item.Participants.Invite;
-using Microsoft.Graph.Communications.Calls.Item.Transfer;
 using Microsoft.Graph.Models;
 using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using System.Text.Json;
 
 namespace GroupCalls.Common;
 
+/// <summary>
+/// Bot that invites a single person to a group call.
+/// </summary>
 public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
 {
     public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
@@ -24,7 +25,8 @@ public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
         }
 
         // Work out what audio to play, if anything
-        var mediaInfoItem = string.IsNullOrEmpty(groupMeetingRequest.MessageUrl) ? null : new MediaInfo { Uri = groupMeetingRequest.MessageUrl, ResourceId = Guid.NewGuid().ToString() };
+        var mediaInfoItem = string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl) ? null 
+            : new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = Guid.NewGuid().ToString() };
 
         // Remember initial state
         await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, mediaInfoItem, createdCallState => createdCallState.GroupCallId = createdGroupCall.Id);

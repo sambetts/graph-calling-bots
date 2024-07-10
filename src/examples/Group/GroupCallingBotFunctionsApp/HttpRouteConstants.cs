@@ -11,6 +11,9 @@ public static class HttpRouteConstants
     public const string CallNotificationsRoute = "/api/CallNotification";
 
 
-    public static string WavFileRoute = $"/api/{WavFileActionName}";
-    public const string WavFileActionName = "WavFile";
+    public static string WavFileInviteToCallRoute = $"/api/{WavFileInviteToCallActionName}";
+    public const string WavFileInviteToCallActionName = "WavFileInviteToCall";
+
+    public static string WavFileTransferingRoute = $"/api/{WavFileTransferingActionName}";
+    public const string WavFileTransferingActionName = "WavFileTransfering";
 }

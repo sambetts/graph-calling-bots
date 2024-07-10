@@ -3,6 +3,9 @@ using ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
+/// <summary>
+/// Makes sure the right bot instance get the right call notifications.
+/// </summary>
 public class BotCallRedirector(ILogger<BotCallRedirector> logger)
 {
     private readonly Dictionary<string, ICommsNotificationsPayloadHandler> _botInstances = new();
