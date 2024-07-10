@@ -14,17 +14,23 @@ using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
+public interface ICommsNotificationsPayloadHandler
+{
+    Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
+}
+
 /// <summary>
 /// A simple, stateless bot that can make outbound calls, and play prompts.
 /// State is held in the call state manager.
 /// </summary>
-public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot
+public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificationsPayloadHandler
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     public const string DefaultNotificationPrompt = "DefaultNotificationPrompt";
 
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
+    private readonly BotCallRedirector _botCallRedirector;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
     private readonly ICallHistoryManager<CALLSTATETYPE, CallNotification> _callHistoryManager;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;
@@ -32,10 +38,14 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
     protected readonly GraphServiceClient _graphServiceClient;
 
-    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
+    public string BotTypeName => this.GetType().Name;
+
+    public BaseStatelessGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, 
+        ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
     {
         _botConfig = botConfig;
         _logger = logger;
+        _botCallRedirector = botCallRedirector;
         _callStateManager = callStateManager;
         _callHistoryManager = callHistoryManager;
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
@@ -280,18 +290,26 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// </summary>
     protected async Task<Call?> CreateNewCall(Call newCallRequest)
     {
-        _logger.LogInformation($"Creating new call with Graph API...");
-        _logger.LogDebug($"Media info: {JsonSerializer.Serialize(newCallRequest.MediaConfig)}");
+        _logger.LogInformation($"{BotTypeName}: Creating new call with Graph API...");
+        _logger.LogDebug($"{BotTypeName}: Media info: {JsonSerializer.Serialize(newCallRequest.MediaConfig)}");
         try
         {
             var callCreated = await _graphServiceClient.Communications.Calls.PostAsync(newCallRequest);
 
-            _logger.LogInformation($"Call {callCreated?.Id} created");
+            if (callCreated?.Id != null)
+            {
+                _logger.LogInformation($"{BotTypeName}: Call {callCreated.Id} created");
+                _botCallRedirector.AddCall(callCreated.Id, this);
+            }
+            else
+            {
+                _logger.LogWarning($"{BotTypeName}: Call created but no call ID returned?");
+            }
             return callCreated;
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError($"Can't create call: {ex.Message}");
+            _logger.LogError($"{BotTypeName}: Can't create call: {ex.Message}");
         }
         return null;
     }
@@ -303,10 +321,10 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     {
         if (mediaPrompts.Count() == 0)
         {
-            _logger.LogWarning($"No media prompts to play for call {callState.CallId}");
+            _logger.LogWarning($"{BotTypeName}: No media prompts to play for call {callState.CallId}");
             return null;
         }
-        _logger.LogInformation($"Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
+        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
 
         callState.MediaPromptsPlaying.AddRange(mediaPrompts);
         return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(new PlayPromptPostRequestBody { Prompts = mediaPrompts.Cast<Prompt>().ToList() });
@@ -314,7 +332,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
 
     protected async Task SubscribeToToneAsync(string callId)
     {
-        _logger.LogInformation($"Subscribing to tones for call {callId}");
+        _logger.LogInformation($"{BotTypeName}: Subscribing to tones for call {callId}");
         await PostData($"/communications/calls/{callId}/subscribeToTone", new EmptyModelWithClientContext());
     }
 
@@ -323,7 +341,7 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     protected async Task InviteToCallAsync(string callId, List<InvitationParticipantInfo> participantInfo)
     {
         var i = new InviteInfo { Participants = participantInfo };
-        _logger.LogInformation($"Inviting {participantInfo.Count} participants to call {callId}");
+        _logger.LogInformation($"{BotTypeName}: Inviting {participantInfo.Count} participants to call {callId}");
         await PostData($"/communications/calls/{callId}/participants/invite", i);
     }
 
@@ -333,10 +351,9 @@ public abstract class BaseStatelessGraphCallingBot<CALLSTATETYPE> : IGraphCallin
     /// </summary>
     protected async Task HangUp(string callId)
     {
-        _logger.LogInformation($"Hanging up call {callId}");
+        _logger.LogInformation($"{BotTypeName}: Hanging up call {callId}");
         await this.Delete($"/communications/calls/{callId}");
     }
-
 
     #endregion
 

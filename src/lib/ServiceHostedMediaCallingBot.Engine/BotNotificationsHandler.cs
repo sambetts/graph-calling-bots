@@ -210,7 +210,14 @@ public class BotNotificationsHandler<CALLSTATETYPE>
 
             if (_callbackInfo.NewTonePressed != null)
             {
-                await _callbackInfo.NewTonePressed(callState, toneInfo.Tone.Value);
+                try
+                {
+                    await _callbackInfo.NewTonePressed(callState, toneInfo.Tone.Value);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"{botType}: Error processing tone {toneInfo.Tone.Value} on call {callState.CallId} - {ex.Message}");
+                }
             }
         }
         else

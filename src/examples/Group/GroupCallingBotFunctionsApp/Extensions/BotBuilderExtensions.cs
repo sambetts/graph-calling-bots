@@ -3,6 +3,7 @@ using GroupCalls.Common;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
@@ -14,6 +15,7 @@ public static class BotBuilderExtensions
     internal static IServiceCollection AddCallingBot(this IServiceCollection services, FunctionsAppCallingBotConfig config)
     {
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
+        services.AddSingleton<BotCallRedirector>();
 
         // Use in-memory storage is no storage is configured
         if (!string.IsNullOrEmpty(config.Storage))

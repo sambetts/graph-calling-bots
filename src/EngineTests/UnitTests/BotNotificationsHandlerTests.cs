@@ -19,7 +19,7 @@ public class BotNotificationsHandlerTests : BaseTests
             config.AddConsole();
         }).CreateLogger("Unit tests");
 
-        _unitTestBot = new UnitTestBot(new RemoteMediaCallingBotConfiguration(), _callStateManager, _historyManager, _logger);
+        _unitTestBot = new UnitTestBot(new RemoteMediaCallingBotConfiguration(), _callStateManager, _historyManager, _logger, base.GetLogger<BotCallRedirector>());
     }
 
     /// <summary>

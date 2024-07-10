@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -12,8 +13,9 @@ namespace GroupCalls.Common;
 /// </summary>
 public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
 {
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, ICallHistoryManager<GroupCallActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger)
-        : base(botOptions, callStateManager, callHistoryManager, logger) { }
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, 
+        ICallHistoryManager<GroupCallActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
+        : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector) { }
 
     /// <summary>
     /// Start group call with required attendees.

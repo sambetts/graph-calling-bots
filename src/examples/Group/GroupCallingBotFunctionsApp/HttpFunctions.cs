@@ -3,6 +3,7 @@ using GroupCalls.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Net;
@@ -20,13 +21,15 @@ public class HttpFunctions
     private readonly GroupCallBot _groupCallingBot;
     private readonly CallInviteBot _callInviteBot;
     private readonly ICallStateManager<GroupCallActiveCallState> _callStateManager;
+    private readonly BotCallRedirector _botCallRedirector;
 
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, CallInviteBot callInviteBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
+    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, CallInviteBot callInviteBot, ICallStateManager<GroupCallActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
     {
         _logger = loggerFactory.CreateLogger<HttpFunctions>();
         _groupCallingBot = callingBot;
         _callInviteBot = callInviteBot;
         _callStateManager = callStateManager;
+        _botCallRedirector = botCallRedirector;
     }
 
     /// <summary>
@@ -35,20 +38,33 @@ public class HttpFunctions
     [Function(nameof(CallNotification))]
     public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var (notifications, body) = await GetBody<CommsNotificationsPayload>(req);
+        var (notificationsPayload, body) = await GetBody<CommsNotificationsPayload>(req);
 
-        if (notifications != null)
+        if (notificationsPayload != null)
         {
-            _logger.LogDebug($"Processing {notifications.CommsNotifications.Count} Graph call notification(s)");
-            try
+            _logger.LogDebug($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s)");
+            foreach (var notification in notificationsPayload.CommsNotifications)
             {
-                await _groupCallingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
-            }
-            catch (Exception ex)
-            {
-                var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                exResponse.WriteString(ex.ToString());
-                return exResponse;
+                var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
+                if (callId != null)
+                {
+                    var bot = _botCallRedirector.GetBotByCallId(callId);
+                    if (bot != null)        // Logging for negative handled in GetBotByCallId
+                        try
+                        {
+                            await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                        }
+                        catch (Exception ex)
+                        {
+                            var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+                            exResponse.WriteString(ex.ToString());
+                            return exResponse;
+                        }
+                }
+                else
+                {
+                    _logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
+                }
             }
 
             var response = req.CreateResponse(HttpStatusCode.Accepted);

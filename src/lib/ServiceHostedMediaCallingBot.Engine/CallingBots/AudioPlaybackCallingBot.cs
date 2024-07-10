@@ -9,7 +9,8 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// </summary>
 public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCallingBot<T> where T : BaseActiveCallState, new()
 {
-    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger) : base(botOptions, callStateManager, callHistoryManager, logger)
+    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector) 
+        : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector)
     {
     }
 
