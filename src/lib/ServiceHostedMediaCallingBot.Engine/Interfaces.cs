@@ -1,14 +1,13 @@
-﻿using ServiceHostedMediaCallingBot.Engine.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
+using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
-
+/// <summary>
+/// Non generic class to handle notifications and call state management.
+/// </summary>
 public interface ICommsNotificationsPayloadHandler
 {
     Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
+    Task<bool> ValidateNotificationRequestAsync(HttpRequest request);
 }

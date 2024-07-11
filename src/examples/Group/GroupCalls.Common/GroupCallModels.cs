@@ -29,7 +29,7 @@ public class StartGroupCallData
     /// <summary>
     /// Id of the organizer of the group call.
     /// </summary>
-    public string OrganizerUserId { get; set; } = null!;
+    public string? OrganizerUserId { get; set; }
 
     [JsonIgnore]
     public bool HasPSTN => this.Attendees.Any(a => a.Type == GroupMeetingAttendeeType.Phone);
@@ -109,14 +109,6 @@ public enum GroupMeetingAttendeeType
     Unknown,
     Phone,
     Teams
-}
-
-public class GroupCallActiveCallState : BaseActiveCallState
-{
-    /// <summary>
-    /// List of invitees to the call once call is established.
-    /// </summary>
-    public List<InvitationParticipantInfo> GroupCallInvites { get; set; } = new();
 }
 
 public class GroupCallInviteActiveCallState : BaseActiveCallState

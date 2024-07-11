@@ -9,18 +9,18 @@ using System.Text.Json;
 namespace GroupCalls.Common;
 
 /// <summary>
-/// A bot that starts a call with a bunch of people, internal and external.
+/// A bot that creates a group meeting to invite people to later.
 /// </summary>
-public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
+public class GroupCallBot : PstnCallingBot<BaseActiveCallState>
 {
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallActiveCallState> callStateManager, 
-        ICallHistoryManager<GroupCallActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager, 
+        ICallHistoryManager<BaseActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
         : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector) { }
 
     /// <summary>
-    /// Start group call with required attendees.
+    /// Create group call so invitees can join if they accept their individual invite calls.
     /// </summary>
-    public async Task<Call?> StartGroupCall(StartGroupCallData meetingRequest)
+    public async Task<Call?> CreateGroupCall(StartGroupCallData meetingRequest)
     {
         if (!meetingRequest.IsValid)
         {
@@ -58,12 +58,6 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
 
         // Create group call
         var createdGroupCall = await CreateNewCall(groupCallReq);
-
-        if (createdGroupCall != null)
-        {
-            // Remember initial state
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, createdCallState => createdCallState.GroupCallInvites = inviteNumberList.ToList());
-        }
 
         _logger.LogInformation($"Group call created.");
 

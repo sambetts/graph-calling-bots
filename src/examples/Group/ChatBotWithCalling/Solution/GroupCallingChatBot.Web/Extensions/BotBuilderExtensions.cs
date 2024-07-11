@@ -6,6 +6,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
@@ -19,9 +20,15 @@ public static class BotBuilderExtensions
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
 
         // Use in-memory storage for the call state for now
-        services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
-        services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>>(new ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState, CallNotification>());
+        services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallInviteActiveCallState>>();
+        services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>>(new ConcurrentInMemoryCallHistoryManager<BaseActiveCallState, CallNotification>());
+        services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification>>(new ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState, CallNotification>());
 
+        services.AddSingleton<BotCallRedirector>();
+        services.AddSingleton<CallOrchestrator>();
+
+        services.AddSingleton<CallInviteBot>();
         return services.AddSingleton<GroupCallBot>();
     }
 

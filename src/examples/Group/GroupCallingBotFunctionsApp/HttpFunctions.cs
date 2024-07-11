@@ -15,22 +15,9 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions
+public class HttpFunctions(ILogger<HttpFunctions> logger, CallOrchestrator callOrchestrator, 
+    ICallStateManager<BaseActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
 {
-    private readonly ILogger _logger;
-    private readonly GroupCallBot _groupCallingBot;
-    private readonly CallInviteBot _callInviteBot;
-    private readonly ICallStateManager<GroupCallActiveCallState> _callStateManager;
-    private readonly BotCallRedirector _botCallRedirector;
-
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, CallInviteBot callInviteBot, ICallStateManager<GroupCallActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
-    {
-        _logger = loggerFactory.CreateLogger<HttpFunctions>();
-        _groupCallingBot = callingBot;
-        _callInviteBot = callInviteBot;
-        _callStateManager = callStateManager;
-        _botCallRedirector = botCallRedirector;
-    }
 
     /// <summary>
     /// Handle Graph call notifications. Must be anonymous.
@@ -42,14 +29,15 @@ public class HttpFunctions
 
         if (notificationsPayload != null)
         {
-            _logger.LogDebug($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s)");
+            logger.LogDebug($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s)");
             foreach (var notification in notificationsPayload.CommsNotifications)
             {
                 var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
                 if (callId != null)
                 {
-                    var bot = _botCallRedirector.GetBotByCallId(callId);
+                    var bot = botCallRedirector.GetBotByCallId(callId);
                     if (bot != null)        // Logging for negative handled in GetBotByCallId
+                    {
                         try
                         {
                             await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
@@ -60,10 +48,12 @@ public class HttpFunctions
                             exResponse.WriteString(ex.ToString());
                             return exResponse;
                         }
+                    }
+                        
                 }
                 else
                 {
-                    _logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
+                    logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
                 }
             }
 
@@ -72,6 +62,7 @@ public class HttpFunctions
         }
         else
         {
+            logger.LogError($"Unrecognized request body: {body}");
             return SendBadRequest(req);
         }
     }
@@ -82,7 +73,7 @@ public class HttpFunctions
     [Function(HttpRouteConstants.WavFileInviteToCallActionName)]
     public async Task<HttpResponseData> WavFileInviteToCall([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
-        _logger.LogInformation($"Sending InviteToCall WAV file HTTP response");
+        logger.LogInformation($"Sending InviteToCall WAV file HTTP response");
 
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
@@ -105,7 +96,7 @@ public class HttpFunctions
     [Function(HttpRouteConstants.WavFileTransferingActionName)]
     public async Task<HttpResponseData> WavFileTransfering([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
-        _logger.LogInformation($"Sending transfering WAV file HTTP response");
+        logger.LogInformation($"Sending transfering WAV file HTTP response");
 
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
@@ -131,44 +122,21 @@ public class HttpFunctions
         var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
         {
-            var groupCall = await _groupCallingBot.StartGroupCall(newCallReq);
-            if (groupCall != null)
+            var groupCall = await callOrchestrator.StartGroupCall(newCallReq);
+            if (groupCall == null)
             {
-                LogBotLogic($"Started group call with ID {groupCall.Id}");
-
-                if (groupCall != null)
-                {
-                    foreach (var attendee in newCallReq.Attendees)
-                    {
-                        var inviteCall = await _callInviteBot.CallCandidateForGroupCall(attendee, newCallReq, groupCall);
-                        if (inviteCall == null)
-                        {
-                            _logger.LogError($"Failed to invite {attendee.DisplayName} ({attendee.Id})");
-                        }
-                        else
-                        {
-                            LogBotLogic($"Invited '{attendee.DisplayName}' ({attendee.Id}) on new P2P call {inviteCall.Id}");
-                        }
-                    }
-
-                    var response = req.CreateResponse(HttpStatusCode.Accepted);
-                    await response.WriteAsJsonAsync(groupCall);
-                    return response;
-                }
-                else
-                {
-                    return req.CreateResponse(HttpStatusCode.BadRequest);
-                }
+                return req.CreateResponse(HttpStatusCode.BadRequest);
             }
             else
             {
-                _logger.LogError("Failed to start group call");
-                return req.CreateResponse(HttpStatusCode.InternalServerError);
+                var response = req.CreateResponse(HttpStatusCode.Accepted);
+                await response.WriteAsJsonAsync(groupCall);
+                return response;
             }
         }
         else
         {
-            _logger.LogError($"Unrecognized request body: {responseBodyRaw}");
+            logger.LogError($"Unrecognized request body: {responseBodyRaw}");
             return SendBadRequest(req);
         }
     }
@@ -177,22 +145,17 @@ public class HttpFunctions
     [Function(nameof(GetActiveCalls))]
     public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
     {
-        if (!_callStateManager.Initialised) await _callStateManager.Initialise();
+        if (!callStateManager.Initialised) await callStateManager.Initialise();
 
-        var calls = await _callStateManager.GetActiveCalls();
+        var calls = await callStateManager.GetActiveCalls();
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(calls);
         return response;
     }
 
-    void LogBotLogic(string msg)
-    { 
-        _logger.LogInformation("-" + msg);
-    }
-
     HttpResponseData SendBadRequest(HttpRequestData req)
     {
-        _logger.LogWarning("Unrecognized request body.");
+        logger.LogWarning("Unrecognized request body.");
         var response = req.CreateResponse(HttpStatusCode.BadRequest);
         return response;
     }

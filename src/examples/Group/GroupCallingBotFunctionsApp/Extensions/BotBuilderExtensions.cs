@@ -16,31 +16,32 @@ public static class BotBuilderExtensions
     {
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
         services.AddSingleton<BotCallRedirector>();
+        services.AddSingleton<CallOrchestrator>();
 
         // Use in-memory storage is no storage is configured
         if (!string.IsNullOrEmpty(config.Storage))
         {
             services.AddSingleton(new TableServiceClient(config.Storage));
 
-            services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, AzTablesCallStateManager<GroupCallActiveCallState>>();
+            services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
             services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, AzTablesCallStateManager<GroupCallInviteActiveCallState>>();
         }
         else
         {
-            services.AddSingleton<ICallStateManager<GroupCallActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallActiveCallState>>();
+            services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
             services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallInviteActiveCallState>>();
         }
 
         // Prefer SQL storage if configured, then CosmosDb, otherwise use in-memory storage
         if (!string.IsNullOrEmpty(config.SqlCallHistory))
         {
-            services.AddDbContext<CallHistorySqlContext<GroupCallActiveCallState, CallNotification>>(options => options
+            services.AddDbContext<CallHistorySqlContext<BaseActiveCallState, CallNotification>>(options => options
                 .UseSqlServer(config.SqlCallHistory)
             );
             services.AddDbContext<CallHistorySqlContext<GroupCallInviteActiveCallState, CallNotification>>(options => options
                 .UseSqlServer(config.SqlCallHistory)
             );
-            services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, SqlCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+            services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>, SqlCallHistoryManager<BaseActiveCallState, CallNotification>>();
             services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification>, SqlCallHistoryManager<GroupCallInviteActiveCallState, CallNotification>>();
         }
         else
@@ -48,12 +49,12 @@ public static class BotBuilderExtensions
             if (!string.IsNullOrEmpty(config.CosmosDb))
             {
                 services.AddSingleton(new CosmosClient(config.CosmosDb));
-                services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, CosmosCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+                services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>, CosmosCallHistoryManager<BaseActiveCallState, CallNotification>>();
                 services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification>, CosmosCallHistoryManager<GroupCallInviteActiveCallState, CallNotification>>();
             }
             else
             {
-                services.AddSingleton<ICallHistoryManager<GroupCallActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<GroupCallActiveCallState, CallNotification>>();
+                services.AddSingleton<ICallHistoryManager<BaseActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState, CallNotification>>();
                 services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState, CallNotification>>();
             }
         }
