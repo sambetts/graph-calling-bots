@@ -29,29 +29,16 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
             { 
                 OrganizerUserId = Guid.NewGuid().ToString(), 
                 Attendees = new List<AttendeeCallInfo> { new AttendeeCallInfo { DisplayName = "Teams user", Id = Guid.NewGuid().ToString(), Type = GroupMeetingAttendeeType.Teams } },
-                MessageInviteUrl = "https://example.com/audio.wav"
+                MessageInviteUrl = "https://example.com/callintroaudio.wav"
             };
             _logger.LogError($"Invalid meeting request. Required request: {JsonSerializer.Serialize(exampleRequest)}");
             return null;
         }
 
-        // Work out what audio to play, if anything
-        var mediaInfoItem = string.IsNullOrEmpty(meetingRequest.MessageInviteUrl) ? null : new MediaInfo { Uri = meetingRequest.MessageInviteUrl, ResourceId = Guid.NewGuid().ToString() };
-
-        if (mediaInfoItem?.Uri != null)
-        {
-            var validMedia = await TestMediaExists(mediaInfoItem.Uri);
-            if (!validMedia)
-            {
-                _logger.LogError("Media URL is invalid");
-                return null;
-            }
-        }
-
         // Create group call with nobody in. We'll transfer people into it later.
-        var (_, inviteNumberList) = meetingRequest.GetInitialParticipantsAndInvites();
+        var inviteNumberList = meetingRequest.Attendees.Select(a=> new InvitationParticipantInfo { Identity = a.ToIdentity() });
 
-        var groupCallReq = await CreateCallRequest(null, null, meetingRequest.HasPSTN, false);
+        var groupCallReq = await CreateCallRequest(null, meetingRequest.HasPSTN, false);
 
         // Create a meeting for the group call as organizer. Requires the OnlineMeetings.ReadWrite.All permission.
         _logger.LogInformation($"Creating online meeting for group call for organiser '{meetingRequest.OrganizerUserId}'");
@@ -75,24 +62,11 @@ public class GroupCallBot : PstnCallingBot<GroupCallActiveCallState>
         if (createdGroupCall != null)
         {
             // Remember initial state
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, mediaInfoItem, createdCallState => createdCallState.GroupCallInvites = inviteNumberList);
+            await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, createdCallState => createdCallState.GroupCallInvites = inviteNumberList.ToList());
         }
 
         _logger.LogInformation($"Group call created.");
 
         return createdGroupCall;
-    }
-
-
-    protected override async Task UsersJoinedGroupCall(GroupCallActiveCallState callState, List<CallParticipant> participants)
-    {
-        await base.UsersJoinedGroupCall(callState, participants);
-        await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
-    }
-
-    protected async override Task CallConnectedWithP2PAudio(GroupCallActiveCallState callState)
-    {
-        await base.CallConnectedWithP2PAudio(callState);
-        await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
     }
 }

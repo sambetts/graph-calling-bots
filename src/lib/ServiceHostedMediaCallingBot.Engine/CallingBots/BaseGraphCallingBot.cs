@@ -33,6 +33,16 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
         _botCallRedirector = botCallRedirector;
     }
 
+
+    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, bool addBotIdentityForPSTN, bool testMedia)
+    {
+        return await CreateCallRequest(initialAdd, new List<MediaInfo>(), addBotIdentityForPSTN, testMedia);
+    }
+    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, MediaInfo mediaPromptOnCallConnected, bool addBotIdentityForPSTN, bool testMedia)
+    { 
+        return await CreateCallRequest(initialAdd, new List<MediaInfo> { mediaPromptOnCallConnected }, addBotIdentityForPSTN, testMedia);
+    }
+
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request. Also optionally tests if the WAV file exists.
     /// </summary>
@@ -95,11 +105,11 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
         return newCall;
     }
 
-    protected async Task<bool> TestMediaExists(string uri)
+    protected async Task<bool> TestMediaExists(string? uri)
     {
-        if (string.IsNullOrEmpty(uri))
+        if (string.IsNullOrWhiteSpace(uri))
         {
-            throw new ArgumentException($"'{nameof(uri)}' cannot be null or empty.", nameof(uri));
+            return false;
         }
 
         try
@@ -155,17 +165,14 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     /// <summary>
     /// https://learn.microsoft.com/en-us/graph/api/call-playprompt
     /// </summary>
-    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, IEnumerable<EquatableMediaPrompt> mediaPrompts)
+    protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, EquatableMediaPrompt mediaPrompt)
     {
-        if (mediaPrompts.Count() == 0)
-        {
-            _logger.LogWarning($"{BotTypeName}: No media prompts to play for call {callState.CallId}");
-            return null;
-        }
-        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompts.Count()} media prompts to call {callState.CallId}");
+        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompt?.MediaInfo?.Uri} media prompt on call {callState.CallId}");
 
-        callState.MediaPromptsPlaying.AddRange(mediaPrompts);
-        return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(new PlayPromptPostRequestBody { Prompts = mediaPrompts.Cast<Prompt>().ToList() });
+        callState.MediaPromptsPlaying.Add(mediaPrompt);
+        return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(
+            new PlayPromptPostRequestBody { Prompts = new List<Prompt> { mediaPrompt } 
+        });
     }
 
     protected async Task SubscribeToToneAsync(string callId)

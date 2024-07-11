@@ -45,8 +45,8 @@ public class StartGroupCallData
 
         string? initialIdAdded = null;
 
-        // To start a group call, we can't add all users at once, for some reason. It just fails to actually call, and even if it worked is limited to 5 users.
-        // So to workaround this we add one user to the call, then invite the rest.
+        // To start a group call, we can't add all users at once, for some reason. Teams just fails to actually call, and even if it worked is limited to 5 users.
+        // So to workaround this we add one initial user to the call, then invite the rest.
         foreach (var attendee in Attendees)
         {
             var newTarget = new InvitationParticipantInfo

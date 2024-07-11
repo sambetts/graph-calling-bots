@@ -24,7 +24,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
     public string BotTypeName => this.GetType().Name;
 
-    public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, 
+    public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
@@ -75,17 +75,27 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
         return false;
     }
 
+
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo mediaInfoItem)
+    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo callMedia)
     {
-        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem, null);
+        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo> { callMedia }, null);
     }
+
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo? mediaInfoItem, Action<CALLSTATETYPE>? updateCacheCallback)
+    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, Action<CALLSTATETYPE>? updateCacheCallback)
+    {
+        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo>(), updateCacheCallback);
+    }
+
+    /// <summary>
+    /// Init the call state manager and store the media info for the created call.
+    /// </summary>
+    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, List<MediaInfo> callMedia, Action<CALLSTATETYPE>? updateCacheCallback)
     {
         if (!_callStateManager.Initialised)
         {
@@ -102,12 +112,11 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             };
 
             // Is there anything to play?
-            if (mediaInfoItem != null)
+            if (callMedia.Count > 0)
             {
-                initialCallState.BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
-                {
-                    { DefaultNotificationPrompt, new EquatableMediaPrompt { MediaInfo = mediaInfoItem } }
-                };
+                var playlistDic = new Dictionary<string, EquatableMediaPrompt>();
+                callMedia.Select(m => new EquatableMediaPrompt { MediaInfo = m }).ToList().ForEach(e => playlistDic.Add(Guid.NewGuid().ToString(), e));
+                initialCallState.BotMediaPlaylist = playlistDic;
             }
             await _callStateManager.AddCallStateOrUpdate(initialCallState);
 
