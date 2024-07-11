@@ -1,7 +1,4 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
-using Microsoft.Graph;
-using System.Threading.Tasks;
+﻿using Microsoft.Bot.Schema;
 
 namespace GroupCallingChatBot.Web.Models;
 

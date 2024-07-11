@@ -1,9 +1,7 @@
-﻿using GroupCalls.Common;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
-using System.Net;
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;

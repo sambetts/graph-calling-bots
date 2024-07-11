@@ -4,7 +4,6 @@ using GroupCallingChatBot.Web.Bots;
 using GroupCallingChatBot.Web.Dialogues.Utils;
 using GroupCallingChatBot.Web.Models;
 using GroupCalls.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -56,7 +55,7 @@ public class MainDialog : CancellableDialogue
 
         // Get user state
         var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
-        var meetingState = await userStateAccessors.GetAsync(stepContext.Context, 
+        var meetingState = await userStateAccessors.GetAsync(stepContext.Context,
             () => TeamsDialogueBot<MainDialog>.GetDefaultStartGroupCallData(_config, botUser.IsAzureAdUserId ? botUser.UserId : null));
 
         // Set organiser id
@@ -72,7 +71,7 @@ public class MainDialog : CancellableDialogue
                 {
                     meetingState.OrganizerUserId = meetingState.Attendees.First().Id;
                     await stepContext.Context.SendActivityAsync(
-                        MessageFactory.Text($"I'm sorry, I can't seem to find your Azure AD user ID. I'll use the first attendee's ID instead."), 
+                        MessageFactory.Text($"I'm sorry, I can't seem to find your Azure AD user ID. I'll use the first attendee's ID instead."),
                         cancellationToken);
                 }
             }
@@ -162,7 +161,8 @@ public class MainDialog : CancellableDialogue
         // Get user state
         var userStateAccessors = _userState.CreateProperty<StartGroupCallData?>(nameof(StartGroupCallData));
         var meetingState = await userStateAccessors.GetAsync(stepContext.Context, () => null);
-        if (meetingState == null) {
+        if (meetingState == null)
+        {
             await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Oops, looks like I forgot the meeting details...try again?"), cancellationToken);
             return await stepContext.EndDialogAsync(meetingState, cancellationToken);
         }

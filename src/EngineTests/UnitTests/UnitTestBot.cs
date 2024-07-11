@@ -12,7 +12,7 @@ namespace ServiceHostedMediaCallingBot.UnitTests;
 internal class UnitTestBot : BaseGraphCallingBot<BaseActiveCallState>
 {
     public UnitTestBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState,
-        CallNotification> callHistoryManager, ILogger logger, ILogger<BotCallRedirector> botCallRedirectorLogger) 
+        CallNotification> callHistoryManager, ILogger logger, ILogger<BotCallRedirector> botCallRedirectorLogger)
         : base(botConfig, callStateManager, callHistoryManager, logger, new BotCallRedirector(botCallRedirectorLogger))
     {
     }

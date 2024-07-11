@@ -15,7 +15,7 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions(ILogger<HttpFunctions> logger, CallOrchestrator callOrchestrator, 
+public class HttpFunctions(ILogger<HttpFunctions> logger, CallOrchestrator callOrchestrator,
     ICallStateManager<BaseActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
 {
 
@@ -49,7 +49,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, CallOrchestrator callO
                             return exResponse;
                         }
                     }
-                        
+
                 }
                 else
                 {

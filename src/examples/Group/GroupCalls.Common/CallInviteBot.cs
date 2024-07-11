@@ -32,8 +32,8 @@ public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
         var playList = new List<MediaInfo>();
 
         // Add default prompt. Will automatically play
-        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl)) playList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = DEFAULT_PROMPT_ID});
-        
+        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl)) playList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = DEFAULT_PROMPT_ID });
+
         // Add any message transfering audio
         if (!string.IsNullOrEmpty(groupMeetingRequest.MessageTransferingUrl)) playList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageTransferingUrl, ResourceId = TRANSFERING_PROMPT_ID });
 

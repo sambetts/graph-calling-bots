@@ -96,7 +96,7 @@ public class BotNotificationsHandlerTests : BaseTests
         await FailedCallTest(_logger, _callStateManager, _historyManager, _unitTestBot);
     }
 
-    internal static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> _callStateManager, 
+    internal static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> _callStateManager,
         ICallHistoryManager<BaseActiveCallState, CallNotification> historyManager, UnitTestBot unitTestBot)
     {
         var callEstablishingCount = 0;

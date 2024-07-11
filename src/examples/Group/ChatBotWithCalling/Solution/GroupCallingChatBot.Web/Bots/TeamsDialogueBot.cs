@@ -2,7 +2,6 @@ using GroupCallingChatBot.Web.AdaptiveCards;
 using GroupCallingChatBot.Web.Dialogues;
 using GroupCallingChatBot.Web.Models;
 using GroupCalls.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;

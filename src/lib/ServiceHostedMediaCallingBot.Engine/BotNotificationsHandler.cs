@@ -9,8 +9,8 @@ namespace ServiceHostedMediaCallingBot.Engine;
 /// <summary>
 /// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
-public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATETYPE> callStateManager, 
-    ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger) 
+public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATETYPE> callStateManager,
+    ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);

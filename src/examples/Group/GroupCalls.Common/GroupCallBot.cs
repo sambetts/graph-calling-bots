@@ -13,7 +13,7 @@ namespace GroupCalls.Common;
 /// </summary>
 public class GroupCallBot : PstnCallingBot<BaseActiveCallState>
 {
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager, 
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager,
         ICallHistoryManager<BaseActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
         : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector) { }
 
@@ -25,9 +25,9 @@ public class GroupCallBot : PstnCallingBot<BaseActiveCallState>
         if (!meetingRequest.IsValid)
         {
             // Invalid group call request. Send example valid request. 
-            var exampleRequest = new StartGroupCallData 
-            { 
-                OrganizerUserId = Guid.NewGuid().ToString(), 
+            var exampleRequest = new StartGroupCallData
+            {
+                OrganizerUserId = Guid.NewGuid().ToString(),
                 Attendees = new List<AttendeeCallInfo> { new AttendeeCallInfo { DisplayName = "Teams user", Id = Guid.NewGuid().ToString(), Type = GroupMeetingAttendeeType.Teams } },
                 MessageInviteUrl = "https://example.com/callintroaudio.wav"
             };
@@ -36,7 +36,7 @@ public class GroupCallBot : PstnCallingBot<BaseActiveCallState>
         }
 
         // Create group call with nobody in. We'll transfer people into it later.
-        var inviteNumberList = meetingRequest.Attendees.Select(a=> new InvitationParticipantInfo { Identity = a.ToIdentity() });
+        var inviteNumberList = meetingRequest.Attendees.Select(a => new InvitationParticipantInfo { Identity = a.ToIdentity() });
 
         var groupCallReq = await CreateCallRequest(null, meetingRequest.HasPSTN, false);
 

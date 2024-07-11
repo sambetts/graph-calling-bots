@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 namespace ServiceHostedMediaCallingBot.Engine;
 
@@ -11,7 +10,7 @@ public class BotCallRedirector(ILogger<BotCallRedirector> logger)
     private readonly Dictionary<string, ICommsNotificationsPayloadHandler> _botInstances = new();
 
     public ICommsNotificationsPayloadHandler? GetBotByCallId(string callId)
-    { 
+    {
         if (_botInstances.ContainsKey(callId))
         {
             return _botInstances[callId];
@@ -23,7 +22,8 @@ public class BotCallRedirector(ILogger<BotCallRedirector> logger)
 
     internal void AddCall(string callId, ICommsNotificationsPayloadHandler baseStatelessGraphCallingBot)
     {
-        if (!_botInstances.ContainsKey(callId)) {
+        if (!_botInstances.ContainsKey(callId))
+        {
             _botInstances.Add(callId, baseStatelessGraphCallingBot);
             logger.LogInformation($"{nameof(BotCallRedirector)} - Added call {callId} to bot redirector");
         }

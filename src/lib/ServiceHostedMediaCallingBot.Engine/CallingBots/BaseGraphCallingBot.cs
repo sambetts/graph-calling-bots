@@ -39,7 +39,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
         return await CreateCallRequest(initialAdd, new List<MediaInfo>(), addBotIdentityForPSTN, testMedia);
     }
     protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, MediaInfo mediaPromptOnCallConnected, bool addBotIdentityForPSTN, bool testMedia)
-    { 
+    {
         return await CreateCallRequest(initialAdd, new List<MediaInfo> { mediaPromptOnCallConnected }, addBotIdentityForPSTN, testMedia);
     }
 
@@ -171,8 +171,10 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
 
         callState.MediaPromptsPlaying.Add(mediaPrompt);
         return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(
-            new PlayPromptPostRequestBody { Prompts = new List<Prompt> { mediaPrompt } 
-        });
+            new PlayPromptPostRequestBody
+            {
+                Prompts = new List<Prompt> { mediaPrompt }
+            });
     }
 
     protected async Task SubscribeToToneAsync(string callId)
