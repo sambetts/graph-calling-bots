@@ -1,6 +1,8 @@
-﻿using GroupCalls.Common;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
+using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -9,14 +11,8 @@ namespace GroupCallingChatBot.Web.Controllers;
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.
 /// </summary>
-public class PlatformCallController : ControllerBase
+public class PlatformCallController(BotCallRedirector botCallRedirector, ILogger<PlatformCallController> logger) : ControllerBase
 {
-    private readonly GroupCallBot _callingBot;
-
-    public PlatformCallController(GroupCallBot callingBot)
-    {
-        _callingBot = callingBot;
-    }
 
     /// <summary>
     /// Handle a callback for an existing call.
@@ -25,17 +21,46 @@ public class PlatformCallController : ControllerBase
     [Route(HttpRouteConstants.CallNotificationsRoute)]
     public async Task<IActionResult> OnIncomingRequestAsync([FromBody] JsonElement json)
     {
-        var validRequest = await _callingBot.ValidateNotificationRequestAsync(Request);
-        if (validRequest)
+        var rawText = json.GetRawText();
+        var notificationsPayload = JsonSerializer.Deserialize<CommsNotificationsPayload>(rawText);
+
+        if (notificationsPayload != null)
         {
-            var rawText = json.GetRawText();
-            var notifications = JsonSerializer.Deserialize<CommsNotificationsPayload>(rawText);
-            if (notifications != null)
+            foreach (var notification in notificationsPayload.CommsNotifications)
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
+                var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
+                if (callId != null)
+                {
 
-                return Accepted();
+                    var bot = botCallRedirector.GetBotByCallId(callId);
+                    if (bot != null)        // Logging for negative handled in GetBotByCallId
+                    {
+                        var validRequest = await bot.ValidateNotificationRequestAsync(Request);
 
+                        if (validRequest)
+                        {
+                            try
+                            {
+                                await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, "Error handling notifications");
+                                throw;
+                            }
+
+                            return Accepted();
+                        }
+                        else
+                        {
+                            return BadRequest();
+                        }
+                    }
+                }
+                else
+                {
+                    logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
+                }
             }
         }
         return BadRequest();

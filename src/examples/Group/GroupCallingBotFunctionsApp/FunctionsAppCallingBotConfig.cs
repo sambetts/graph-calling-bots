@@ -54,7 +54,7 @@ internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
             AppInstanceObjectName = "Group Call Bot",
             BotBaseUrl = BotBaseUrl,
             CallingEndpoint = BotBaseUrl + relativeUrlCallingEndPoint,
-            RelativeWavCallbackUrl = HttpRouteConstants.WavFileRoute,
+            RelativeWavCallbackUrl = HttpRouteConstants.WavFileInviteToCallRoute,
             TenantId = TenantId
         };
     }

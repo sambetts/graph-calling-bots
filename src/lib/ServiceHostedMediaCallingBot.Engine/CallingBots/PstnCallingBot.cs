@@ -11,8 +11,9 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 /// </summary>
 public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPstnCallingBot where T : BaseActiveCallState, new()
 {
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger)
-        : base(botConfig, callStateManager, callHistoryManager, logger)
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager,
+        ILogger logger, BotCallRedirector botCallRedirector)
+        : base(botConfig, callStateManager, callHistoryManager, logger, botCallRedirector)
     {
     }
 
@@ -27,7 +28,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
 
 
         var mediaInfoItem = new MediaInfo { Uri = mediaUrl, ResourceId = Guid.NewGuid().ToString() };
-        var pstnCallRequest = await TestCallMediaAndCreateCallRequest(new InvitationParticipantInfo { Identity = target }, mediaInfoItem, true);
+        var pstnCallRequest = await CreateCallRequest(new InvitationParticipantInfo { Identity = target }, mediaInfoItem, true, true);
 
         var createdCall = await CreateNewCall(pstnCallRequest);
         if (createdCall != null)

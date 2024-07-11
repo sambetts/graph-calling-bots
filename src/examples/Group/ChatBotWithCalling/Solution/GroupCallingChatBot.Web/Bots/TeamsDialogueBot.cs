@@ -1,4 +1,5 @@
 using GroupCallingChatBot.Web.AdaptiveCards;
+using GroupCallingChatBot.Web.Dialogues;
 using GroupCallingChatBot.Web.Models;
 using GroupCalls.Common;
 using Microsoft.Bot.Builder;
@@ -24,13 +25,21 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
     protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
     {
         var userStateAccessors = _userState.CreateProperty<StartGroupCallData>(nameof(StartGroupCallData));
-        var meetingState = await userStateAccessors.GetAsync(turnContext, () => GetDefaultStartGroupCallData(_config));
 
         var welcomeText = "Hello and welcome!";
         foreach (var member in membersAdded)
         {
             if (member.Id != turnContext.Activity.Recipient.Id)
             {
+                var botUser = member.ParseBotUserInfo();
+
+                // Is this an Azure AD user?
+                if (!botUser.IsAzureAdUserId)
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Hi, anonynous user. I only work with Azure AD users in Teams normally..."));
+
+
+                var meetingState = await userStateAccessors.GetAsync(turnContext,
+                    () => TeamsDialogueBot<MainDialog>.GetDefaultStartGroupCallData(_config, botUser.IsAzureAdUserId ? botUser.UserId : null));
                 // Say hi
                 await turnContext.SendActivityAsync(MessageFactory.Text(welcomeText, welcomeText), cancellationToken);
 
@@ -40,9 +49,9 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
         }
     }
 
-    public static StartGroupCallData GetDefaultStartGroupCallData(TeamsChatbotBotConfig botConfig)
+    public static StartGroupCallData GetDefaultStartGroupCallData(TeamsChatbotBotConfig botConfig, string? organizerUserId)
     {
-        return new StartGroupCallData { MessageUrl = $"{botConfig.BotBaseUrl}/audio/rickroll.wav" };
+        return new StartGroupCallData { MessageInviteUrl = $"{botConfig.BotBaseUrl}/audio/rickroll.wav", OrganizerUserId = organizerUserId };
     }
 }
 

@@ -3,6 +3,7 @@ using GroupCalls.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Net;
@@ -14,18 +15,9 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions
+public class HttpFunctions(ILogger<HttpFunctions> logger, CallOrchestrator callOrchestrator,
+    ICallStateManager<BaseActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
 {
-    private readonly ILogger _logger;
-    private readonly GroupCallBot _callingBot;
-    private readonly ICallStateManager<GroupCallActiveCallState> _callStateManager;
-
-    public HttpFunctions(ILoggerFactory loggerFactory, GroupCallBot callingBot, ICallStateManager<GroupCallActiveCallState> callStateManager)
-    {
-        _logger = loggerFactory.CreateLogger<HttpFunctions>();
-        _callingBot = callingBot;
-        _callStateManager = callStateManager;
-    }
 
     /// <summary>
     /// Handle Graph call notifications. Must be anonymous.
@@ -33,20 +25,36 @@ public class HttpFunctions
     [Function(nameof(CallNotification))]
     public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var (notifications, body) = await GetBody<CommsNotificationsPayload>(req);
+        var (notificationsPayload, body) = await GetBody<CommsNotificationsPayload>(req);
 
-        if (notifications != null)
+        if (notificationsPayload != null)
         {
-            _logger.LogDebug($"Processing {notifications.CommsNotifications.Count} Graph call notification(s)");
-            try
+            logger.LogDebug($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s)");
+            foreach (var notification in notificationsPayload.CommsNotifications)
             {
-                await _callingBot.HandleNotificationsAndUpdateCallStateAsync(notifications);
-            }
-            catch (Exception ex)
-            {
-                var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                exResponse.WriteString(ex.ToString());
-                return exResponse;
+                var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
+                if (callId != null)
+                {
+                    var bot = botCallRedirector.GetBotByCallId(callId);
+                    if (bot != null)        // Logging for negative handled in GetBotByCallId
+                    {
+                        try
+                        {
+                            await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                        }
+                        catch (Exception ex)
+                        {
+                            var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+                            exResponse.WriteString(ex.ToString());
+                            return exResponse;
+                        }
+                    }
+
+                }
+                else
+                {
+                    logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
+                }
             }
 
             var response = req.CreateResponse(HttpStatusCode.Accepted);
@@ -54,6 +62,7 @@ public class HttpFunctions
         }
         else
         {
+            logger.LogError($"Unrecognized request body: {body}");
             return SendBadRequest(req);
         }
     }
@@ -61,15 +70,38 @@ public class HttpFunctions
     /// <summary>
     /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
     /// </summary>
-    [Function(HttpRouteConstants.WavFileActionName)]
-    public async Task<HttpResponseData> WavFile([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
+    [Function(HttpRouteConstants.WavFileInviteToCallActionName)]
+    public async Task<HttpResponseData> WavFileInviteToCall([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
     {
-        _logger.LogInformation($"Sending WAV file HTTP response");
+        logger.LogInformation($"Sending InviteToCall WAV file HTTP response");
 
         // Use embedded WAV file to avoid external dependencies. Not recommended for production.
         using (var memoryStream = new MemoryStream())
         {
-            using (var localWavStream = Resources.ReadResource("GroupCallingBot.FunctionApp.groupcall.wav", Assembly.GetExecutingAssembly()))
+            using (var localWavStream = Resources.ReadResource("GroupCallingBot.FunctionApp.WAVs.invite.wav", Assembly.GetExecutingAssembly()))
+            {
+                localWavStream.CopyTo(memoryStream);
+
+                var response = req.CreateResponse(HttpStatusCode.OK);
+                await response.WriteBytesAsync(memoryStream.ToArray());
+                response.Headers.Add("Content-Type", "audio/wav");
+                return response;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
+    /// </summary>
+    [Function(HttpRouteConstants.WavFileTransferingActionName)]
+    public async Task<HttpResponseData> WavFileTransfering([HttpTrigger(AuthorizationLevel.Anonymous, "get", "head")] HttpRequestData req)
+    {
+        logger.LogInformation($"Sending transfering WAV file HTTP response");
+
+        // Use embedded WAV file to avoid external dependencies. Not recommended for production.
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var localWavStream = Resources.ReadResource("GroupCallingBot.FunctionApp.WAVs.transfering.wav", Assembly.GetExecutingAssembly()))
             {
                 localWavStream.CopyTo(memoryStream);
 
@@ -90,21 +122,21 @@ public class HttpFunctions
         var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
         {
-            var call = await _callingBot.StartGroupCall(newCallReq);
-
-            if (call != null)
+            var groupCall = await callOrchestrator.StartGroupCall(newCallReq);
+            if (groupCall == null)
             {
-                var response = req.CreateResponse(HttpStatusCode.Accepted);
-                await response.WriteAsJsonAsync(call);
-                return response;
+                return req.CreateResponse(HttpStatusCode.BadRequest);
             }
             else
             {
-                return req.CreateResponse(HttpStatusCode.BadRequest);
+                var response = req.CreateResponse(HttpStatusCode.Accepted);
+                await response.WriteAsJsonAsync(groupCall);
+                return response;
             }
         }
         else
         {
+            logger.LogError($"Unrecognized request body: {responseBodyRaw}");
             return SendBadRequest(req);
         }
     }
@@ -113,9 +145,9 @@ public class HttpFunctions
     [Function(nameof(GetActiveCalls))]
     public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
     {
-        if (!_callStateManager.Initialised) await _callStateManager.Initialise();
+        if (!callStateManager.Initialised) await callStateManager.Initialise();
 
-        var calls = await _callStateManager.GetActiveCalls();
+        var calls = await callStateManager.GetActiveCalls();
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(calls);
         return response;
@@ -123,7 +155,7 @@ public class HttpFunctions
 
     HttpResponseData SendBadRequest(HttpRequestData req)
     {
-        _logger.LogWarning("Unrecognized request body.");
+        logger.LogWarning("Unrecognized request body.");
         var response = req.CreateResponse(HttpStatusCode.BadRequest);
         return response;
     }

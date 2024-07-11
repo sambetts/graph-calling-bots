@@ -5,11 +5,13 @@ using ServiceHostedMediaCallingBot.Engine.StateManagement;
 namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 
 /// <summary>
-/// A bot that plays service-hosted audio and responds to DTMF input. Can be used for Teams calls or PSTN calls.
+/// A bot that plays service-hosted audio and responds to DTMF input (dial-tones). Can be used for Teams calls or PSTN calls.
 /// </summary>
-public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCallingBot<T> where T : BaseActiveCallState, new()
+public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseGraphCallingBot<T> where T : BaseActiveCallState, new()
 {
-    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger) : base(botOptions, callStateManager, callHistoryManager, logger)
+    public const string DEFAULT_PROMPT_ID = "defaultPrompt";
+    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
+        : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector)
     {
     }
 
@@ -17,9 +19,9 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
     {
         if (callState.CallId != null)
         {
-            // Play the prompt found in the call state
+            // Play the default prompt found in the call state
             await SubscribeToToneAsync(callState.CallId);
-            await PlayConfiguredMediaIfNotAlreadyPlaying(callState);
+            await PlayConfiguredMediaIfNotAlreadyPlaying(callState, DEFAULT_PROMPT_ID);
         }
         else
         {
@@ -28,30 +30,40 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseStatelessGraphCall
         await base.CallConnectedWithP2PAudio(callState);
     }
 
-    protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(T callState)
+    protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(T callState, string wantedPromptId)
     {
         // Don't play media if already playing
         var alreadyPlaying = false;
-        foreach (var itemToPlay in callState.BotMediaPlaylist.Values)
+
+        if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(wantedPromptId))
         {
-            if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(itemToPlay.MediaInfo!.ResourceId))
-            {
-                alreadyPlaying = true;
-                break;
-            }
+            alreadyPlaying = true;
+            _logger.LogInformation("Already playing prompt {PromptId}", wantedPromptId);
+            return;
         }
 
         // But if not playing, play notification prompt again
-        if (!alreadyPlaying && callState.BotMediaPlaylist.Count > 0)
+        var prompt = callState.BotMediaPlaylist.FirstOrDefault(m => m.Value.MediaInfo?.ResourceId == wantedPromptId).Value;
+        if (alreadyPlaying)
+        {
+            _logger.LogInformation("Prompt {PromptId} is already playing", wantedPromptId);
+            return;
+        }
+
+        if (prompt != null)
         {
             try
             {
-                await PlayPromptAsync(callState, callState.BotMediaPlaylist.Select(m => m.Value));
+                await PlayPromptAsync(callState, prompt);
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Error playing prompt");
             }
+        }
+        else
+        {
+            _logger.LogWarning("Prompt {PromptId} not found in playlist", wantedPromptId);
         }
     }
 }

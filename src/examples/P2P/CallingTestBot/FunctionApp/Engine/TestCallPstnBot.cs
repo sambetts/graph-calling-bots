@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
+using ServiceHostedMediaCallingBot.Engine;
 using ServiceHostedMediaCallingBot.Engine.CallingBots;
 using ServiceHostedMediaCallingBot.Engine.Models;
 using ServiceHostedMediaCallingBot.Engine.StateManagement;
@@ -19,8 +20,9 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     /// <summary>
     /// Initializes a new instance of the <see cref="TestCallPstnBot" /> class.
     /// </summary>
-    public TestCallPstnBot(SingleWavFileBotConfig botOptions, CallingTestBotConfig callingTestBotConfig, ILogger<TestCallPstnBot> logger, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState, CallNotification> callHistoryManager, IBotTestsLogger botTestsLogger)
-        : base(botOptions, callStateManager, callHistoryManager, logger)
+    public TestCallPstnBot(SingleWavFileBotConfig botOptions, CallingTestBotConfig callingTestBotConfig, ILogger<TestCallPstnBot> logger,
+        ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState, CallNotification> callHistoryManager, IBotTestsLogger botTestsLogger, ILogger<BotCallRedirector> botCallRedirectorLogger)
+        : base(botOptions, callStateManager, callHistoryManager, logger, new BotCallRedirector(botCallRedirectorLogger))
     {
         _callingTestBotConfig = callingTestBotConfig;
         _botTestsLogger = botTestsLogger;

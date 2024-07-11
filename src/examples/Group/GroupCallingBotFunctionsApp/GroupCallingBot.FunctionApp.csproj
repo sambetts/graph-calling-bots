@@ -9,12 +9,14 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="groupcall.wav" />
+    <None Remove="WAVs\transfering.wav" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="local.settings.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="groupcall.wav" />
+    <EmbeddedResource Include="WAVs\invite.wav" />
+    <EmbeddedResource Include="WAVs\transfering.wav" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.11.3" />

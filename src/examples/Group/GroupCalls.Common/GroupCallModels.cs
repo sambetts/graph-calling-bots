@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
+/// <summary>
+/// Configuration for the group call bot. Who to call, and what to play.
+/// </summary>
 public class StartGroupCallData
 {
     /// <summary>
@@ -13,14 +16,20 @@ public class StartGroupCallData
     public List<AttendeeCallInfo> Attendees { get; set; } = new();
 
     /// <summary>
-    /// Absolute URL to WAV file to play to attendees.
+    /// Absolute URL to WAV file to play to attendees when the bot 1st calls.
     /// </summary>
-    public string? MessageUrl { get; set; } = null;
+    public string? MessageInviteUrl { get; set; } = null;
+
 
     /// <summary>
-    /// Info to join the meeting, if this is a Teams meeting.
+    /// Absolute URL to WAV file to play to attendees when the user confirms they want to join the group call.
     /// </summary>
-    public JoinMeetingInfo? JoinMeetingInfo { get; set; } = null;
+    public string? MessageTransferingUrl { get; set; } = null;
+
+    /// <summary>
+    /// Id of the organizer of the group call.
+    /// </summary>
+    public string? OrganizerUserId { get; set; }
 
     [JsonIgnore]
     public bool HasPSTN => this.Attendees.Any(a => a.Type == GroupMeetingAttendeeType.Phone);
@@ -36,8 +45,8 @@ public class StartGroupCallData
 
         string? initialIdAdded = null;
 
-        // To start a group call, we can't add all users at once, for some reason. It just fails to actually call, and even if it worked is limited to 5 users.
-        // So to workaround this we add one user to the call, then invite the rest.
+        // To start a group call, we can't add all users at once, for some reason. Teams just fails to actually call, and even if it worked is limited to 5 users.
+        // So to workaround this we add one initial user to the call, then invite the rest.
         foreach (var attendee in Attendees)
         {
             var newTarget = new InvitationParticipantInfo
@@ -65,11 +74,9 @@ public class StartGroupCallData
 
         return (initialAdd, inviteNumberList);
     }
-}
 
-public class JoinMeetingInfo
-{
-    public string? JoinUrl { get; set; } = null!;
+    [JsonIgnore]
+    public bool IsValid => !string.IsNullOrEmpty(OrganizerUserId) && Attendees.Count > 0;
 }
 
 public class AttendeeCallInfo
@@ -104,10 +111,8 @@ public enum GroupMeetingAttendeeType
     Teams
 }
 
-public class GroupCallActiveCallState : BaseActiveCallState
+public class GroupCallInviteActiveCallState : BaseActiveCallState
 {
-    /// <summary>
-    /// List of invitees to the call once call is established.
-    /// </summary>
-    public List<InvitationParticipantInfo> GroupCallInvites { get; set; } = new();
+    public string GroupCallId { get; set; } = null!;
+    public IdentitySet AtendeeIdentity { get; set; } = null!;
 }
