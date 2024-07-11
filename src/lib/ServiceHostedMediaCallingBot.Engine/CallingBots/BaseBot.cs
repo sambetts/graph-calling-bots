@@ -15,8 +15,6 @@ namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
 public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificationsPayloadHandler
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
-    public const string DefaultNotificationPrompt = "DefaultNotificationPrompt";
-
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;

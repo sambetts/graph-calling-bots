@@ -22,7 +22,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
     private readonly BotCallRedirector _botCallRedirector;
 
-    public BaseGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, 
+    public BaseGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
         : base(botConfig, callStateManager, callHistoryManager, logger)
     {
@@ -36,7 +36,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     /// <summary>
     /// A common way to init the ICallStateManager and create a call request. Also optionally tests if the WAV file exists.
     /// </summary>
-    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, MediaInfo? defaultMedia, bool addBotIdentityForPSTN, bool testMedia)
+    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, List<MediaInfo> callMediaList, bool addBotIdentityForPSTN, bool testMedia)
     {
         if (!_callStateManager.Initialised)
         {
@@ -44,7 +44,9 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
         }
 
         var defaultMediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo>() };
-        if (testMedia && !string.IsNullOrEmpty(defaultMedia?.Uri))
+
+        // We test each media item before making a call. No point calling in silence
+        foreach (var defaultMedia in callMediaList)
         {
             bool fileExists = await TestMediaExists(defaultMedia.Uri);
             if (!fileExists)
@@ -53,13 +55,11 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
             }
             defaultMediaConfig = new ServiceHostedMediaConfig { PreFetchMedia = new List<MediaInfo> { defaultMedia } };
         }
-        else
+        if (callMediaList.Count == 0 && testMedia)
         {
-            if (testMedia)
-            {
-                _logger.LogInformation($"No media URI found for call. Won't play any initial message via bot.");
-            }
+            _logger.LogInformation($"No media URI found for call. Won't play any initial message via bot.");
         }
+
 
         // Create call for initial participants
         var newCall = new Call
