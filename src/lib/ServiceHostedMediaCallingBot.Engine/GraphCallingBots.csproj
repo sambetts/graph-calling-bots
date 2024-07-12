@@ -1,16 +1,38 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>Grap</PackageId>
+    <PackageId></PackageId>
+    <Title>Graph Calling Bots</Title>
+    <RepositoryUrl>https://github.com/sambetts/graph-calling-bots</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sambetts/graph-calling-bots</PackageProjectUrl>
+    <Description>Graph calling bots built for ASP.Net 8. Simplify calling bots for Teams/Graph in C#
+</Description>
+    <Company>Sam Betts</Company>
+    <PackageTags>graph;bots;calls;teams;meetings</PackageTags>
+    <PackageIcon>robot-128.png</PackageIcon>
+    <PackageReadmeFile>nuget.md</PackageReadmeFile>
+    <PackageReleaseNotes>First release. Has been used in various production scenarios already.</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 	<ItemGroup>
 		<ProjectCapability Include="AspNetCore" />
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\imgs\robot-128.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\..\nuget.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 	
   <ItemGroup>
