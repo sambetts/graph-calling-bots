@@ -1,11 +1,11 @@
 # Teams Calling Bots (with optional PSTN)
-Stateless MS Graph calling bots built for ASP.Net 7. 
+Stateless MS Graph calling bots built for ASP.Net 8. Simplify calling bots for Teams/Graph; designed for scalable cloud. 
 
 This is a project to demonstrate how calling bots can work in Teams, using service-hosted media (static WAV files only). It _doesn’t_ use the [Graph Communications Calling SDK](https://microsoftgraph.github.io/microsoft-graph-comms-samples/docs/client/index.html) except for some model classes and request validation checks, as I wanted a more .Net standardised app model: abstracted state persistence, standard logging libraries etc, that fit much better into things like functions apps where you don’t necessarily keep everything in memory. 
 
-The calling logic therefore is much simplified and just uses standard .Net 7 classes and libraries, which makes it more lightweight, but does means it can’t handle app-hosted media for now. 
+The calling logic therefore is much simplified and just uses standard .Net classes and libraries, which makes it more lightweight, but does means it can’t handle app-hosted media for now. 
 
-For PSTN bots especially we just want some basic logic-flow controls:
+For calling bots especially we just want some basic logic-flow controls:
 
 * Call answered.
 * Play pre-recorded media.
