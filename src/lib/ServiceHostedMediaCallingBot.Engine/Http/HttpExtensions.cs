@@ -1,4 +1,4 @@
-﻿namespace ServiceHostedMediaCallingBot.Engine.Http;
+﻿namespace GraphCallingBots.Http;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;

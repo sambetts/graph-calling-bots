@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using GraphCallingBots;
+using GraphCallingBots.Http;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Client.Authentication;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.Http;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
+namespace GraphCallingBots.CallingBots;
 
 /// <summary>
 /// Base bot class that handles notifications and call state management.
@@ -22,7 +23,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
-    public string BotTypeName => this.GetType().Name;
+    public string BotTypeName => GetType().Name;
 
     public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
@@ -174,7 +175,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
     protected virtual Task NewTonePressed(CALLSTATETYPE callState, Tone tone)
     {
-        _logger.LogInformation($"{this.GetType().Name}: New tone pressed: {tone} on call {callState.CallId}");
+        _logger.LogInformation($"{GetType().Name}: New tone pressed: {tone} on call {callState.CallId}");
         return Task.CompletedTask;
     }
 

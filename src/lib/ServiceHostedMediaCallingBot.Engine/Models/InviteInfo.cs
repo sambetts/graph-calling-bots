@@ -1,7 +1,7 @@
 ﻿using Microsoft.Graph.Models;
 using System.Text.Json.Serialization;
 
-namespace ServiceHostedMediaCallingBot.Engine.Models;
+namespace GraphCallingBots.Models;
 
 internal class InviteInfo : EmptyModelWithClientContext
 {

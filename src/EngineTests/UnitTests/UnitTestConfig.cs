@@ -1,6 +1,6 @@
 ﻿using CommonUtils.Config;
+using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Configuration;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
 

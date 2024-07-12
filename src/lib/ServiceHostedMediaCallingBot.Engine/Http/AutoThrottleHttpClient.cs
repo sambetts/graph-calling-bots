@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ServiceHostedMediaCallingBot.Engine.Http;
+namespace GraphCallingBots.Http;
 
 public class AutoThrottleHttpClient : HttpClient
 {

@@ -1,11 +1,11 @@
+using GraphCallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Sql;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
-using ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;
 

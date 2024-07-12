@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using GraphCallingBots.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
+namespace GraphCallingBots.CallingBots;
 
 public interface IGraphCallingBot
 {

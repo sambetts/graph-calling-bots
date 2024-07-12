@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
+namespace GraphCallingBots.StateManagement.Sql;
 
 
 public class CallHistorySqlContext<CALLSTATETYPE, HISTORYPAYLOADTYPE> : DbContext

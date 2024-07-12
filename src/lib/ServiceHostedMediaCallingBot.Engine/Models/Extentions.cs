@@ -1,6 +1,6 @@
 ﻿using Microsoft.Graph.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.Models;
+namespace GraphCallingBots.Models;
 
 public static class Extentions
 {

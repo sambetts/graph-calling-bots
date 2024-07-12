@@ -2,7 +2,7 @@
 using Microsoft.Identity.Client;
 using System.Net.Http.Headers;
 
-namespace ServiceHostedMediaCallingBot.Engine.Http;
+namespace GraphCallingBots.Http;
 
 /// <summary>
 /// HttpClient that can handle HTTP 429s automatically + handles token acquisition for MS Graph

@@ -2,7 +2,7 @@
 using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+namespace GraphCallingBots.StateManagement;
 
 /// <summary>
 /// Abstract base class for Azure tables storage managers. Async initialization.

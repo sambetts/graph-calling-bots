@@ -1,6 +1,6 @@
-﻿using Microsoft.Graph.Contracts;
+﻿using GraphCallingBots.Models;
+using Microsoft.Graph.Contracts;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.Models;
 using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;

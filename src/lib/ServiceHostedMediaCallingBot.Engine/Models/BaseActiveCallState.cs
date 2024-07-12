@@ -1,7 +1,7 @@
 ﻿using Microsoft.Graph.Models;
 using System.Text.Json.Serialization;
 
-namespace ServiceHostedMediaCallingBot.Engine.Models;
+namespace GraphCallingBots.Models;
 
 /// <summary>
 /// State of a call made by the bot. Base implementation.

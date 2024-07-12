@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ServiceHostedMediaCallingBot.Engine.Models;
+namespace GraphCallingBots.Models;
 
 public class EmptyModelWithClientContext
 {

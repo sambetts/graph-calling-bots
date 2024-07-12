@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 
-namespace ServiceHostedMediaCallingBot.Engine.Http;
+namespace GraphCallingBots.Http;
 
 /// <summary>
 /// Ensures call notifications from Graph are real and authenticated correctly.

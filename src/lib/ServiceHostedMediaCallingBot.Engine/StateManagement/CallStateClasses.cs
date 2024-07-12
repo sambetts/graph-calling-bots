@@ -1,11 +1,11 @@
 ﻿using Azure;
 using Azure.Data.Tables;
-using ServiceHostedMediaCallingBot.Engine.Models;
+using GraphCallingBots.Models;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+namespace GraphCallingBots.StateManagement;
 
 public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
 {

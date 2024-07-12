@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace ServiceHostedMediaCallingBot.Engine;
+namespace GraphCallingBots;
 
 /// <summary>
 /// Turns Graph call notifications into callbacks and updates base call state & history.

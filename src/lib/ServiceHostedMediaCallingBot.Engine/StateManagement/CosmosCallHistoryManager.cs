@@ -1,8 +1,8 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using GraphCallingBots.Models;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+namespace GraphCallingBots.StateManagement;
 
 /// <summary>
 /// Something that has to go in Cosmos DB
@@ -22,8 +22,8 @@ public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosm
     public CallHistoryCosmosDoc() : this(null) { }
     public CallHistoryCosmosDoc(CALLSTATETYPE? callState)
     {
-        this.CallId = callState?.CallId ?? string.Empty;
-        this.LastUpdated = DateTime.UtcNow;
+        CallId = callState?.CallId ?? string.Empty;
+        LastUpdated = DateTime.UtcNow;
     }
 
     public string CallId { get; set; }

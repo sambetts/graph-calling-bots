@@ -1,10 +1,10 @@
 ﻿using Azure.Data.Tables;
 using CallingTestBot.FunctionApp.Engine;
+using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace CallingTestBot.FunctionApp.Extensions;
 

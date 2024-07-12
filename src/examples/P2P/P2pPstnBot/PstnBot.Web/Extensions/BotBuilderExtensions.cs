@@ -1,7 +1,7 @@
-﻿using PstnBot.Shared;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
+﻿using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using PstnBot.Shared;
 
 namespace PstnBot.Web.Extensions;
 

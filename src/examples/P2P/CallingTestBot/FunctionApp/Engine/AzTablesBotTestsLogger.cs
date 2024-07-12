@@ -1,7 +1,7 @@
 ﻿using Azure.Data.Tables;
+using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace CallingTestBot.FunctionApp.Engine;
 

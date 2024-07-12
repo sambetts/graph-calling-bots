@@ -1,7 +1,7 @@
 ﻿using Microsoft.Graph.Models;
 using System.Text.Json;
 
-namespace ServiceHostedMediaCallingBot.Engine.Models;
+namespace GraphCallingBots.Models;
 
 /// <summary>
 /// To implement IEqutable, we need to override the default implementation of these classes

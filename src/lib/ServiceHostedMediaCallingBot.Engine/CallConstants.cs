@@ -1,4 +1,4 @@
-﻿namespace ServiceHostedMediaCallingBot.Engine;
+﻿namespace GraphCallingBots;
 
 internal class CallConstants
 {

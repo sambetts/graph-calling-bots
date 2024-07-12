@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GraphCallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Contracts;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
-namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
+namespace GraphCallingBots.CallingBots;
 
 /// <summary>
 /// A bot that calls you over the phone.

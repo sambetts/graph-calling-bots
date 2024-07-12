@@ -1,16 +1,17 @@
 ﻿using Azure.Identity;
+using GraphCallingBots;
+using GraphCallingBots.Http;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Calls.Item.PlayPrompt;
 using Microsoft.Graph.Contracts;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine.Http;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
+namespace GraphCallingBots.CallingBots;
 
 /// <summary>
 /// Bot that uses Graph API for calling. Contains common methods for calling Graph API.
@@ -34,17 +35,25 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     }
 
 
-    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, bool addBotIdentityForPSTN, bool testMedia)
+    /// <summary>
+    /// A common way to init the ICallStateManager and create a call request
+    /// </summary>
+    protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, bool addBotIdentityForPSTN)
     {
-        return await CreateCallRequest(initialAdd, new List<MediaInfo>(), addBotIdentityForPSTN, testMedia);
+        return await CreateCallRequest(initialAdd, new List<MediaInfo>(), addBotIdentityForPSTN, false);
     }
+
+
+    /// <summary>
+    /// A common way to init the ICallStateManager and create a call request. Also optionally tests if the WAV file exists.
+    /// </summary>
     protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, MediaInfo mediaPromptOnCallConnected, bool addBotIdentityForPSTN, bool testMedia)
     {
         return await CreateCallRequest(initialAdd, new List<MediaInfo> { mediaPromptOnCallConnected }, addBotIdentityForPSTN, testMedia);
     }
 
     /// <summary>
-    /// A common way to init the ICallStateManager and create a call request. Also optionally tests if the WAV file exists.
+    /// A common way to init the ICallStateManager and create a call request. Also optionally tests if WAV files exists.
     /// </summary>
     protected async Task<Call> CreateCallRequest(InvitationParticipantInfo? initialAdd, List<MediaInfo> callMediaList, bool addBotIdentityForPSTN, bool testMedia)
     {
@@ -69,7 +78,6 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
         {
             _logger.LogInformation($"No media URI found for call. Won't play any initial message via bot.");
         }
-
 
         // Create call for initial participants
         var newCall = new Call
@@ -190,13 +198,14 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     protected async Task HangUp(string callId)
     {
         _logger.LogInformation($"{BotTypeName}: Hanging up call {callId}");
-        await this.Delete($"/communications/calls/{callId}");
+        await Delete($"/communications/calls/{callId}");
     }
 
     #endregion
 
     #region HTTP Calls
 
+    // Calls for when Graph SDK doesn't support the API call needed. Will one day be deprecated in favour of SDK calls.
     async Task<string> PostData(string urlMinusRoot, object payload)
     {
         var response = await _httpClient.PostAsJsonAsync($"https://graph.microsoft.com/v1.0" + urlMinusRoot, payload);
@@ -225,5 +234,4 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     }
 
     #endregion
-
 }

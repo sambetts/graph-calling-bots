@@ -1,4 +1,4 @@
-﻿using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.Models;
 using System.Text.Json;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;

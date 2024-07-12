@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GraphCallingBots.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
+namespace GraphCallingBots.StateManagement.Sql;
 
 public class SqlCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
     where CALLSTATETYPE : BaseActiveCallState

@@ -1,7 +1,7 @@
 ﻿using CommonUtils.Config;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Configuration;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace GroupCallingBot.FunctionApp;
 

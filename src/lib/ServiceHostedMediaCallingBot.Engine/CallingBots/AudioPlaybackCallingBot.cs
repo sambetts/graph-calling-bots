@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
+﻿using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using Microsoft.Extensions.Logging;
 
-namespace ServiceHostedMediaCallingBot.Engine.CallingBots;
+namespace GraphCallingBots.CallingBots;
 
 /// <summary>
 /// A bot that plays service-hosted audio and responds to DTMF input (dial-tones). Can be used for Teams calls or PSTN calls.

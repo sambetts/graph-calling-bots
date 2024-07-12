@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.Models;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement.Sql;
+namespace GraphCallingBots.StateManagement.Sql;
 
 /// <summary>
 /// SQL Server Entity Framework Core entry for call history

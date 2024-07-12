@@ -1,5 +1,5 @@
-﻿using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
+﻿using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 
 namespace ServiceHostedMediaCallingBot.UnitTests.TestServices;
 

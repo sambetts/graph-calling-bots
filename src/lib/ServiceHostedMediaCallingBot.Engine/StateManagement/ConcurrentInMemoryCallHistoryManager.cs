@@ -1,6 +1,6 @@
-﻿using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+namespace GraphCallingBots.StateManagement;
 
 public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
     where CALLSTATETYPE : BaseActiveCallState

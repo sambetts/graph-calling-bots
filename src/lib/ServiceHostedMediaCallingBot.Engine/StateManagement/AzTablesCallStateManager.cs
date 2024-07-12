@@ -1,8 +1,8 @@
 ﻿using Azure.Data.Tables;
+using GraphCallingBots.Models;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+namespace GraphCallingBots.StateManagement;
 
 /// <summary>
 /// Azure tables implementation of ICallStateManager

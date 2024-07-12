@@ -1,6 +1,6 @@
 ﻿using CommonUtils.Config;
+using GraphCallingBots.Models;
 using Microsoft.Extensions.Configuration;
-using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace GroupCallingChatBot.Web.Models;
 

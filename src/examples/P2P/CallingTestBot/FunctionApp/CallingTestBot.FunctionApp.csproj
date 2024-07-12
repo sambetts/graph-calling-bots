@@ -22,7 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\CommonUtils\CommonUtils.csproj" />
-    <ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\ServiceHostedMediaCallingBot.Engine.csproj" />
+    <ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\GraphCallingBots.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

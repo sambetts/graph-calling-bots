@@ -1,8 +1,8 @@
+using GraphCallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.Engine;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using ServiceHostedMediaCallingBot.UnitTests.TestServices;
 
 namespace ServiceHostedMediaCallingBot.UnitTests;

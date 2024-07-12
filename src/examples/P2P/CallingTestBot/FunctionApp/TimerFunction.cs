@@ -1,7 +1,7 @@
+using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
 
 namespace CallingTestBot.FunctionApp;
 

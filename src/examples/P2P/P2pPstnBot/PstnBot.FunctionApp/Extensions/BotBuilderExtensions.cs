@@ -1,9 +1,9 @@
 ﻿using Azure.Data.Tables;
+using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.DependencyInjection;
 using PstnBot.Shared;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 
 namespace PstnBot.FunctionApp.Extensions;
 

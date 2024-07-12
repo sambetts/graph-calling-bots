@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ServiceHostedMediaCallingBot.Engine;
+namespace GraphCallingBots;
 
 /// <summary>
 /// Makes sure the right bot instance get the right call notifications.

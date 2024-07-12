@@ -1,11 +1,11 @@
 using CommonUtils;
+using GraphCallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
 using GroupCalls.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;

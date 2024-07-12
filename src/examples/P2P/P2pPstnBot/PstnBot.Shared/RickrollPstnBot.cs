@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
-using ServiceHostedMediaCallingBot.Engine.StateManagement;
+﻿using GraphCallingBots;
+using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
+using GraphCallingBots.StateManagement;
+using Microsoft.Extensions.Logging;
 
 namespace PstnBot.Shared;
 

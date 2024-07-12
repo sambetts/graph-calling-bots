@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GraphCallingBots;
+using GraphCallingBots.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.Engine;
-using ServiceHostedMediaCallingBot.Engine.Models;
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;

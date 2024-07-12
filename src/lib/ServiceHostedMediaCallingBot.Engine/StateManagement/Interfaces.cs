@@ -1,6 +1,6 @@
-﻿using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.Models;
 
-namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
+namespace GraphCallingBots.StateManagement;
 
 /// <summary>
 /// A service that needs to be initialised async before use.

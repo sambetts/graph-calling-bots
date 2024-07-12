@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ServiceHostedMediaCallingBot.Engine.CallingBots;
-using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.CallingBots;
+using GraphCallingBots.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace PstnBot.Web.Controllers;

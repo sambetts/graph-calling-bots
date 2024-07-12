@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using ServiceHostedMediaCallingBot.Engine.Models;
+﻿using GraphCallingBots.Models;
+using Microsoft.AspNetCore.Http;
 
-namespace ServiceHostedMediaCallingBot.Engine;
+namespace GraphCallingBots;
 
 /// <summary>
 /// Non generic class to handle notifications and call state management.
