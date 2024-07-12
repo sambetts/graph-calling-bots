@@ -1,5 +1,5 @@
 # Group Calling Bots - Azure Functions App
-This example calls a bunch of people and plays a "this is a group call" message to anyone that joins. 
+This example calls a list of either Teams or PSTN contacts, and plays a "Hi, there has been an incident. Press 1 to join the call" message to anyone that answers. When they press "1" on the keypad, an optional 2nd audio is played and they are then transfered to the common call.
 
 Functions apps are the more "cloud" version of the group calling bot, being that Azure Function Apps are "serverless". It does have the small downside that static content isn't so easy to host - in this example we send an embedded WAV file as an action, but usually we'd recommend hosting this on a CDN.
 
@@ -33,7 +33,8 @@ ngrok http http://localhost:7221
 POST this JSon to the bot endpoint /api/StartCall:
 ```json
 {
-    "MessageUrl": "https://callingbot.eu.ngrok.io/api/WavFile",
+    "MessageInviteUrl": "https://sambetts.eu.ngrok.io/api/WavFileInviteToCall",
+    "MessageTransferingUrl": "https://sambetts.eu.ngrok.io/api/WavFileTransfering",
     "Attendees": [
         {
             "Id": "+3468279XXXX",
@@ -56,7 +57,7 @@ The call data can include PSTN numbers or Teams users (object IDs). The bot will
 You can link the call to a meeting by passing a join URL:
 ```json
 {
-    "MessageUrl": "https://callingbot.eu.ngrok.io/Content/GroupCallIntro.wav",
+    "MessageInviteUrl": "https://callingbot.eu.ngrok.io/Content/GroupCallIntro.wav",
     "Attendees": [
         {
             "Id": "3b10aa94-739a-472c-a68a-0000000",
