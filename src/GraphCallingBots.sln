@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Web", "examples\P2P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphCallingBots.UnitTests", "EngineTests\UnitTests\GraphCallingBots.UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphCallingBots", "lib\ServiceHostedMediaCallingBot.Engine\GraphCallingBots.csproj", "{2BCCDA31-DB8C-48C4-917B-91A6652B446E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphCallingBots", "lib\GraphCallingBots.Engine\GraphCallingBots.csproj", "{2BCCDA31-DB8C-48C4-917B-91A6652B446E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{3897B9CF-F021-4E78-9984-B3B67F377AD0}"
 EndProject

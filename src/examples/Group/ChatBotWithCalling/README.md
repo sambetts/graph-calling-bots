@@ -1,5 +1,5 @@
 # Group Calling Bot
-This bot is in fact two bots in one; a chatbot with Bot Framework SDK 4 and a calling bot for Graph calls, using the ServiceHostedMediaCallingBot engine the other bots in this repo use.
+This bot is in fact two bots in one; a chatbot with Bot Framework SDK 4 and a calling bot for Graph calls, using the GraphCallingBots.Engine engine the other bots in this repo use.
 
 ![alt](imgs/chat.jpg)
 

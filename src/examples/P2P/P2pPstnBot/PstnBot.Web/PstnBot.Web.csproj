@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\lib\ServiceHostedMediaCallingBot.Engine\GraphCallingBots.csproj" />
+    <ProjectReference Include="..\..\..\..\lib\GraphCallingBots.Engine\GraphCallingBots.csproj" />
     <ProjectReference Include="..\PstnBot.Shared\PstnBot.Shared.csproj" />
   </ItemGroup>
 
