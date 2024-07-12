@@ -2,7 +2,7 @@
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Configuration;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GraphCallingBots.UnitTests;
 
 public class UnitTestConfig : PropertyBoundConfig, ICosmosConfig
 {

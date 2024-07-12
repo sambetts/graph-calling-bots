@@ -1,7 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 
-namespace ServiceHostedMediaCallingBot.UnitTests.TestServices;
+namespace GraphCallingBots.UnitTests.TestServices;
 
 public class SlowInMemoryCallStateManager<T> : ConcurrentInMemoryCallStateManager<T> where T : BaseActiveCallState
 {

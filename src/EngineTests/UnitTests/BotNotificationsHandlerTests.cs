@@ -1,11 +1,10 @@
-using GraphCallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.UnitTests.TestServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
-using ServiceHostedMediaCallingBot.UnitTests.TestServices;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GraphCallingBots.UnitTests;
 
 [TestClass]
 public class BotNotificationsHandlerTests : BaseTests
@@ -19,7 +18,7 @@ public class BotNotificationsHandlerTests : BaseTests
             config.AddConsole();
         }).CreateLogger("Unit tests");
 
-        _unitTestBot = new UnitTestBot(new RemoteMediaCallingBotConfiguration(), _callStateManager, _historyManager, _logger, base.GetLogger<BotCallRedirector>());
+        _unitTestBot = new UnitTestBot(new RemoteMediaCallingBotConfiguration(), _callStateManager, _historyManager, _logger, GetLogger<BotCallRedirector>());
     }
 
     /// <summary>

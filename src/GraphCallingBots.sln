@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PstnBot.Web", "examples\P2P\P2pPstnBot\PstnBot.Web\PstnBot.Web.csproj", "{41B58F3B-9F6C-48C5-B2E1-420C64FC270F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceHostedMediaCallingBot.UnitTests", "EngineTests\UnitTests\ServiceHostedMediaCallingBot.UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphCallingBots.UnitTests", "EngineTests\UnitTests\GraphCallingBots.UnitTests.csproj", "{3F9E66BE-A0E1-4A51-8FA6-18AC9188A420}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphCallingBots", "lib\ServiceHostedMediaCallingBot.Engine\GraphCallingBots.csproj", "{2BCCDA31-DB8C-48C4-917B-91A6652B446E}"
 EndProject

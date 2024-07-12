@@ -33,11 +33,11 @@ public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiv
         var callMediaPlayList = new List<MediaInfo>();
 
         // Add default media prompt. Will automatically play when call is connected.
-        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl)) 
+        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl))
             callMediaPlayList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = DEFAULT_PROMPT_ID });
 
         // Add any message transfering audio
-        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageTransferingUrl)) 
+        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageTransferingUrl))
             callMediaPlayList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageTransferingUrl, ResourceId = TRANSFERING_PROMPT_ID });
 
         // Start P2P call

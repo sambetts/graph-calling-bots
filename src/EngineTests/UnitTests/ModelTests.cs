@@ -2,7 +2,7 @@ using GraphCallingBots.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GraphCallingBots.UnitTests;
 
 [TestClass]
 public class ModelTests

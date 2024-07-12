@@ -55,7 +55,7 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
         {
             MessageInviteUrl = $"{botConfig.BotBaseUrl}/audio/invite.wav",
             MessageTransferingUrl = $"{botConfig.BotBaseUrl}/audio/transfering.wav",
-            OrganizerUserId = organizerUserId 
+            OrganizerUserId = organizerUserId
         };
     }
 }

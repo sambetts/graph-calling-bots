@@ -1,5 +1,4 @@
-﻿using GraphCallingBots;
-using GraphCallingBots.Models;
+﻿using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Contracts;

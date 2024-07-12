@@ -1,4 +1,3 @@
-using GraphCallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GraphCallingBots.StateManagement.Sql;
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GraphCallingBots.UnitTests;
 
 [TestClass]
 public class EngineTests : BaseTests

@@ -1,10 +1,10 @@
 ﻿using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.UnitTests.TestServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using ServiceHostedMediaCallingBot.UnitTests.TestServices;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GraphCallingBots.UnitTests;
 
 public class BaseTests
 {

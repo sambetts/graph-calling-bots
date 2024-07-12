@@ -1,7 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using System.Text.Json;
 
-namespace ServiceHostedMediaCallingBot.UnitTests;
+namespace GraphCallingBots.UnitTests;
 
 internal class NotificationsLibrary
 {
