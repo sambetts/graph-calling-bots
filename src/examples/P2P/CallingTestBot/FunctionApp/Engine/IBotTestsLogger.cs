@@ -2,6 +2,9 @@
 
 namespace CallingTestBot.FunctionApp.Engine;
 
+/// <summary>
+/// Tests for recording if test calls work.
+/// </summary>
 public interface IBotTestsLogger
 {
     string TableName { get; }

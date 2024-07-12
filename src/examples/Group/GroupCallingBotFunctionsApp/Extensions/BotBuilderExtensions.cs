@@ -16,7 +16,7 @@ public static class BotBuilderExtensions
     {
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
         services.AddSingleton<BotCallRedirector>();
-        services.AddSingleton<CallOrchestrator>();
+        services.AddSingleton<GroupCallOrchestrator>();
 
         // Use in-memory storage is no storage is configured
         if (!string.IsNullOrEmpty(config.Storage))

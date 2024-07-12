@@ -26,9 +26,9 @@ public class MainDialog : CancellableDialogue
     private readonly UserState _userState;
     private readonly TeamsChatbotBotConfig _config;
     private readonly GraphServiceClient _graphServiceClient;
-    private readonly CallOrchestrator _callOrchestrator;
+    private readonly GroupCallOrchestrator _callOrchestrator;
 
-    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallBot groupCallBot, GraphServiceClient graphServiceClient, CallOrchestrator callOrchestrator) : base(nameof(MainDialog))
+    public MainDialog(UserState userState, TeamsChatbotBotConfig config, GroupCallBot groupCallBot, GraphServiceClient graphServiceClient, GroupCallOrchestrator callOrchestrator) : base(nameof(MainDialog))
     {
         AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
         {
@@ -46,7 +46,9 @@ public class MainDialog : CancellableDialogue
 
 
     /// <summary>
-    /// Main entry-point for bot new chat
+    /// Main entry-point for bot new chat. 
+    /// Sends either an intro card or a call menu card to the user so they can configure and confirm the group call they want to setup.
+    /// The next step also sends the menu card if you add a call contact, so we need to check if the meeting should start here too as this will be the next step.
     /// </summary>
     private async Task<DialogTurnResult> SendBotMenu(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
@@ -77,10 +79,10 @@ public class MainDialog : CancellableDialogue
             }
         }
 
-        var val = stepContext.Context.Activity.Value ?? string.Empty;
+        var actvitiyResponse = stepContext.Context.Activity.Value ?? string.Empty;
 
         // Form action
-        var actionInfo = AdaptiveCardUtils.GetAdaptiveCardAction(val?.ToString()) ?? new AdaptiveCardActionResponse();
+        var actionInfo = AdaptiveCardUtils.GetAdaptiveCardAction(actvitiyResponse?.ToString()) ?? new AdaptiveCardActionResponse();
 
         if (actionInfo != null)
         {
@@ -113,6 +115,7 @@ public class MainDialog : CancellableDialogue
 
                     try
                     {
+                        // Create call using bot engine
                         var createdCall = await _callOrchestrator.StartGroupCall(meetingState);
                         if (createdCall != null)
                         {
@@ -156,6 +159,9 @@ public class MainDialog : CancellableDialogue
         return await stepContext.EndDialogAsync(meetingState, cancellationToken);
     }
 
+    /// <summary>
+    /// If we're here it's because the user has added a contact to the meeting. We need to validate the input and add it to the meeting state.
+    /// </summary>
     private async Task<DialogTurnResult> ProcessNumberAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         // Get user state
@@ -248,5 +254,4 @@ public class MainDialog : CancellableDialogue
 
         return await stepContext.EndDialogAsync(meetingState, cancellationToken);
     }
-
 }

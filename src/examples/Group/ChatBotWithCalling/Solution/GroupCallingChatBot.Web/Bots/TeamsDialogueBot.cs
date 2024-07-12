@@ -51,7 +51,12 @@ public class TeamsDialogueBot<T> : DialogBot<T> where T : Dialog
 
     public static StartGroupCallData GetDefaultStartGroupCallData(TeamsChatbotBotConfig botConfig, string? organizerUserId)
     {
-        return new StartGroupCallData { MessageInviteUrl = $"{botConfig.BotBaseUrl}/audio/rickroll.wav", OrganizerUserId = organizerUserId };
+        return new StartGroupCallData
+        {
+            MessageInviteUrl = $"{botConfig.BotBaseUrl}/audio/invite.wav",
+            MessageTransferingUrl = $"{botConfig.BotBaseUrl}/audio/transfering.wav",
+            OrganizerUserId = organizerUserId 
+        };
     }
 }
 

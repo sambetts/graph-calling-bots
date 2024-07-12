@@ -26,7 +26,7 @@ public static class BotBuilderExtensions
         services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification>>(new ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState, CallNotification>());
 
         services.AddSingleton<BotCallRedirector>();
-        services.AddSingleton<CallOrchestrator>();
+        services.AddSingleton<GroupCallOrchestrator>();
 
         services.AddSingleton<CallInviteBot>();
         return services.AddSingleton<GroupCallBot>();

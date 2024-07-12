@@ -11,11 +11,15 @@
 	<ItemGroup>
 	  <Content Remove="AdaptiveCards\Templates\AddContact.json" />
 	  <Content Remove="AdaptiveCards\Templates\BotMenu.json" />
+	  <Content Remove="wwwroot\audio\invite.wav" />
+	  <Content Remove="wwwroot\audio\transfering.wav" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <EmbeddedResource Include="AdaptiveCards\Templates\AddContact.json" />
 	  <EmbeddedResource Include="AdaptiveCards\Templates\BotMenu.json" />
+	  <EmbeddedResource Include="wwwroot\audio\invite.wav" />
+	  <EmbeddedResource Include="wwwroot\audio\transfering.wav" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,10 +42,6 @@
 		<Content Update="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="wwwroot\audio\" />
 	</ItemGroup>
 
 </Project>

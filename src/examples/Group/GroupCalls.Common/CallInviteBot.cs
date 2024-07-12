@@ -11,7 +11,7 @@ namespace GroupCalls.Common;
 /// <summary>
 /// Bot that invites a single person to a group call.
 /// </summary>
-public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
+public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiveCallState>
 {
     public const string TRANSFERING_PROMPT_ID = "transferingPrompt";
     public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
@@ -25,30 +25,29 @@ public class CallInviteBot : PstnCallingBot<GroupCallInviteActiveCallState>
     {
         if (createdGroupCall == null || createdGroupCall.Id == null)
         {
+            _logger.LogError("Invalid group call ID for invites");
             throw new ArgumentNullException(nameof(createdGroupCall));
         }
 
         // Work out what audio to play, if anything
-        var playList = new List<MediaInfo>();
+        var callMediaPlayList = new List<MediaInfo>();
 
-        // Add default prompt. Will automatically play
-        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl)) playList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = DEFAULT_PROMPT_ID });
+        // Add default media prompt. Will automatically play when call is connected.
+        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageInviteUrl)) 
+            callMediaPlayList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = DEFAULT_PROMPT_ID });
 
         // Add any message transfering audio
-        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageTransferingUrl)) playList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageTransferingUrl, ResourceId = TRANSFERING_PROMPT_ID });
+        if (!string.IsNullOrEmpty(groupMeetingRequest.MessageTransferingUrl)) 
+            callMediaPlayList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageTransferingUrl, ResourceId = TRANSFERING_PROMPT_ID });
 
-        // Remember initial state
-        await InitCallStateAndStoreMediaInfoForCreatedCall(createdGroupCall, playList, createdCallState => createdCallState.GroupCallId = createdGroupCall.Id);
-
-        var singleAttendeeCallReq = await CreateCallRequest(new InvitationParticipantInfo { Identity = initialAdd.ToIdentity() }, playList, groupMeetingRequest.HasPSTN, false);
-
-        // Start call
+        // Start P2P call
+        var singleAttendeeCallReq = await CreateCallRequest(new InvitationParticipantInfo { Identity = initialAdd.ToIdentity() }, callMediaPlayList, groupMeetingRequest.HasPSTN, false);
         var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
 
         if (singleAttendeeCall != null)
         {
-            // Remember initial state of the call to transfer to and who to transfer to it
-            await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, playList,
+            // Remember initial state of the call: which group-call to transfer to and who to transfer
+            await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, callMediaPlayList,
                 createdCallState =>
                 {
                     createdCallState.GroupCallId = createdGroupCall.Id;

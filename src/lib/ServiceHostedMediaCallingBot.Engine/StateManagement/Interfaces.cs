@@ -2,6 +2,9 @@
 
 namespace ServiceHostedMediaCallingBot.Engine.StateManagement;
 
+/// <summary>
+/// A service that needs to be initialised async before use.
+/// </summary>
 public interface IAsyncInit
 {
     Task Initialise();
@@ -21,6 +24,9 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
     Task<List<T>> GetActiveCalls();
 }
 
+/// <summary>
+/// Manages saving the history of calls made by the bot in Graph. Used for debugging normally.
+/// </summary>
 public interface ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : IAsyncInit
     where CALLSTATETYPE : BaseActiveCallState
     where HISTORYPAYLOADTYPE : class

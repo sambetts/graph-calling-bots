@@ -20,7 +20,6 @@ public class StartGroupCallData
     /// </summary>
     public string? MessageInviteUrl { get; set; } = null;
 
-
     /// <summary>
     /// Absolute URL to WAV file to play to attendees when the user confirms they want to join the group call.
     /// </summary>
@@ -77,6 +76,16 @@ public class StartGroupCallData
 
     [JsonIgnore]
     public bool IsValid => !string.IsNullOrEmpty(OrganizerUserId) && Attendees.Count > 0;
+
+    /// <summary>
+    /// Optional join URL for the group call. If not specified, a new meeting will be created.
+    /// </summary>
+    public JoinMeetingInfo? JoinMeetingInfo { get; set; } = null;
+}
+
+public class JoinMeetingInfo
+{
+    public required string JoinUrl { get; set; }
 }
 
 public class AttendeeCallInfo
