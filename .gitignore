@@ -76,3 +76,6 @@
 /src/lib/ServiceHostedMediaCallingBot.Engine/bin/Debug/net8.0
 /src/examples/Group/GroupCalls.Common/bin/Debug/net8.0
 /src/lib/ServiceHostedMediaCallingBot.Engine/bin/Debug
+/src/lib/GraphCallingBots.Engine/obj
+/src/lib/GraphCallingBots.Engine.Engine/obj
+/src/lib/GraphCallingBots.Engine/bin/Debug
