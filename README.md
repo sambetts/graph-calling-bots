@@ -1,7 +1,7 @@
 # Teams Calling Bots (with optional PSTN)
-Stateless MS Graph calling bots built for ASP.Net 8. Simplify calling bots for Teams/Graph; designed for scalable cloud. 
+Graph calling bots built for ASP.Net 8. Simplify calling bots for Teams/Graph in C#; designed for scalable cloud. 
 
-This is a project to demonstrate how calling bots can work in Teams, using service-hosted media (static WAV files only). It _doesn’t_ use the [Graph Communications Calling SDK](https://microsoftgraph.github.io/microsoft-graph-comms-samples/docs/client/index.html) except for some model classes and request validation checks, as I wanted a more .Net standardised app model: abstracted state persistence, standard logging libraries etc, that fit much better into things like functions apps where you don’t necessarily keep everything in memory. 
+This is a project to demonstrate how calling bots can work in Teams, using service-hosted media (static WAV files only). It _doesn’t_ use the [Graph Communications Calling SDK](https://microsoftgraph.github.io/microsoft-graph-comms-samples/docs/client/index.html) except for some model classes and request validation checks, as I wanted a more .Net standardised app model: abstracted state persistence, standard logging libraries etc, that fit much better into things like functions apps where you don’t necessarily keep everything in memory (stateful). 
 
 The calling logic therefore is much simplified and just uses standard .Net classes and libraries, which makes it more lightweight, but does means it can’t handle app-hosted media for now. 
 
@@ -27,35 +27,67 @@ There are a few projects that use the same engine.
 Here's an example:
 
 ```C#
-public class SurveyCallingBot : BaseStatelessGraphCallingBot
+public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiveCallState>
 {
-    protected SurveyCallingBot(BotOptions botOptions, ICallStateManager callStateManager, ILogger logger) : base(botOptions, callStateManager, logger)
+    public const string TRANSFERING_PROMPT_ID = "transferingPrompt";
+
+    /// <summary>
+    /// Call someone and ask if they can join a group call.
+    /// </summary>
+    public async Task<Call?> InviteUserToGroupCall(AttendeeCallInfo initialAdd, StartGroupCallData groupMeetingRequest, Call createdGroupCall)
     {
-        this.MediaMap[NotificationPromptName] = new MediaPrompt
+        var callMediaPlayList = new List<MediaInfo>
         {
-            MediaInfo = new MediaInfo
-            {
-                Uri = new Uri(botOptions.BotBaseUrl + "/audio/corpsurvey.wav").ToString(),
-                ResourceId = Guid.NewGuid().ToString(),
-            },
+            // Add default media prompt. Will automatically play when call is connected.
+            new MediaInfo { Uri = groupMeetingRequest.MessageInviteUrl, ResourceId = DEFAULT_PROMPT_ID },
+
+            // Add any message transfering audio
+            new MediaInfo { Uri = groupMeetingRequest.MessageTransferingUrl, ResourceId = TRANSFERING_PROMPT_ID }
         };
+
+        // Start P2P call
+        var singleAttendeeCallReq = await CreateCallRequest(new InvitationParticipantInfo { Identity = initialAdd.ToIdentity() }, callMediaPlayList, groupMeetingRequest.HasPSTN, false);
+        var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
+
+        // Remember initial state of the call: which group-call to transfer to and who to transfer
+        await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, callMediaPlayList,
+            createdCallState =>
+            {
+                createdCallState.GroupCallId = createdGroupCall.Id;
+                createdCallState.AtendeeIdentity = initialAdd.ToIdentity();
+            });
+
+        return singleAttendeeCall;
     }
 
-    protected override async Task CallConnectedWithAudio(ActiveCallState callState)
+    protected async override Task NewTonePressed(GroupCallInviteActiveCallState callState, Tone tone)
     {
-        await base.SubscribeToToneAsync(callState.CallId);
-        await base.PlayPromptAsync(callState.CallId, MediaMap.Select(m => m.Value));
-    }
+        if (tone == Tone.Tone1)
+        {
+            // Play "transfering" WAV.
+            await PlayConfiguredMediaIfNotAlreadyPlaying(callState, TRANSFERING_PROMPT_ID);
 
-    protected override Task NewTonePressed(ActiveCallState callState, Tone tone)
-    {
-        _logger.LogInformation($"New tone pressed: {tone}");
-        return Task.CompletedTask;
+            // Transfer P2P call to group call, replacing the call used for the invite
+            var transferReq = new InvitePostRequestBody
+            {
+                Participants = new List<InvitationParticipantInfo>
+                {
+                    new InvitationParticipantInfo
+                    {
+                        Identity = callState.AtendeeIdentity,
+                        ReplacesCallId = callState.CallId
+                    },
+
+                },
+            };
+
+            await _graphServiceClient.Communications.Calls[callState.GroupCallId].Participants.Invite.PostAsync(transferReq);
+        }
     }
 }
-```
-Also a bonus: as the bots run "stateless", they can scale much easier, in Azure Functions apps for example. There is one such example bot in this repo...
 
+```
+Also a bonus: as the bots run "stateless", they can scale much easier in Azure Functions apps for example. There are a couple of example bots in this repo...
 
 All the examples need this setup being done.
 
