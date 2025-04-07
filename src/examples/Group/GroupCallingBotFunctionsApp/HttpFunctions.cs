@@ -6,6 +6,7 @@ using GroupCalls.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Graph.Models;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -122,7 +123,17 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
         var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
         if (newCallReq != null)
         {
-            var groupCall = await callOrchestrator.StartGroupCall(newCallReq);
+            Call? groupCall;
+            try
+            {
+                groupCall = await callOrchestrator.StartGroupCall(newCallReq);
+            }
+            catch (ArgumentException)
+            {
+                // Something went wrong with the request
+                return SendBadRequest(req);
+            }
+
             if (groupCall == null)
             {
                 return req.CreateResponse(HttpStatusCode.BadRequest);

@@ -141,7 +141,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, this);
+        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, this.GetType().Name);
     }
 
     #region Bot Events

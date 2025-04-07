@@ -18,9 +18,8 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, BaseBot<CALLSTATETYPE> bot)
+    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName)
     {
-        var botType = bot.GetType().Name;
         if (notificationPayload == null) return;
 
         // Ensure processing is single-threaded to maintain processing order
@@ -35,7 +34,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
-            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification, botType);
+            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification, botTypeName);
 
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
@@ -45,12 +44,12 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                 {
                     // Is this notification for a tone on a call we're tracking?
                     updateCallState = true;
-                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState, botType);
+                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState, botTypeName);
                 }
                 else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
                 {
                     // Tone finished playing
-                    logger.LogInformation($"{botType}: Call {callState.CallId} finished playing tone");
+                    logger.LogInformation($"{botTypeName}: Call {callState.CallId} finished playing tone");
                     var playingTone = callState.MediaPromptsPlaying.Where(p => p.MediaInfo != null && p.MediaInfo.ResourceId == callnotification.AssociatedPlayPromptOperation.Id);
                     if (playingTone.Any())
                     {
@@ -65,7 +64,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                     if (newPartipants.Count > 0)
                     {
                         // User joined group call
-                        logger.LogInformation($"{botType}: {newPartipants.Count} user(s) joined group call {callState.CallId}");
+                        logger.LogInformation($"{botTypeName}: {newPartipants.Count} user(s) joined group call {callState.CallId}");
                         if (callbackInfo.UsersJoinedGroupCall != null) await callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
                     }
 
@@ -73,7 +72,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                     if (diconnectedPartipants.Count > 0)
                     {
                         // User left group call
-                        logger.LogInformation($"{botType}: {diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
+                        logger.LogInformation($"{botTypeName}: {diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
                         if (callbackInfo.UsersLeftGroupCall != null) await callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
                     }
 
