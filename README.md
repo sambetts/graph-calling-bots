@@ -121,8 +121,10 @@ In the examples given, there are a couple of example messages. Assuming you want
 ### Teams Calling Policies
 If the bot is to call Teams users, you need to create Teams app policies to allow the bot to make call by associating it with a user:
 
-``New-CsApplicationAccessPolicy -Identity CallingPolicyDev -AppIds "$botAppId" -Description "Allow calling"``
-``Grant-CsApplicationAccessPolicy -PolicyName CallingPolicyDev -Identity "$userObjectId"``
+```powershell
+New-CsApplicationAccessPolicy -Identity CallingPolicyDev -AppIds "$botAppId" -Description "Allow calling"
+Grant-CsApplicationAccessPolicy -PolicyName CallingPolicyDev -Identity "$userObjectId"
+```
 
 Replace '$botAppId' and '$userObjectId' with your own values. 
 
