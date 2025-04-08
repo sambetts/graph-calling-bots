@@ -53,9 +53,8 @@ public class CallStateEntity<T> : ITableEntity where T : BaseActiveCallState
 }
 
 
-public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
     public CallStateAndNotificationsHistoryEntity()
     {
@@ -69,11 +68,11 @@ public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOA
 
     public virtual List<CALLSTATETYPE> StateHistory { get; set; } = new();
 
-    public virtual List<NotificationHistory<HISTORYPAYLOADTYPE>> NotificationsHistory { get; set; } = new();
+    public virtual List<NotificationHistory> NotificationsHistory { get; set; } = new();
 }
 
-public class NotificationHistory<HISTORYPAYLOADTYPE> where HISTORYPAYLOADTYPE : class
+public class NotificationHistory
 {
-    public HISTORYPAYLOADTYPE? Payload { get; set; }
+    public string Payload { get; set; }
     public DateTime Timestamp { get; set; }
 }

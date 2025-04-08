@@ -1,12 +1,12 @@
 ﻿using GraphCallingBots.Models;
+using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement;
 
-public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
-    private readonly Dictionary<string, CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>> _callHistory = new();
+    private readonly Dictionary<string, CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>> _callHistory = new();
 
     public Task Initialise()
     {
@@ -14,21 +14,21 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
     }
     public bool Initialised => true;        // Nothing to initialise
 
-    public Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload)
+    public Task AddToCallHistory(CALLSTATETYPE callState, JsonElement graphNotificationPayload)
     {
         lock (this)
         {
             if (callState.HasValidCallId)
             {
-                var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>>
+                var newHistoryArray = new List<NotificationHistory>
                 {
-                    new NotificationHistory<HISTORYPAYLOADTYPE> { Payload = graphNotificationPayload, Timestamp = DateTime.Now }
+                    new NotificationHistory { Payload = graphNotificationPayload.ToString(), Timestamp = DateTime.Now }
                 };
                 var newCallStateList = new List<CALLSTATETYPE> { callState };
 
                 if (!_callHistory.ContainsKey(callState.CallId!))
                 {
-                    _callHistory.Add(callState.CallId!, new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState) { NotificationsHistory = newHistoryArray, StateHistory = newCallStateList });
+                    _callHistory.Add(callState.CallId!, new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>(callState) { NotificationsHistory = newHistoryArray, StateHistory = newCallStateList });
                 }
                 else
                 {
@@ -40,7 +40,7 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
         return Task.CompletedTask;
     }
 
-    public Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
+    public Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?> GetCallHistory(CALLSTATETYPE callState)
     {
         lock (this)
         {
@@ -48,18 +48,18 @@ public class ConcurrentInMemoryCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADT
             {
                 if (_callHistory.ContainsKey(callState.CallId!))
                 {
-                    return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(_callHistory[callState.CallId!]);
+                    return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?>(_callHistory[callState.CallId!]);
                 }
                 else
                 {
-                    Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState));
+                    Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?>(new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>(callState));
                 }
             }
         }
-        return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?>(null);
+        return Task.FromResult<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?>(null);
     }
 
-    Task ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>.DeleteCallHistory(CALLSTATETYPE callState)
+    Task ICallHistoryManager<CALLSTATETYPE>.DeleteCallHistory(CALLSTATETYPE callState)
     {
         lock (this)
         {

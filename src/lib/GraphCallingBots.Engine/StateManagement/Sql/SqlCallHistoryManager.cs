@@ -1,35 +1,35 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement.Sql;
 
-public class SqlCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+public class SqlCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
     private bool _initialised = false;
-    private readonly CallHistorySqlContext<CALLSTATETYPE, HISTORYPAYLOADTYPE> _context;
-    private readonly ILogger<SqlCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>> _logger;
+    private readonly CallHistorySqlContext<CALLSTATETYPE> _context;
+    private readonly ILogger<SqlCallHistoryManager<CALLSTATETYPE>> _logger;
 
     public bool Initialised => _initialised;
 
-    public SqlCallHistoryManager(CallHistorySqlContext<CALLSTATETYPE, HISTORYPAYLOADTYPE> context, ILogger<SqlCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>> logger)
+    public SqlCallHistoryManager(CallHistorySqlContext<CALLSTATETYPE> context, ILogger<SqlCallHistoryManager<CALLSTATETYPE>> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    public async Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload)
+    public async Task AddToCallHistory(CALLSTATETYPE callState, JsonElement graphNotificationPayload)
     {
         if (callState?.CallId == null)
         {
             throw new ArgumentNullException(nameof(callState.CallId));
         }
 
-        var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>> { new NotificationHistory<HISTORYPAYLOADTYPE>
+        var newHistoryArray = new List<NotificationHistory> { new NotificationHistory 
         {
-            Payload = graphNotificationPayload, Timestamp = DateTime.Now }
+            Payload = graphNotificationPayload.ToString(), Timestamp = DateTime.Now }
         };
         var newCallStateList = new List<CALLSTATETYPE> { callState };
         var callRecordFound = await GetCall(callState.CallId);
@@ -50,7 +50,7 @@ public class SqlCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHis
         else
         {
             _logger.LogInformation($"Creating new call history for call {callState.CallId}");
-            var callHistoryRecordNew = new CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState)
+            var callHistoryRecordNew = new CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE>(callState)
             {
                 NotificationsHistory = newHistoryArray,
                 StateHistory = newCallStateList,
@@ -62,12 +62,12 @@ public class SqlCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHis
         }
     }
 
-    async Task<CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCall(string callId)
+    async Task<CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE>?> GetCall(string callId)
     {
         return await _context.CallsMade.Where(h => h.CallId == callId).SingleOrDefaultAsync();
     }
 
-    public async Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
+    public async Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?> GetCallHistory(CALLSTATETYPE callState)
     {
         if (callState?.CallId == null)
         {

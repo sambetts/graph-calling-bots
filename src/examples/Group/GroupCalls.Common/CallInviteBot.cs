@@ -15,7 +15,7 @@ public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiv
 {
     public const string TRANSFERING_PROMPT_ID = "transferingPrompt";
     public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
-        ICallHistoryManager<GroupCallInviteActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
+        ICallHistoryManager<GroupCallInviteActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
         : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector) { }
 
     /// <summary>

@@ -18,14 +18,14 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
     protected readonly ILogger _logger;
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
-    private readonly ICallHistoryManager<CALLSTATETYPE, CallNotification> _callHistoryManager;
+    private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
     private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
     public string BotTypeName => GetType().Name;
 
     public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
-        ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger)
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;

@@ -95,7 +95,7 @@ public class BotNotificationsHandlerTests : BaseTests
     }
 
     internal static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> _callStateManager,
-        ICallHistoryManager<BaseActiveCallState, CallNotification> historyManager)
+        ICallHistoryManager<BaseActiveCallState> historyManager)
     {
         var callEstablishingCount = 0;
         var callConnectedCount = 0;

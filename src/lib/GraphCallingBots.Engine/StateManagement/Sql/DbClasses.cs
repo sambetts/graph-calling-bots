@@ -2,15 +2,15 @@
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement.Sql;
 
 /// <summary>
 /// SQL Server Entity Framework Core entry for call history
 /// </summary>
-public class CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE, HISTORYPAYLOADTYPE> : CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+public class CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE> : CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
     public CallStateAndNotificationsHistoryEntitySqlEntry() : this(null) { }
     public CallStateAndNotificationsHistoryEntitySqlEntry(CALLSTATETYPE? callState)
@@ -25,9 +25,9 @@ public class CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE, HISTO
     public string NotificationsHistoryJson { get; set; } = null!;
 
     [NotMapped]
-    public override List<NotificationHistory<HISTORYPAYLOADTYPE>> NotificationsHistory
+    public override List<NotificationHistory> NotificationsHistory
     {
-        get => GetListFromJson<NotificationHistory<HISTORYPAYLOADTYPE>>(NotificationsHistoryJson);
+        get => GetListFromJson<NotificationHistory>(NotificationsHistoryJson);
         set => NotificationsHistoryJson = JsonConvert.SerializeObject(value);
     }
 
@@ -40,7 +40,7 @@ public class CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE, HISTO
         set => StateHistoryJson = JsonConvert.SerializeObject(value);
     }
 
-    static List<T> GetListFromJson<T>(string json) where T : class
+    static List<T> GetListFromJson<T>(string json) 
     {
         var empty = new List<T>();
         try

@@ -1,4 +1,5 @@
 ﻿using GraphCallingBots.Models;
+using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement;
 
@@ -27,12 +28,11 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
 /// <summary>
 /// Manages saving the history of calls made by the bot in Graph. Used for debugging normally.
 /// </summary>
-public interface ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : IAsyncInit
+public interface ICallHistoryManager<CALLSTATETYPE> : IAsyncInit
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
-    Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload);
-    Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState);
+    Task AddToCallHistory(CALLSTATETYPE callState, JsonElement graphNotificationPayload);
+    Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?> GetCallHistory(CALLSTATETYPE callState);
 
     Task DeleteCallHistory(CALLSTATETYPE callState);
 }
