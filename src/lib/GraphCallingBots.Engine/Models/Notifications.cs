@@ -11,6 +11,10 @@ public class CommsNotificationsPayload
 {
     [JsonPropertyName("value")]
     public List<CallNotification> CommsNotifications { get; set; } = new();
+
+    [JsonExtensionData]
+    [NotMapped]
+    public Dictionary<string, object> AdditionalData { get; set; } = new();
 }
 
 public class CallNotification

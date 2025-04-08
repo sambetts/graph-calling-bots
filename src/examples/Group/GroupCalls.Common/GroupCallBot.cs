@@ -14,7 +14,7 @@ namespace GroupCalls.Common;
 public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
 {
     public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager,
-        ICallHistoryManager<BaseActiveCallState, CallNotification> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
+        ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
         : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector) { }
 
     /// <summary>

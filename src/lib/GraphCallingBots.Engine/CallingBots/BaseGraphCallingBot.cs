@@ -23,7 +23,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     private readonly BotCallRedirector _botCallRedirector;
 
     public BaseGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
-        ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
         : base(botConfig, callStateManager, callHistoryManager, logger)
     {
         var clientSecretCredential = new ClientSecretCredential(_botConfig.TenantId, _botConfig.AppId, _botConfig.AppSecret);

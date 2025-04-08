@@ -1,6 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement;
 
@@ -15,9 +16,8 @@ public abstract class StatsCosmosDoc
 /// <summary>
 /// Class to encapsulate CallHistoryEntity<T> in a Cosmos DB way. 
 /// </summary>
-public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosmosDoc
+public class CallHistoryCosmosDoc<CALLSTATETYPE> : StatsCosmosDoc
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
     public CallHistoryCosmosDoc() : this(null) { }
     public CallHistoryCosmosDoc(CALLSTATETYPE? callState)
@@ -27,7 +27,7 @@ public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosm
     }
 
     public string CallId { get; set; }
-    public CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE> CallHistory { get; set; } = null!;
+    public CallStateAndNotificationsHistoryEntity<CALLSTATETYPE> CallHistory { get; set; } = null!;
 
     public override string id { get => CallId; set => CallId = value; }
 
@@ -35,20 +35,19 @@ public class CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE> : StatsCosm
 }
 
 
-public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+public class CosmosCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
     private bool _initialised = false;
-    private static string PARTITION_KEY = "/" + nameof(CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>.CallId);
+    private static string PARTITION_KEY = "/" + nameof(CallHistoryCosmosDoc<CALLSTATETYPE>.CallId);
     private readonly Container _historyContainer;
     private readonly CosmosClient _cosmosClient;
     private readonly ICosmosConfig _cosmosConfig;
-    private readonly ILogger<CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>> _logger;
+    private readonly ILogger<CosmosCallHistoryManager<CALLSTATETYPE>> _logger;
 
     public bool Initialised => _initialised;
 
-    public CosmosCallHistoryManager(CosmosClient cosmosClient, ICosmosConfig cosmosConfig, ILogger<CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE>> logger)
+    public CosmosCallHistoryManager(CosmosClient cosmosClient, ICosmosConfig cosmosConfig, ILogger<CosmosCallHistoryManager<CALLSTATETYPE>> logger)
     {
         _historyContainer = cosmosClient.GetContainer(cosmosConfig.DatabaseName, cosmosConfig.ContainerName);
         _cosmosClient = cosmosClient;
@@ -56,18 +55,18 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
         _logger = logger;
     }
 
-    public async Task AddToCallHistory(CALLSTATETYPE callState, HISTORYPAYLOADTYPE graphNotificationPayload)
+    public async Task AddToCallHistory(CALLSTATETYPE callState, JsonElement graphNotificationPayload)
     {
-        var newHistoryArray = new List<NotificationHistory<HISTORYPAYLOADTYPE>> { new NotificationHistory<HISTORYPAYLOADTYPE>
+        var newHistoryArray = new List<NotificationHistory> { new NotificationHistory
         {
-            Payload = graphNotificationPayload, Timestamp = DateTime.Now }
+            Payload = graphNotificationPayload.ToString(), Timestamp = DateTime.Now }
         };
         var newCallStateList = new List<CALLSTATETYPE> { callState };
         var callHistoryRecordFound = await GetCallHistory(callState);
         if (callHistoryRecordFound != null)
         {
             _logger.LogInformation($"Adding to existing call history for call {callState.CallId}");
-            var callHistoryRecordExistingReplacement = new CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState);
+            var callHistoryRecordExistingReplacement = new CallHistoryCosmosDoc<CALLSTATETYPE>(callState);
 
             if (callHistoryRecordFound.StateHistory.Count > 0 && !callHistoryRecordFound.StateHistory.Last().Equals(callState))
             {
@@ -81,8 +80,8 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
         else
         {
             _logger.LogInformation($"Creating new call history for call {callState.CallId}");
-            var callHistoryRecordNew = new CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>(callState);
-            callHistoryRecordNew.CallHistory = new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>
+            var callHistoryRecordNew = new CallHistoryCosmosDoc<CALLSTATETYPE>(callState);
+            callHistoryRecordNew.CallHistory = new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>
             {
                 NotificationsHistory = newHistoryArray,
                 StateHistory = newCallStateList,
@@ -93,12 +92,12 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
         }
     }
 
-    public async Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>?> GetCallHistory(CALLSTATETYPE callState)
+    public async Task<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>?> GetCallHistory(CALLSTATETYPE callState)
     {
-        CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>? r = null;
+        CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>? r = null;
         try
         {
-            var result = await _historyContainer.ReadItemAsync<CallHistoryCosmosDoc<CALLSTATETYPE, HISTORYPAYLOADTYPE>>(callState.CallId, new PartitionKey(callState.CallId));
+            var result = await _historyContainer.ReadItemAsync<CallHistoryCosmosDoc<CALLSTATETYPE>>(callState.CallId, new PartitionKey(callState.CallId));
             if (result != null && result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 r = result.Resource.CallHistory;
@@ -114,7 +113,7 @@ public class CosmosCallHistoryManager<CALLSTATETYPE, HISTORYPAYLOADTYPE> : ICall
 
     public async Task DeleteCallHistory(CALLSTATETYPE callState)
     {
-        await _historyContainer.DeleteItemAsync<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE, HISTORYPAYLOADTYPE>>(callState.CallId, new PartitionKey(callState.CallId));
+        await _historyContainer.DeleteItemAsync<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>>(callState.CallId, new PartitionKey(callState.CallId));
     }
 
     public async Task Initialise()

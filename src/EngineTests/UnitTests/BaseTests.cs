@@ -9,7 +9,7 @@ namespace GraphCallingBots.UnitTests;
 public class BaseTests
 {
     protected SlowInMemoryCallStateManager<BaseActiveCallState> _callStateManager = new SlowInMemoryCallStateManager<BaseActiveCallState>();
-    protected ConcurrentInMemoryCallHistoryManager<BaseActiveCallState, CallNotification> _historyManager = new ConcurrentInMemoryCallHistoryManager<BaseActiveCallState, CallNotification>();
+    protected ConcurrentInMemoryCallHistoryManager<BaseActiveCallState> _historyManager = new ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>();
     protected ILogger _logger;
     protected UnitTestConfig _config;
 

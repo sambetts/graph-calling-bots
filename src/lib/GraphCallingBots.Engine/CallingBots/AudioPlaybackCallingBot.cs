@@ -10,7 +10,7 @@ namespace GraphCallingBots.CallingBots;
 public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseGraphCallingBot<T> where T : BaseActiveCallState, new()
 {
     public const string DEFAULT_PROMPT_ID = "defaultPrompt";
-    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T, CallNotification> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
+    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
         : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector)
     {
     }

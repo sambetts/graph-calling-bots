@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore;
 namespace GraphCallingBots.StateManagement.Sql;
 
 
-public class CallHistorySqlContext<CALLSTATETYPE, HISTORYPAYLOADTYPE> : DbContext
+public class CallHistorySqlContext<CALLSTATETYPE> : DbContext
     where CALLSTATETYPE : BaseActiveCallState
-    where HISTORYPAYLOADTYPE : class
 {
-    public DbSet<CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE, HISTORYPAYLOADTYPE>> CallsMade { get; set; }
+    public DbSet<CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE>> CallsMade { get; set; }
 
-    public CallHistorySqlContext(DbContextOptions<CallHistorySqlContext<CALLSTATETYPE, HISTORYPAYLOADTYPE>> options) : base(options)
+    public CallHistorySqlContext(DbContextOptions<CallHistorySqlContext<CALLSTATETYPE>> options) : base(options)
     {
     }
 }

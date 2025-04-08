@@ -3,6 +3,7 @@ using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
+using System.Text.Json;
 
 namespace GraphCallingBots;
 
@@ -10,7 +11,7 @@ namespace GraphCallingBots;
 /// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
 public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATETYPE> callStateManager,
-    ICallHistoryManager<CALLSTATETYPE, CallNotification> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
+    ICallHistoryManager<CALLSTATETYPE> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
@@ -89,7 +90,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
             // Update history even if no state changes
             if (callState != null)
             {
-                await callHistoryManager.AddToCallHistory(callState, callnotification);
+                await callHistoryManager.AddToCallHistory(callState, JsonDocument.Parse(JsonSerializer.Serialize(callnotification)).RootElement);
             }
         }
 
