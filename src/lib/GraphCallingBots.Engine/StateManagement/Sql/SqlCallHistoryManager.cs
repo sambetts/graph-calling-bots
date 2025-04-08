@@ -32,7 +32,7 @@ public class SqlCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTAT
             Payload = graphNotificationPayload.ToString(), Timestamp = DateTime.Now }
         };
         var newCallStateList = new List<CALLSTATETYPE> { callState };
-        var callRecordFound = await GetCall(callState.CallId);
+        var callRecordFound = await GetCallFromContext(callState.CallId);
         if (callRecordFound != null)
         {
             _logger.LogInformation($"Adding to existing call history for call {callState.CallId}");
@@ -62,7 +62,7 @@ public class SqlCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTAT
         }
     }
 
-    async Task<CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE>?> GetCall(string callId)
+    async Task<CallStateAndNotificationsHistoryEntitySqlEntry<CALLSTATETYPE>?> GetCallFromContext(string callId)
     {
         return await _context.CallsMade.Where(h => h.CallId == callId).SingleOrDefaultAsync();
     }
@@ -74,7 +74,7 @@ public class SqlCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTAT
             throw new ArgumentNullException(nameof(callState.CallId));
         }
 
-        var result = await GetCall(callState.CallId);
+        var result = await GetCallFromContext(callState.CallId);
         return result;
     }
 
@@ -84,7 +84,7 @@ public class SqlCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTAT
         {
             throw new ArgumentNullException(nameof(callState.CallId));
         }
-        var call = await GetCall(callState.CallId);
+        var call = await GetCallFromContext(callState.CallId);
         if (call != null)
         {
             _context.CallsMade.Remove(call);
