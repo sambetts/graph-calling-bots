@@ -79,3 +79,10 @@
 /src/lib/GraphCallingBots.Engine/obj
 /src/lib/GraphCallingBots.Engine.Engine/obj
 /src/lib/GraphCallingBots.Engine/bin/Debug
+/src/examples/Group/ChatBotWithCalling/Solution/GroupCallingChatBot.Web/bin/Release/net8.0
+/src/examples/Group/GroupCalls.Common/bin/Release/net8.0
+/src/examples/P2P/P2pPstnBot/PstnBot.Web/bin/Release/net8.0/runtimes
+/src/examples/P2P/P2pPstnBot/PstnBot.Web/bin/Release/net8.0
+/src/examples/P2P/P2pPstnBot/PstnBot.Shared/bin/Release/net8.0
+/src/lib/GraphCallingBots.Engine/bin/Release/net8.0
+/src/lib/GraphCallingBots.Engine/bin/Release
