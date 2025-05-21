@@ -133,6 +133,13 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                 // Something went wrong with the request
                 return SendBadRequest(req);
             }
+            catch (Exception ex)
+            {
+                logger.LogError($"Failed to start group call: {ex}");
+                var response = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await response.WriteAsJsonAsync(ex.ToString());
+                return response;
+            }
 
             if (groupCall == null)
             {

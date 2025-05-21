@@ -99,6 +99,7 @@ I had problems with it so resorted to my own setup methodology, but “your mile
 Note, that for all these steps you can do them all in PowerShell if you wish. I’m not a sysadmin so this is what works best for me. 
 
 1. Go to: https://dev.teams.microsoft.com/ and create a new app.
+    * Important: you must use an app registration this is also a registerd bot in Teams. 
 2. In app features, add a new bot. You can reuse a previously created bot or create a new one.
 3. Find the client-id in Azure portal.
 4. Create or get a previous client secret for the bot app registration.
@@ -127,6 +128,10 @@ Grant-CsApplicationAccessPolicy -PolicyName CallingPolicyDev -Identity "$userObj
 ```
 
 Replace '$botAppId' and '$userObjectId' with your own values. 
+
+## Configure application access policy
+You need to allow the bot to make calls. Follow [this guide](https://learn.microsoft.com/en-us/graph/cloud-communication-online-meeting-application-access-policy#configure-application-access-policy) 
+to create an application access policy for your bot application. 
 
 ## Optional: Setup PSTN Calling
 If you need PSTN calling, here are the extra steps. 
