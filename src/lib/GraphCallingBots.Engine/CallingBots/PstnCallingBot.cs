@@ -12,8 +12,8 @@ namespace GraphCallingBots.CallingBots;
 public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPstnCallingBot where T : BaseActiveCallState, new()
 {
     protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager,
-        ILogger logger, BotCallRedirector botCallRedirector)
-        : base(botConfig, callStateManager, callHistoryManager, logger, botCallRedirector)
+        ILogger logger)
+        : base(botConfig, callStateManager, callHistoryManager, logger)
     {
     }
 

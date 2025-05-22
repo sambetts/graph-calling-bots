@@ -14,8 +14,8 @@ namespace GroupCalls.Common;
 public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
 {
     public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager,
-        ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger, BotCallRedirector botCallRedirector)
-        : base(botOptions, callStateManager, callHistoryManager, logger, botCallRedirector) { }
+        ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
+        : base(botOptions, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
     /// Create group call so invitees can join if they accept their individual invite calls.

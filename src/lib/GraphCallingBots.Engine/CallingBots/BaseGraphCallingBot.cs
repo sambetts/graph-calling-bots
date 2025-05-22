@@ -15,22 +15,20 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// Bot that uses Graph API for calling. Contains common methods for calling Graph API.
 /// </summary>
-public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE>, IGraphCallingBot, ICommsNotificationsPayloadHandler
+public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE>, IGraphCallingBot
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     protected readonly GraphServiceClient _graphServiceClient;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
-    private readonly BotCallRedirector _botCallRedirector;
 
     public BaseGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
-        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
         : base(botConfig, callStateManager, callHistoryManager, logger)
     {
         var clientSecretCredential = new ClientSecretCredential(_botConfig.TenantId, _botConfig.AppId, _botConfig.AppSecret);
 
         _graphServiceClient = new GraphServiceClient(clientSecretCredential, ["https://graph.microsoft.com/.default"]);
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
-        _botCallRedirector = botCallRedirector;
     }
 
 
@@ -154,7 +152,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
             if (callCreated?.Id != null)
             {
                 _logger.LogInformation($"{BotTypeName}: Call {callCreated.Id} created");
-                _botCallRedirector.AddCall(callCreated.Id, this);
+                await _callStateManager.AddCall(callCreated.Id, this);
             }
             else
             {

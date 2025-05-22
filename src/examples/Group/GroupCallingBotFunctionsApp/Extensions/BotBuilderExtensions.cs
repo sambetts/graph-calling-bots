@@ -15,7 +15,6 @@ public static class BotBuilderExtensions
     internal static IServiceCollection AddCallingBot(this IServiceCollection services, FunctionsAppCallingBotConfig config)
     {
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
-        services.AddSingleton<BotCallRedirector>();
         services.AddSingleton<GroupCallOrchestrator>();
 
         // Use in-memory storage is no storage is configured
@@ -28,8 +27,7 @@ public static class BotBuilderExtensions
         }
         else
         {
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
-            services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallInviteActiveCallState>>();
+            throw new ArgumentException("Persistent call state manager is required for function apps, but no storage is configured.");
         }
 
         // Prefer SQL storage if configured, then CosmosDb, otherwise use in-memory storage

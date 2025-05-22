@@ -83,4 +83,14 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
             return Task.FromResult(_callStates.Select(s => s.Value).ToList());
         }
     }
+
+    public Task<ICommsNotificationsPayloadHandler?> GetBotByCallId(string callId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddCall(string callId, ICommsNotificationsPayloadHandler baseStatelessGraphCallingBot)
+    {
+        throw new NotImplementedException();
+    }
 }

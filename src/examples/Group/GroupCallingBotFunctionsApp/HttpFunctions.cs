@@ -16,8 +16,7 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator callOrchestrator,
-    ICallStateManager<BaseActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
+public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator callOrchestrator, ICallStateManager<BaseActiveCallState> callStateManager)
 {
 
     /// <summary>
@@ -36,7 +35,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                 var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
                 if (callId != null)
                 {
-                    var bot = botCallRedirector.GetBotByCallId(callId);
+                    var bot = await callStateManager.GetBotByCallId(callId);
                     if (bot != null)        // Logging for negative handled in GetBotByCallId
                     {
                         try
@@ -45,6 +44,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                         }
                         catch (Exception ex)
                         {
+                            logger.LogError($"Error handling notifications: {ex.Message}");
                             var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
                             exResponse.WriteString(ex.ToString());
                             return exResponse;

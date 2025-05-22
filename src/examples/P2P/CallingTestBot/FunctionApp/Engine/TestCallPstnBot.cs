@@ -21,8 +21,8 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     /// Initializes a new instance of the <see cref="TestCallPstnBot" /> class.
     /// </summary>
     public TestCallPstnBot(SingleWavFileBotConfig botOptions, CallingTestBotConfig callingTestBotConfig, ILogger<TestCallPstnBot> logger,
-        ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, IBotTestsLogger botTestsLogger, ILogger<BotCallRedirector> botCallRedirectorLogger)
-        : base(botOptions, callStateManager, callHistoryManager, logger, new BotCallRedirector(botCallRedirectorLogger))
+        ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, IBotTestsLogger botTestsLogger)
+        : base(botOptions, callStateManager, callHistoryManager, logger)
     {
         _callingTestBotConfig = callingTestBotConfig;
         _botTestsLogger = botTestsLogger;

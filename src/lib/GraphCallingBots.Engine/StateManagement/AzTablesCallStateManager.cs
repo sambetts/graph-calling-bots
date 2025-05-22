@@ -7,7 +7,7 @@ namespace GraphCallingBots.StateManagement;
 /// <summary>
 /// Azure tables implementation of ICallStateManager
 /// </summary>
-public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICallStateManager<T> where T : BaseActiveCallState
+public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, ICallStateManager<T> where T : BaseActiveCallState
 {
     public override string TableName => "CallState";
 
@@ -82,5 +82,15 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
             }
         }
         return list;
+    }
+
+    public Task<ICommsNotificationsPayloadHandler?> GetBotByCallId(string callId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddCall(string callId, ICommsNotificationsPayloadHandler baseStatelessGraphCallingBot)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -35,18 +35,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
 
-        // Create a callback handler for notifications. Do so on each request as no state is held.
-        var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
-        {
-            CallEstablishing = CallEstablishing,
-            CallEstablished = CallEstablished,
-            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
-            NewTonePressed = NewTonePressed,
-            CallTerminated = CallTerminated,
-            PlayPromptFinished = PlayPromptFinished,
-            UsersJoinedGroupCall = UsersJoinedGroupCall
-        };
-        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, _callHistoryManager, callBacks, _logger);
+        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>();
     }
 
     /// <summary>
@@ -141,7 +130,18 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, this.GetType().Name);
+        // Create a callback handler for notifications. Do so on each request as no state is held.
+        var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
+        {
+            CallEstablishing = CallEstablishing,
+            CallEstablished = CallEstablished,
+            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
+            NewTonePressed = NewTonePressed,
+            CallTerminated = CallTerminated,
+            PlayPromptFinished = PlayPromptFinished,
+            UsersJoinedGroupCall = UsersJoinedGroupCall
+        };
+        await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(notifications, this.GetType().Name, _callStateManager, _callHistoryManager, callBacks, _logger);
     }
 
     #region Bot Events

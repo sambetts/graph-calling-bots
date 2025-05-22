@@ -10,16 +10,15 @@ namespace GraphCallingBots;
 /// <summary>
 /// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
-public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATETYPE> callStateManager,
-    ICallHistoryManager<CALLSTATETYPE> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
-    where CALLSTATETYPE : BaseActiveCallState, new()
+public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : BaseActiveCallState, new()
 {
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName)
+    public static async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName, ICallStateManager<CALLSTATETYPE> callStateManager,
+    ICallHistoryManager<CALLSTATETYPE> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
     {
         if (notificationPayload == null) return;
 
@@ -35,7 +34,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
-            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification, botTypeName);
+            updateCallState = await HandleCallChangeTypeUpdate(callStateManager, callbackInfo, callState, callnotification, botTypeName, logger);
 
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
@@ -45,7 +44,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                 {
                     // Is this notification for a tone on a call we're tracking?
                     updateCallState = true;
-                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState, botTypeName);
+                    await HandleToneNotificationAsync(callbackInfo, callnotification.AssociatedCall.ToneInfo, callState, botTypeName, logger);
                 }
                 else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
                 {
@@ -97,7 +96,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
         _semaphore.Release();
     }
 
-    private async Task<bool> HandleCallChangeTypeUpdate(CALLSTATETYPE? callState, CallNotification callNotification, string botType)
+    private static async Task<bool> HandleCallChangeTypeUpdate(ICallStateManager<CALLSTATETYPE> callStateManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, CALLSTATETYPE? callState, CallNotification callNotification, string botType, ILogger logger)
     {
         // Not seen this call before. Is this notification for a new call?
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
@@ -189,7 +188,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
         return false;
     }
 
-    async Task HandleToneNotificationAsync(ToneInfo toneInfo, CALLSTATETYPE callState, string botType)
+    static async Task HandleToneNotificationAsync(NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ToneInfo toneInfo, CALLSTATETYPE callState, string botType, ILogger logger)
     {
         if (toneInfo.Tone != null)
         {
