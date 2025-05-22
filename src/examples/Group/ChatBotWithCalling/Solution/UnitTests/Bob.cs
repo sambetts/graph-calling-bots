@@ -21,7 +21,7 @@ public class Bob
 
 
     [TestMethod]
-    public async Task SerialiseBot()
+    public void SerialiseBot()
     {
         var bot = new GroupCallBot(new GraphCallingBots.Models.RemoteMediaCallingBotConfiguration(),
             new ConcurrentInMemoryCallStateManager<BaseActiveCallState>(),
