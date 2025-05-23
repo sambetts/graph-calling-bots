@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 namespace GroupCallingBot.FunctionApp;
 
 
-internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
+public class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 {
     public FunctionsAppCallingBotConfig(IConfiguration config) : base(config) { }
 

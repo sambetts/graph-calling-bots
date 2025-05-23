@@ -1,5 +1,4 @@
-﻿using GraphCallingBots;
-using GraphCallingBots.CallingBots;
+﻿using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
@@ -13,8 +12,7 @@ namespace GroupCalls.Common;
 /// </summary>
 public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
 {
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager,
-        ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
         : base(botOptions, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
@@ -33,7 +31,7 @@ public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
         // Create call request for group call with no media and nobody to call yet. Callers will be added later.
         var groupCallReq = await CreateCallRequest(null, meetingRequest.HasPSTN);
 
-        // Configure meeeting for the group call - either create a new one or use an existing one
+        // Configure meeting for the group call - either create a new one or use an existing one
         var joinUrl = meetingRequest.JoinMeetingInfo?.JoinUrl;
         if (joinUrl == null)
         {

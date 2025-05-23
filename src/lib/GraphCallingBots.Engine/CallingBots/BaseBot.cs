@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Client.Authentication;
 using Microsoft.Graph.Models;
+using System.Text.Json;
 
 namespace GraphCallingBots.CallingBots;
 
@@ -20,12 +21,10 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
     private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
-    private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
-
+    
     public string BotTypeName => GetType().Name;
 
-    public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
-        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
+    public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
@@ -35,7 +34,6 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
 
-        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>();
     }
 
     /// <summary>
@@ -142,6 +140,28 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             UsersJoinedGroupCall = UsersJoinedGroupCall
         };
         await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(notifications, this.GetType().Name, _callStateManager, _callHistoryManager, callBacks, _logger);
+    }
+
+    public static BOTTYPE HydrateBot<BOTTYPE, CALLSTATE>(
+        RemoteMediaCallingBotConfiguration botConfig,
+        ICallStateManager<CALLSTATETYPE> callStateManager,
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
+        ILogger<BOTTYPE> logger)
+        where BOTTYPE : BaseBot<CALLSTATE>
+        where CALLSTATE : BaseActiveCallState, new()
+    {
+        // Use Activator.CreateInstance with parameters and handle potential null return
+        var instance = Activator.CreateInstance(
+            typeof(BOTTYPE),
+            botConfig, callStateManager, callHistoryManager, logger
+        );
+
+        if (instance is null)
+        {
+            throw new InvalidOperationException($"Failed to create an instance of type {typeof(BOTTYPE).FullName}");
+        }
+
+        return (BOTTYPE)instance;
     }
 
     #region Bot Events
