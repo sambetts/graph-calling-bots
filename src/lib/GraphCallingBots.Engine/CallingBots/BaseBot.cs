@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Client.Authentication;
 using Microsoft.Graph.Models;
-using System.Text.Json;
 
 namespace GraphCallingBots.CallingBots;
 
