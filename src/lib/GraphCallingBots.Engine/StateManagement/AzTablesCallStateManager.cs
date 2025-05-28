@@ -21,7 +21,6 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
 
         var entity = new CallStateEntity<T>(callState);
         var r = await _tableClient!.UpsertEntityAsync(entity);
-
     }
 
     public async Task<T?> GetByNotificationResourceUrl(string resourceUrl)
@@ -84,13 +83,14 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
         return list;
     }
 
-    public Task<ICommsNotificationsPayloadHandler?> GetBotByCallId(string callId)
+    public async Task<string?> GetBotTypeNameByCallId(string callId)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task AddCall(string callId, ICommsNotificationsPayloadHandler baseStatelessGraphCallingBot)
-    {
-        throw new NotImplementedException();
+        InitCheck();
+        var results = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.RowKey == callId);
+        await foreach (var result in results)
+        {
+            return result.State?.BotClassNameFull;
+        }
+        return null;
     }
 }

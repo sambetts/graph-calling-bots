@@ -1,4 +1,5 @@
 ﻿using GraphCallingBots;
+using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace GroupCallingChatBot.Web.Controllers;
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.
 /// </summary>
-public class PlatformCallController(ICallStateManager<BaseActiveCallState> callStateManager, ILogger<PlatformCallController> logger) : ControllerBase
+public class PlatformCallController(BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState> callRedirector, ILogger<PlatformCallController> logger) : ControllerBase
 {
 
     /// <summary>
@@ -33,7 +34,7 @@ public class PlatformCallController(ICallStateManager<BaseActiveCallState> callS
                 if (callId != null)
                 {
 
-                    var bot = await callStateManager.GetBotByCallId(callId);
+                    var bot = await callRedirector.GetBotByCallId(callId);
                     if (bot != null)        // Logging for negative handled in GetBotByCallId
                     {
                         var validRequest = await bot.ValidateNotificationRequestAsync(Request);

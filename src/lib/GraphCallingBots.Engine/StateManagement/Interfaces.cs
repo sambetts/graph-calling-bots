@@ -25,7 +25,6 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
     Task<List<T>> GetActiveCalls();
 
     Task<string?> GetBotTypeNameByCallId(string callId);
-    Task AddCall(string callId, string botTypeName);
 }
 
 /// <summary>

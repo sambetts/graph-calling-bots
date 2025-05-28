@@ -2,7 +2,6 @@
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
 namespace GraphCallingBots;
 
@@ -26,20 +25,23 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(RemoteMediaCallingBotConf
             return _botMemCache[callId];
         }
 
-        var typeName = await callStateManager.GetBotTypeNameByCallId(callId);
-        if (typeName == null) {
+        var typeNameForCallId = await callStateManager.GetBotTypeNameByCallId(callId);
+        if (typeNameForCallId == null) {
             logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No bot found for call {callId} - was this call created before?");
             return null;
         }
 
+        var bot = BaseBot<CALLSTATETYPE>.HydrateBot<BOTTYPE, CALLSTATETYPE>(config, callStateManager, callHistoryManager, logger);
+
+
         // Compare type names to ensure the correct bot type is used
-        if (typeName != typeof(BOTTYPE).FullName)
+        if (typeNameForCallId != bot.BotTypeName)
         {
-            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - Call {callId} is not handled by {typeof(BOTTYPE).FullName}, but by {typeName}");
+            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - Call {callId} is not handled by {typeof(BOTTYPE).FullName}, but by {typeNameForCallId}");
             return null;
         }
 
-        var bot = BaseBot<CALLSTATETYPE>.HydrateBot<BOTTYPE, CALLSTATETYPE>(config, callStateManager, callHistoryManager, logger);
+
         if (bot != null)
         {
             _botMemCache.Add(callId, bot);
@@ -48,17 +50,14 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(RemoteMediaCallingBotConf
         return bot;
     }
 
-    internal async Task AddCall(string callId, BOTTYPE baseStatelessGraphCallingBot)
+    public async Task RegisterBotForCall(string callId, BaseBot<CALLSTATETYPE> bot)
     {
-        if (!_botMemCache.ContainsKey(callId))
+        // Associate the call with this bot type in the call state manager
+        var initialState = new CALLSTATETYPE
         {
-            _botMemCache.Add(callId, baseStatelessGraphCallingBot);
-            await callStateManager.AddCall(callId, baseStatelessGraphCallingBot.GetType().FullName ?? throw new Exception("No type name for bot"));
-            logger.LogInformation($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - Added call {callId} to bot redirector");
-        }
-        else
-        {
-            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - Call {callId} already exists in bot redirector");
-        }
+            ResourceUrl = BaseActiveCallState.GetResourceUrlFromCallId(callId),
+            BotClassNameFull = bot.BotTypeName
+        };
+        await callStateManager.AddCallStateOrUpdate(initialState);
     }
 }

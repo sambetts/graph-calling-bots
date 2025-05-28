@@ -9,11 +9,11 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// A bot that calls you over the phone.
 /// </summary>
-public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPstnCallingBot where T : BaseActiveCallState, new()
+public abstract class PstnCallingBot<CALLSTATETYPE> : AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE>, IPstnCallingBot where CALLSTATETYPE : BaseActiveCallState, new()
 {
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager,
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, BotCallRedirector<BaseGraphCallingBot<CALLSTATETYPE>, CALLSTATETYPE> botCallRedirector, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
         ILogger logger)
-        : base(botConfig, callStateManager, callHistoryManager, logger)
+        : base(botConfig, botCallRedirector, callStateManager, callHistoryManager, logger)
     {
     }
 

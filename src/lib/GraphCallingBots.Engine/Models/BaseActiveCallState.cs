@@ -8,6 +8,10 @@ namespace GraphCallingBots.Models;
 /// </summary>
 public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 {
+    /// <summary>
+    /// Name of the bot class that is handling this call.
+    /// </summary>
+    public string BotClassNameFull { get; set; } = string.Empty;
     public string ResourceUrl { get; set; } = null!;
 
     public CallMediaState? MediaState { get; set; } = null;
@@ -27,6 +31,16 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
         if (parts.Length < 3) return null;
         if (parts[0].ToLower() != "communications" || parts[1].ToLower() != "calls") return null;
         return parts[2];
+    }
+
+    /// <summary>
+    /// Normally the data we get is a resource URL like "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9" so most call ID parsing is done on that. 
+    /// But sometimes we just have the call ID directly without a resource URL, so we fake it here.
+    /// </summary>
+    public static string GetResourceUrlFromCallId(string callId)
+    {
+        if (string.IsNullOrEmpty(callId)) throw new ArgumentNullException(nameof(callId));
+        return $"/communications/calls/{callId}";
     }
 
     public void PopulateFromCallNotification(CallNotification fromNotification)

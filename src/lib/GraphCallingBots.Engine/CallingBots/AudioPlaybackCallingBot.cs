@@ -7,15 +7,20 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// A bot that plays service-hosted audio and responds to DTMF input (dial-tones). Can be used for Teams calls or PSTN calls.
 /// </summary>
-public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseGraphCallingBot<T> where T : BaseActiveCallState, new()
+public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE> : BaseGraphCallingBot<CALLSTATETYPE> where CALLSTATETYPE : BaseActiveCallState, new()
 {
     public const string DEFAULT_PROMPT_ID = "defaultPrompt";
-    protected AudioPlaybackAndDTMFCallingBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager, ILogger logger)
-        : base(botOptions, callStateManager, callHistoryManager, logger)
+    protected AudioPlaybackAndDTMFCallingBot(
+        RemoteMediaCallingBotConfiguration botOptions, 
+        BotCallRedirector<BaseGraphCallingBot<CALLSTATETYPE>, CALLSTATETYPE> botCallRedirector, 
+        ICallStateManager<CALLSTATETYPE> callStateManager, 
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
+        ILogger logger)
+        : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger)
     {
     }
 
-    protected override async Task CallConnectedWithP2PAudio(T callState)
+    protected override async Task CallConnectedWithP2PAudio(CALLSTATETYPE callState)
     {
         if (callState.CallId != null)
         {
@@ -30,7 +35,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot<T> : BaseGraphCallingBot<T>
         await base.CallConnectedWithP2PAudio(callState);
     }
 
-    protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(T callState, string wantedPromptId)
+    protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(CALLSTATETYPE callState, string wantedPromptId)
     {
         // Don't play media if already playing
         var alreadyPlaying = false;

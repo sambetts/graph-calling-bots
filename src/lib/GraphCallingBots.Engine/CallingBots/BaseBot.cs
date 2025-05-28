@@ -127,6 +127,9 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
     public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
+        // Ensure that GetType().FullName is not null before passing it to the method
+        var botTypeName = this.GetType().FullName ?? throw new InvalidOperationException("Bot type name cannot be null.");
+
         // Create a callback handler for notifications. Do so on each request as no state is held.
         var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
         {
@@ -138,7 +141,15 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             PlayPromptFinished = PlayPromptFinished,
             UsersJoinedGroupCall = UsersJoinedGroupCall
         };
-        await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(notifications, this.GetType().Name, _callStateManager, _callHistoryManager, callBacks, _logger);
+
+        await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(
+            notifications,
+            botTypeName,
+            _callStateManager,
+            _callHistoryManager,
+            callBacks,
+            _logger
+        );
     }
 
     public static BOTTYPE HydrateBot<BOTTYPE, CALLSTATE>(

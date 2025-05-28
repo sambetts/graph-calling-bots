@@ -29,7 +29,9 @@ public class Bob : AbstractTest
 
         var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
         var callHistoryManager = new ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>();
+        var callRedirector = new GraphCallingBots.BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState>(config, callStateManager, callHistoryManager, GetLogger<GroupCallBot>());   
         var bot = new GroupCallBot(config,
+            callRedirector,
             callStateManager,
             callHistoryManager,
             LoggerFactory.Create(config => { config.AddTraceSource(new System.Diagnostics.SourceSwitch("SourceSwitch")); config.AddConsole(); }).CreateLogger<GroupCallBot>());

@@ -96,7 +96,8 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
         _semaphore.Release();
     }
 
-    private static async Task<bool> HandleCallChangeTypeUpdate(ICallStateManager<CALLSTATETYPE> callStateManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, CALLSTATETYPE? callState, CallNotification callNotification, string botType, ILogger logger)
+    private static async Task<bool> HandleCallChangeTypeUpdate(ICallStateManager<CALLSTATETYPE> callStateManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, 
+        CALLSTATETYPE? callState, CallNotification callNotification, string botType, ILogger logger)
     {
         // Not seen this call before. Is this notification for a new call?
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)

@@ -1,5 +1,6 @@
 using CommonUtils;
 using GraphCallingBots;
+using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GroupCalls.Common;
@@ -16,7 +17,7 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator callOrchestrator, 
+public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator callOrchestrator,
     ICallStateManager<BaseActiveCallState> callStateManager,
     BotCallRedirector<GroupCallBot, BaseActiveCallState> botCallRedirectorGroupCall,
     BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState> botCallRedirectorCallInviteCall)
@@ -38,13 +39,13 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                 var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
                 if (callId != null)
                 {
-                    var bot = await botCallRedirectorGroupCall.GetBotByCallId(callId);
+                    var botGroupCall = await Ball(botCallRedirectorGroupCall, callId, notificationsPayload);
 
-                    if (bot != null)        // Logging for negative handled in GetBotByCallId
+                    if (botGroupCall != null)        // Logging for negative handled in GetBotByCallId
                     {
                         try
                         {
-                            await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                            await botGroupCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
                         }
                         catch (Exception ex)
                         {
@@ -54,7 +55,23 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                             return exResponse;
                         }
                     }
+                    else
+                    {
 
+                        var botInviteCall = await Ball(botCallRedirectorCallInviteCall, callId, notificationsPayload);
+                        if (botInviteCall != null)
+                            try
+                            {
+                                await botInviteCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogError($"Error handling notifications: {ex.Message}");
+                                var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+                                exResponse.WriteString(ex.ToString());
+                                return exResponse;
+                            }
+                    }
                 }
                 else
                 {
@@ -70,6 +87,20 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
             logger.LogError($"Unrecognized request body: {body}");
             return SendBadRequest(req);
         }
+    }
+
+    private async Task<BOTTYPE?> Ball<BOTTYPE, CALLSTATETYPE>(
+        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector, string callId, CommsNotificationsPayload notificationsPayload)
+        where BOTTYPE : BaseBot<CALLSTATETYPE>
+        where CALLSTATETYPE : BaseActiveCallState, new()
+    {
+        var bot = await botCallRedirector.GetBotByCallId(callId);
+        if (bot != null)
+        {
+            await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+        }
+
+        return bot;
     }
 
     /// <summary>

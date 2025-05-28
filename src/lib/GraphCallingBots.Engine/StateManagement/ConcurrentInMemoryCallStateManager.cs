@@ -4,7 +4,7 @@ namespace GraphCallingBots.StateManagement;
 
 public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where T : BaseActiveCallState
 {
-    private readonly Dictionary<string, T> _callStates = new();
+    private readonly Dictionary<string, T> _callStatesByCallId = new();
 
     public virtual Task AddCallStateOrUpdate(T callState)
     {
@@ -14,13 +14,13 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         }
         lock (this)
         {
-            if (_callStates.ContainsKey(callState.CallId))
+            if (_callStatesByCallId.ContainsKey(callState.CallId))
             {
-                _callStates[callState.CallId] = callState;
+                _callStatesByCallId[callState.CallId] = callState;
             }
             else
             {
-                _callStates.Add(callState.CallId, callState);
+                _callStatesByCallId.Add(callState.CallId, callState);
             }
         }
         return Task.CompletedTask;
@@ -30,11 +30,16 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
     {
         var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult<T?>(null);
+        return GetByCallId(callId);
+    }
+
+    public Task<T?> GetByCallId(string callId)
+    {
         lock (this)
         {
             T? callState = null;
 
-            _callStates.TryGetValue(callId, out callState);
+            _callStatesByCallId.TryGetValue(callId, out callState);
             return Task.FromResult(callState);
         }
     }
@@ -46,7 +51,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 
         lock (this)
         {
-            var r = _callStates.Remove(callId);
+            var r = _callStatesByCallId.Remove(callId);
             return Task.FromResult(r);
         }
     }
@@ -60,9 +65,9 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 
         lock (this)
         {
-            if (_callStates.ContainsKey(callState.CallId))
+            if (_callStatesByCallId.ContainsKey(callState.CallId))
             {
-                _callStates[callState.CallId] = callState;
+                _callStatesByCallId[callState.CallId] = callState;
             }
         }
         return Task.CompletedTask;
@@ -80,16 +85,18 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 
         lock (this)
         {
-            return Task.FromResult(_callStates.Select(s => s.Value).ToList());
+            return Task.FromResult(_callStatesByCallId.Select(s => s.Value).ToList());
         }
     }
 
-    public Task<ICommsNotificationsPayloadHandler?> GetBotByCallId(string callId)
+    public async Task<string?> GetBotTypeNameByCallId(string callId)
     {
-        throw new NotImplementedException();
+        var callState = await GetByCallId(callId);
+        if (callState == null) return null;
+        return callState.BotClassNameFull;
     }
 
-    public Task AddCall(string callId, ICommsNotificationsPayloadHandler baseStatelessGraphCallingBot)
+    public Task AddCall(string callId, string botTypeName)
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,5 @@
-﻿using GraphCallingBots.CallingBots;
+﻿using GraphCallingBots;
+using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
@@ -12,8 +13,8 @@ namespace GroupCalls.Common;
 /// </summary>
 public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
 {
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
-        : base(botOptions, callStateManager, callHistoryManager, logger) { }
+    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState> botCallRedirector, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
+        : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
     /// Create group call so invitees can join if they accept their individual invite calls.

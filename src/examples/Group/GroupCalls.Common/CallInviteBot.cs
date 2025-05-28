@@ -14,9 +14,9 @@ namespace GroupCalls.Common;
 public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiveCallState>
 {
     public const string TRANSFERING_PROMPT_ID = "transferingPrompt";
-    public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
+    public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, BotCallRedirector<BaseGraphCallingBot<GroupCallInviteActiveCallState>, GroupCallInviteActiveCallState> botCallRedirector, ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
         ICallHistoryManager<GroupCallInviteActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
-        : base(botOptions, callStateManager, callHistoryManager, logger) { }
+        : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
     /// Call someone and ask if they can join a group call.
