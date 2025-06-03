@@ -4,6 +4,7 @@ using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
+using System.Net;
 using System.Text.Json;
 
 namespace GroupCalls.Common;
@@ -38,12 +39,27 @@ public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
         {
             // Create a meeting for the group call as organizer. Requires the OnlineMeetings.ReadWrite.All permission.
             _logger.LogInformation($"No preconfigure meeting found in request for group call. Creating online meeting for group call for organiser '{meetingRequest.OrganizerUserId}'");
-            var groupCallMeeting = await _graphServiceClient.Users[meetingRequest.OrganizerUserId].OnlineMeetings.PostAsync(new OnlineMeeting
+
+            try
             {
-                StartDateTime = DateTimeOffset.UtcNow,
-                EndDateTime = DateTimeOffset.UtcNow.AddHours(1),
-            });
-            joinUrl = groupCallMeeting?.JoinWebUrl;
+                var groupCallMeeting = await _graphServiceClient.Users[meetingRequest.OrganizerUserId].OnlineMeetings.PostAsync(new OnlineMeeting
+                {
+                    StartDateTime = DateTimeOffset.UtcNow,
+                    EndDateTime = DateTimeOffset.UtcNow.AddHours(1),
+                });
+                joinUrl = groupCallMeeting?.JoinWebUrl;
+            }
+            catch (Microsoft.Graph.Models.ODataErrors.ODataError ex)
+            {
+                // Graph API returned an error
+                _logger.LogError($"Graph API error {ex.ResponseStatusCode} creating online meeting for group call for user {meetingRequest.OrganizerUserId}");
+                if (ex.ResponseStatusCode == 403)
+                {
+                    _logger.LogWarning($"Check if the bot has the OnlineMeetings.ReadWrite.All permission assigned in Azure AD");
+                }
+                throw new Exception("Failed to create online meeting for group call", ex);
+            }
+            
         }
         else
         {

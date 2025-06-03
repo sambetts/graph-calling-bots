@@ -39,7 +39,7 @@ public class GroupCallOrchestrator(GroupCallBot groupCallingBot, CallInviteBot c
         }
         else
         {
-            logger.LogError("Failed to start group call - empty return call from Graph");
+            logger.LogError("Failed to start group call - check previous errors");
             return null;
         }
     }

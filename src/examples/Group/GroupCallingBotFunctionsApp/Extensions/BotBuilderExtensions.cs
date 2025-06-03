@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using GraphCallingBots;
+using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GraphCallingBots.StateManagement.Sql;
@@ -58,6 +59,13 @@ public static class BotBuilderExtensions
         }
 
         services.AddSingleton<ICosmosConfig>(config);
+
+
+        services.AddSingleton<BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState>>();
+        services.AddSingleton<BotCallRedirector<GroupCallBot, BaseActiveCallState>>();
+        services.AddSingleton<BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState>>();
+        services.AddSingleton<BotCallRedirector<BaseGraphCallingBot<GroupCallInviteActiveCallState>, GroupCallInviteActiveCallState>>();
+
         services.AddSingleton<CallInviteBot>();
         return services.AddSingleton<GroupCallBot>();
     }

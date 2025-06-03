@@ -17,7 +17,6 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(RemoteMediaCallingBotConf
 {
     private readonly Dictionary<string, BOTTYPE> _botMemCache = new();
 
-
     public async Task<BOTTYPE?> GetBotByCallId(string callId)
     {
         if (_botMemCache.ContainsKey(callId))
