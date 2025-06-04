@@ -7,13 +7,16 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// A bot that plays service-hosted audio and responds to DTMF input (dial-tones). Can be used for Teams calls or PSTN calls.
 /// </summary>
-public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE> : BaseGraphCallingBot<CALLSTATETYPE> where CALLSTATETYPE : BaseActiveCallState, new()
+public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE>
+    where CALLSTATETYPE : BaseActiveCallState, new()
+    where BOTTYPE : BaseBot<CALLSTATETYPE>
+
 {
     public const string DEFAULT_PROMPT_ID = "defaultPrompt";
     protected AudioPlaybackAndDTMFCallingBot(
-        RemoteMediaCallingBotConfiguration botOptions, 
-        BotCallRedirector<BaseGraphCallingBot<CALLSTATETYPE>, CALLSTATETYPE> botCallRedirector, 
-        ICallStateManager<CALLSTATETYPE> callStateManager, 
+        RemoteMediaCallingBotConfiguration botOptions,
+        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector,
+        ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
         ILogger logger)
         : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger)

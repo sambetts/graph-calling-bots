@@ -11,11 +11,14 @@ namespace GroupCalls.Common;
 /// <summary>
 /// Bot that invites a single person to a group call.
 /// </summary>
-public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiveCallState>
+public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiveCallState, CallInviteBot>
 {
     public const string TRANSFERING_PROMPT_ID = "transferingPrompt";
-    public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, BotCallRedirector<BaseGraphCallingBot<GroupCallInviteActiveCallState>, GroupCallInviteActiveCallState> botCallRedirector, ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
-        ICallHistoryManager<GroupCallInviteActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
+    public CallInviteBot(RemoteMediaCallingBotConfiguration botOptions, 
+        BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState> botCallRedirector, 
+        ICallStateManager<GroupCallInviteActiveCallState> callStateManager,
+        ICallHistoryManager<GroupCallInviteActiveCallState> callHistoryManager, 
+        ILogger<CallInviteBot> logger)
         : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>

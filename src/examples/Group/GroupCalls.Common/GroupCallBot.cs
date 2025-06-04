@@ -12,10 +12,15 @@ namespace GroupCalls.Common;
 /// <summary>
 /// A bot that creates a group meeting to invite people to later. Doesn't call anyone direct - CallInviteBot does that work.
 /// </summary>
-public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState>
+public class GroupCallBot : AudioPlaybackAndDTMFCallingBot<BaseActiveCallState, GroupCallBot>
 {
-    public GroupCallBot(RemoteMediaCallingBotConfiguration botOptions, BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState> botCallRedirector, ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, ILogger<GroupCallBot> logger)
-        : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger) { }
+    public GroupCallBot(
+        RemoteMediaCallingBotConfiguration botConfig, 
+        BotCallRedirector<GroupCallBot, BaseActiveCallState> botCallRedirector, 
+        ICallStateManager<BaseActiveCallState> callStateManager, 
+        ICallHistoryManager<BaseActiveCallState> callHistoryManager, 
+        ILogger<GroupCallBot> logger)
+        : base(botConfig, botCallRedirector, callStateManager, callHistoryManager, logger) { }
 
     /// <summary>
     /// Create group call so invitees can join if they accept their individual invite calls.

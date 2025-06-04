@@ -63,8 +63,6 @@ public static class BotBuilderExtensions
 
         services.AddSingleton<BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState>>();
         services.AddSingleton<BotCallRedirector<GroupCallBot, BaseActiveCallState>>();
-        services.AddSingleton<BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState>>();
-        services.AddSingleton<BotCallRedirector<BaseGraphCallingBot<GroupCallInviteActiveCallState>, GroupCallInviteActiveCallState>>();
 
         services.AddSingleton<CallInviteBot>();
         return services.AddSingleton<GroupCallBot>();

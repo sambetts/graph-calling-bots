@@ -8,7 +8,8 @@ namespace GraphCallingBots;
 /// <summary>
 /// Makes sure the right bot instance get the right call notifications.
 /// </summary>
-public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(RemoteMediaCallingBotConfiguration config,
+public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
+        RemoteMediaCallingBotConfiguration config,
         ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
         ILogger<BOTTYPE> logger)
@@ -24,22 +25,23 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(RemoteMediaCallingBotConf
             return _botMemCache[callId];
         }
 
+        await callStateManager.Initialise();
+
         var typeNameForCallId = await callStateManager.GetBotTypeNameByCallId(callId);
         if (typeNameForCallId == null) {
             logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No bot found for call {callId} - was this call created before?");
             return null;
         }
 
-        var bot = BaseBot<CALLSTATETYPE>.HydrateBot<BOTTYPE, CALLSTATETYPE>(config, callStateManager, callHistoryManager, logger);
+        var bot = BaseBot<CALLSTATETYPE>.HydrateBot<BOTTYPE, CALLSTATETYPE>(config, this, callStateManager, callHistoryManager, logger);
 
 
         // Compare type names to ensure the correct bot type is used
         if (typeNameForCallId != bot.BotTypeName)
         {
-            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - Call {callId} is not handled by {typeof(BOTTYPE).FullName}, but by {typeNameForCallId}");
+            logger.LogDebug($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - call {callId} is not handled by '{typeof(BOTTYPE).FullName}', but by '{typeNameForCallId}'");
             return null;
         }
-
 
         if (bot != null)
         {

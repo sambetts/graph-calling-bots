@@ -20,7 +20,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
     private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
-    
+
     public string BotTypeName => GetType().Name;
 
     public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
@@ -32,7 +32,6 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
-
     }
 
     /// <summary>
@@ -152,19 +151,17 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
         );
     }
 
-    public static BOTTYPE HydrateBot<BOTTYPE, CALLSTATE>(
+    public static BOTTYPE HydrateBot<BOTTYPE, CALLSTATETYPE>(
         RemoteMediaCallingBotConfiguration botConfig,
+        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector,
         ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
         ILogger<BOTTYPE> logger)
-        where BOTTYPE : BaseBot<CALLSTATE>
-        where CALLSTATE : BaseActiveCallState, new()
+        where BOTTYPE : BaseBot<CALLSTATETYPE>
+        where CALLSTATETYPE : BaseActiveCallState, new()
     {
         // Use Activator.CreateInstance with parameters and handle potential null return
-        var instance = Activator.CreateInstance(
-            typeof(BOTTYPE),
-            botConfig, callStateManager, callHistoryManager, logger
-        );
+        var instance = Activator.CreateInstance(typeof(BOTTYPE), botConfig, botCallRedirector, callStateManager, callHistoryManager, logger);
 
         if (instance is null)
         {

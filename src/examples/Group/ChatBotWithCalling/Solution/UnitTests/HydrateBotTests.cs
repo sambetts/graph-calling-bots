@@ -1,3 +1,4 @@
+using GraphCallingBots;
 using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
@@ -8,11 +9,11 @@ using Microsoft.Extensions.Logging;
 namespace GroupCallingChatBot.UnitTests;
 
 [TestClass]
-public class Bob : AbstractTest
+public class HydrateBotTests : AbstractTest
 {
     protected ILogger _logger;
 
-    public Bob()
+    public HydrateBotTests()
     {
         _logger = LoggerFactory.Create(config =>
         {
@@ -23,13 +24,15 @@ public class Bob : AbstractTest
 
 
     [TestMethod]
-    public void SerialiseBot()
+    public void HydrateBot()
     {
         var config = _config.ToRemoteMediaCallingBotConfiguration(string.Empty);
 
         var callStateManager = new ConcurrentInMemoryCallStateManager<BaseActiveCallState>();
         var callHistoryManager = new ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>();
-        var callRedirector = new GraphCallingBots.BotCallRedirector<BaseGraphCallingBot<BaseActiveCallState>, BaseActiveCallState>(config, callStateManager, callHistoryManager, GetLogger<GroupCallBot>());   
+        var callRedirector = new BotCallRedirector<GroupCallBot, BaseActiveCallState>
+            (config, callStateManager, callHistoryManager, GetLogger<GroupCallBot>()
+        );   
         var bot = new GroupCallBot(config,
             callRedirector,
             callStateManager,
@@ -37,7 +40,13 @@ public class Bob : AbstractTest
             LoggerFactory.Create(config => { config.AddTraceSource(new System.Diagnostics.SourceSwitch("SourceSwitch")); config.AddConsole(); }).CreateLogger<GroupCallBot>());
 
         // Deserialize the JSON string back to a GroupCallBot object
-        var deserializedBot = BaseBot<BaseActiveCallState>.HydrateBot<GroupCallBot, BaseActiveCallState>(config, callStateManager, callHistoryManager, base.GetLogger<GroupCallBot>());
+        var deserializedBot = BaseBot<BaseActiveCallState>.HydrateBot<GroupCallBot, BaseActiveCallState>(
+            config, 
+            callRedirector,
+            callStateManager, 
+            callHistoryManager, 
+            base.GetLogger<GroupCallBot>()
+        );
 
         // Check if the deserialized object is not null
         Assert.IsNotNull(deserializedBot, "Deserialized bot should not be null.");

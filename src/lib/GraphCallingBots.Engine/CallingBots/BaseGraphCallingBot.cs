@@ -15,16 +15,18 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// Bot that uses Graph API for calling. Contains common methods for calling Graph API.
 /// </summary>
-public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE>, IGraphCallingBot
+public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALLSTATETYPE>, IGraphCallingBot
     where CALLSTATETYPE : BaseActiveCallState, new()
+        where BOTTYPE : BaseBot<CALLSTATETYPE>
+
 {
     protected readonly GraphServiceClient _graphServiceClient;
-    private readonly BotCallRedirector<BaseGraphCallingBot<CALLSTATETYPE>, CALLSTATETYPE> _botCallRedirector;
+    private readonly BotCallRedirector<BOTTYPE, CALLSTATETYPE> _botCallRedirector;
     protected ConfidentialClientApplicationThrottledHttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
 
     public BaseGraphCallingBot(
         RemoteMediaCallingBotConfiguration botConfig,
-        BotCallRedirector<BaseGraphCallingBot<CALLSTATETYPE>, CALLSTATETYPE> botCallRedirector,
+        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector,
         ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE> callHistoryManager, 
         ILogger logger)
