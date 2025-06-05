@@ -24,7 +24,7 @@ public class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 
 
     [ConfigValue(true)]
-    public string CosmosDb { get; set; } = null!;
+    public string CosmosConnectionString { get; set; } = null!;
 
 
 
@@ -33,7 +33,7 @@ public class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 
 
     [ConfigValue(true)]
-    public string DatabaseName { get; set; } = null!;
+    public string CosmosDatabaseName { get; set; } = null!;
 
     [ConfigValue(true)]
     public string ContainerNameCallHistory { get; set; } = null!;

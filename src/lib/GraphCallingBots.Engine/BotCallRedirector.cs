@@ -27,13 +27,19 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
 
         await callStateManager.Initialise();
 
-        var typeNameForCallId = await callStateManager.GetBotTypeNameByCallId(callId);
-        if (typeNameForCallId == null) {
+        var state = await callStateManager.GetStateByCallId(callId);
+        if (state == null)
+        {
+            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No call state found for call {callId} in call state manager");
+            return null;
+        }
+        var typeNameForCallId = state.BotClassNameFull;
+        if (string.IsNullOrWhiteSpace(typeNameForCallId)) {
             logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No bot found for call {callId} in call state manager");
             return null;
         }
 
-        var bot = BaseBot<CALLSTATETYPE>.HydrateBot<BOTTYPE, CALLSTATETYPE>(config, this, callStateManager, callHistoryManager, logger);
+        var bot = BaseBot<CALLSTATETYPE>.HydrateBot(config, this, callStateManager, callHistoryManager, logger);
 
         // Compare type names to ensure the correct bot type is used
         if (typeNameForCallId != bot.BotTypeName)

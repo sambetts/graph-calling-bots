@@ -16,9 +16,9 @@ public class CosmosCallHistoryManager<CALLSTATETYPE> : CosmosService<CALLSTATETY
     public override string PARTITION_KEY => "/" + nameof(CosmosCallDoc.CallId);
 
     public CosmosCallHistoryManager(CosmosClient cosmosClient, ICosmosConfig cosmosConfig, ILogger<CosmosCallHistoryManager<CALLSTATETYPE>> logger)
-    : base(cosmosClient, cosmosConfig.ContainerNameCallHistory, cosmosConfig.DatabaseName)
+    : base(cosmosClient, cosmosConfig.ContainerNameCallHistory, cosmosConfig.CosmosDatabaseName)
     {
-        _historyContainer = cosmosClient.GetContainer(cosmosConfig.DatabaseName, cosmosConfig.ContainerNameCallHistory);
+        _historyContainer = cosmosClient.GetContainer(cosmosConfig.CosmosDatabaseName, cosmosConfig.ContainerNameCallHistory);
         _logger = logger;
     }
 

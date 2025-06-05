@@ -26,7 +26,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         return Task.CompletedTask;
     }
 
-    public virtual Task<T?> GetByNotificationResourceUrl(string resourceUrl)
+    public virtual Task<T?> GetStateByCallId(string resourceUrl)
     {
         var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult<T?>(null);

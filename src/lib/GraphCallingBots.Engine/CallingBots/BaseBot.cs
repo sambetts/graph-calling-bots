@@ -106,11 +106,11 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             await _callStateManager.AddCallStateOrUpdate(initialCallState);
 
             // Get state and save invite list for when call is established
-            var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
+            var createdCallState = await _callStateManager.GetStateByCallId(BaseActiveCallState.GetResourceUrlFromCallId(createdCall.Id));
             if (createdCallState != null)
             {
                 updateCacheCallback?.Invoke(createdCallState);
-                await _callStateManager.UpdateCurrentCallState(createdCallState);
+                await _callStateManager.AddCallStateOrUpdate(createdCallState);
             }
             else
             {

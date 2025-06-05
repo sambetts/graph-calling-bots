@@ -11,7 +11,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     /// <summary>
     /// Name of the bot class that is handling this call.
     /// </summary>
-    public string BotClassNameFull { get; set; } = string.Empty;
+    public string BotClassNameFull { get; set; } = null!;
     public string ResourceUrl { get; set; } = null!;
 
     public CallMediaState? MediaState { get; set; } = null;

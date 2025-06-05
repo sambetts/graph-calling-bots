@@ -38,7 +38,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var notificationInScope = false;
-            var callState = await callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
+            var callState = await callStateManager.GetStateByCallId(callnotification.ResourceUrl);
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
@@ -95,7 +95,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
             if (updateCallState && callState != null)
             {
                 logger.LogInformation($"Updated call state for call {callState.CallId}");
-                await callStateManager.UpdateCurrentCallState(callState);
+                await callStateManager.AddCallStateOrUpdate(callState);
             }
 
             if (notificationInScope)

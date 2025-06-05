@@ -19,10 +19,10 @@ public abstract class CosmosService<CALLSTATETYPE> : IAsyncInit where CALLSTATET
 
     public CosmosService(CosmosClient cosmosClient, string containerName, string databaseName)
     {
-        container = cosmosClient.GetContainer(DatabaseName, ContainerName);
         _cosmosClient = cosmosClient;
         ContainerName = containerName;
         DatabaseName = databaseName;
+        container = cosmosClient.GetContainer(DatabaseName, ContainerName);
     }
     public async Task Initialise()
     {

@@ -23,7 +23,7 @@ public static class BotBuilderExtensions
         // Storage must be Azure Tables. Value isn't optional.
         services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
 
-        var cosmosClient = new CosmosClient(config.CosmosDb);
+        var cosmosClient = new CosmosClient(config.CosmosConnectionString);
         services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
 
         services.AddSingleton<IBotTestsLogger, AzTablesBotTestsLogger>();

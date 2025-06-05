@@ -23,7 +23,7 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
         var r = await _tableClient!.UpsertEntityAsync(entity);
     }
 
-    public async Task<T?> GetByNotificationResourceUrl(string resourceUrl)
+    public async Task<T?> GetStateByCallId(string resourceUrl)
     {
         InitCheck();
 

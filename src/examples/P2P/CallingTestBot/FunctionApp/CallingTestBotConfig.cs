@@ -27,7 +27,7 @@ public class CallingTestBotConfig : PropertyBoundConfig, ICosmosConfig
 
 
     [ConfigValue(true)]
-    public string CosmosDb { get; set; } = null!;
+    public string CosmosConnectionString { get; set; } = null!;
 
     [ConfigValue]
     public string AppInstanceObjectId { get; set; } = null!;
@@ -40,7 +40,7 @@ public class CallingTestBotConfig : PropertyBoundConfig, ICosmosConfig
     public string TestNumber { get; set; } = null!;
 
     [ConfigValue(true)]
-    public string DatabaseName { get; set; } = null!;
+    public string CosmosDatabaseName { get; set; } = null!;
 
     [ConfigValue(true)]
     public string ContainerNameCallHistory { get; set; } = null!;
