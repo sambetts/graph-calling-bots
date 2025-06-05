@@ -3,6 +3,7 @@ using CallingTestBot.FunctionApp.Engine;
 using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 

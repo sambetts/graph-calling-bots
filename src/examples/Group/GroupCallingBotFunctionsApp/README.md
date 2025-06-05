@@ -27,7 +27,7 @@ For SQL logging, the account in the connection string needs owner rights to the 
 ## Testing the Bot
 Expose the bot with NGrok:
 ```
-ngrok http http://localhost:7221
+ngrok http http://localhost:7221 --host-header="localhost:7221"
 ```
 
 POST this JSon to the bot endpoint /api/StartCall:

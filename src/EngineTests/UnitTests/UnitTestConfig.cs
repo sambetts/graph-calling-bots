@@ -20,6 +20,9 @@ public class UnitTestConfig : PropertyBoundConfig, ICosmosConfig
     public string DatabaseName { get; set; } = null!;
 
     [ConfigValue(true)]
-    public string ContainerName { get; set; } = null!;
+    public string ContainerNameCallHistory { get; set; } = null!;
+
+    [ConfigValue(true)]
+    public string ContainerNameCallState { get; set; } = null!;
 
 }

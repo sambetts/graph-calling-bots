@@ -38,9 +38,9 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
             {
                 groupCall = await callOrchestrator.StartGroupCall(newCallReq);
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
-                // Something went wrong with the request
+                logger.LogError($"Argument exception: {ex.Message}");
                 return SendBadRequest(req);
             }
             catch (Microsoft.Graph.Models.ODataErrors.ODataError ex)

@@ -3,6 +3,7 @@ using GraphCallingBots;
 using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using GraphCallingBots.StateManagement.Sql;
 using GroupCalls.Common;
 using Microsoft.Azure.Cosmos;

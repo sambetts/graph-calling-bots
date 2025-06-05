@@ -1,5 +1,6 @@
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using GraphCallingBots.StateManagement.Sql;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;

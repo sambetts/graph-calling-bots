@@ -3,55 +3,22 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace GraphCallingBots.StateManagement;
+namespace GraphCallingBots.StateManagement.Cosmos;
 
-/// <summary>
-/// Something that has to go in Cosmos DB
-/// </summary>
-public abstract class StatsCosmosDoc
-{
-    public abstract string id { get; set; }
-}
 
-/// <summary>
-/// Class to encapsulate CallHistoryEntity<T> in a Cosmos DB way. 
-/// </summary>
-public class CallHistoryCosmosDoc<CALLSTATETYPE> : StatsCosmosDoc
+
+public class CosmosCallHistoryManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE>, ICallHistoryManager<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState
 {
-    public CallHistoryCosmosDoc() : this(null) { }
-    public CallHistoryCosmosDoc(CALLSTATETYPE? callState)
-    {
-        CallId = callState?.CallId ?? string.Empty;
-        LastUpdated = DateTime.UtcNow;
-    }
-
-    public string CallId { get; set; }
-    public CallStateAndNotificationsHistoryEntity<CALLSTATETYPE> CallHistory { get; set; } = null!;
-
-    public override string id { get => CallId; set => CallId = value; }
-
-    public DateTime? LastUpdated { get; set; } = null;
-}
-
-
-public class CosmosCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLSTATETYPE>
-    where CALLSTATETYPE : BaseActiveCallState
-{
-    private bool _initialised = false;
-    private static string PARTITION_KEY = "/" + nameof(CallHistoryCosmosDoc<CALLSTATETYPE>.CallId);
     private readonly Container _historyContainer;
-    private readonly CosmosClient _cosmosClient;
-    private readonly ICosmosConfig _cosmosConfig;
     private readonly ILogger<CosmosCallHistoryManager<CALLSTATETYPE>> _logger;
 
-    public bool Initialised => _initialised;
+    public override string PARTITION_KEY => "/" + nameof(CosmosCallDoc.CallId);
 
     public CosmosCallHistoryManager(CosmosClient cosmosClient, ICosmosConfig cosmosConfig, ILogger<CosmosCallHistoryManager<CALLSTATETYPE>> logger)
+    : base(cosmosClient, cosmosConfig.ContainerNameCallHistory, cosmosConfig.DatabaseName)
     {
-        _historyContainer = cosmosClient.GetContainer(cosmosConfig.DatabaseName, cosmosConfig.ContainerName);
-        _cosmosClient = cosmosClient;
-        _cosmosConfig = cosmosConfig;
+        _historyContainer = cosmosClient.GetContainer(cosmosConfig.DatabaseName, cosmosConfig.ContainerNameCallHistory);
         _logger = logger;
     }
 
@@ -116,11 +83,4 @@ public class CosmosCallHistoryManager<CALLSTATETYPE> : ICallHistoryManager<CALLS
         await _historyContainer.DeleteItemAsync<CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>>(callState.CallId, new PartitionKey(callState.CallId));
     }
 
-    public async Task Initialise()
-    {
-        await _cosmosClient.CreateDatabaseIfNotExistsAsync(_cosmosConfig.DatabaseName);
-        var db = _cosmosClient.GetDatabase(_cosmosConfig.DatabaseName);
-        await db.CreateContainerIfNotExistsAsync(id: _cosmosConfig.ContainerName, partitionKeyPath: PARTITION_KEY);
-        _initialised = true;
-    }
 }
