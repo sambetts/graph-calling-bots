@@ -141,7 +141,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             UsersJoinedGroupCall = UsersJoinedGroupCall
         };
 
-        await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(
+        var stats = await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(
             notifications,
             botTypeName,
             _callStateManager,
@@ -149,6 +149,10 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             callBacks,
             _logger
         );
+        if (stats.Processed == 0)
+        {
+            _logger.LogInformation("No notifications processed for bot {BotTypeName}", botTypeName);
+        }
     }
 
     public static BOTTYPE HydrateBot<BOTTYPE, CALLSTATETYPE>(

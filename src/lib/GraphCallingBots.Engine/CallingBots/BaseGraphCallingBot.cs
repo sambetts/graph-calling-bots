@@ -22,7 +22,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
 {
     protected readonly GraphServiceClient _graphServiceClient;
     private readonly BotCallRedirector<BOTTYPE, CALLSTATETYPE> _botCallRedirector;
-    protected ConfidentialClientApplicationThrottledHttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
+    protected HttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
 
     public BaseGraphCallingBot(
         RemoteMediaCallingBotConfiguration botConfig,
@@ -34,8 +34,15 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
     {
         var clientSecretCredential = new ClientSecretCredential(_botConfig.TenantId, _botConfig.AppId, _botConfig.AppSecret);
 
-        _graphServiceClient = new GraphServiceClient(clientSecretCredential, ["https://graph.microsoft.com/.default"]);
+
+        // In the constructor, replace the _graphServiceClient initialization with HTTP logging handler
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
+
+        _graphServiceClient = new GraphServiceClient(
+            _httpClient,
+            clientSecretCredential,
+            ["https://graph.microsoft.com/.default"]
+        );
         _botCallRedirector = botCallRedirector;
     }
 
@@ -188,7 +195,8 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
         return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(
             new PlayPromptPostRequestBody
             {
-                Prompts = new List<Prompt> { mediaPrompt }
+                Prompts = new List<Prompt> { mediaPrompt },
+                ClientContext = Guid.NewGuid().ToString()
             });
     }
 

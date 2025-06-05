@@ -14,13 +14,19 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
 {
     private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
+    public record NotificationStats 
+    {
+        public int Processed { get; set; }
+        public int Skipped { get; set; }
+    }
+
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public static async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName, ICallStateManager<CALLSTATETYPE> callStateManager,
+    public static async Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName, ICallStateManager<CALLSTATETYPE> callStateManager,
     ICallHistoryManager<CALLSTATETYPE> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
     {
-        if (notificationPayload == null) return;
+        if (notificationPayload == null) return new NotificationStats { Processed = 0, Skipped = 0 };
 
         // Ensure processing is single-threaded to maintain processing order
         await _semaphore.WaitAsync();
@@ -28,14 +34,19 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
         if (!callStateManager.Initialised) await callStateManager.Initialise();
         if (!callHistoryManager.Initialised) await callHistoryManager.Initialise();
 
+        var stats = new NotificationStats { Processed = 0, Skipped = 0 };
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
+            var notificationInScope = false;
             var callState = await callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
             updateCallState = await HandleCallChangeTypeUpdate(callStateManager, callbackInfo, callState, callnotification, botTypeName, logger);
-
+            if (updateCallState)
+            {
+                notificationInScope = true;
+            }
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
             {
@@ -83,17 +94,31 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
             // Processing ended. Update?
             if (updateCallState && callState != null)
             {
+                logger.LogInformation($"Updated call state for call {callState.CallId}");
                 await callStateManager.UpdateCurrentCallState(callState);
+            }
+
+            if (notificationInScope)
+            {
+                stats.Processed++;
+            }
+            else
+            {
+                stats.Skipped++;
+                logger.LogDebug($"{botTypeName}: Skipped notification for call '{callState?.CallId ?? "unknown"}' - no state change or not in scope");
             }
 
             // Update history even if no state changes
             if (callState != null)
             {
                 await callHistoryManager.AddToCallHistory(callState, JsonDocument.Parse(JsonSerializer.Serialize(callnotification)).RootElement);
+                logger.LogInformation($"Updated call history for call {callState.CallId}");
             }
         }
 
         _semaphore.Release();
+
+        return stats;
     }
 
     private static async Task<bool> HandleCallChangeTypeUpdate(ICallStateManager<CALLSTATETYPE> callStateManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, 

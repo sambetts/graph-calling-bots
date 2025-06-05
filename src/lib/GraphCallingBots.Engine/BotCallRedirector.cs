@@ -16,25 +16,24 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
         where BOTTYPE : BaseBot<CALLSTATETYPE>
         where CALLSTATETYPE : BaseActiveCallState, new()
 {
-    private readonly Dictionary<string, BOTTYPE> _botMemCache = new();
+    private readonly Dictionary<string, BaseBot<CALLSTATETYPE>> _botMemCache = new();
 
     public async Task<BOTTYPE?> GetBotByCallId(string callId)
     {
         if (_botMemCache.ContainsKey(callId))
         {
-            return _botMemCache[callId];
+            return (BOTTYPE?)_botMemCache[callId];
         }
 
         await callStateManager.Initialise();
 
         var typeNameForCallId = await callStateManager.GetBotTypeNameByCallId(callId);
         if (typeNameForCallId == null) {
-            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No bot found for call {callId} - was this call created before?");
+            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No bot found for call {callId} in call state manager");
             return null;
         }
 
         var bot = BaseBot<CALLSTATETYPE>.HydrateBot<BOTTYPE, CALLSTATETYPE>(config, this, callStateManager, callHistoryManager, logger);
-
 
         // Compare type names to ensure the correct bot type is used
         if (typeNameForCallId != bot.BotTypeName)
@@ -53,6 +52,8 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
 
     public async Task RegisterBotForCall(string callId, BaseBot<CALLSTATETYPE> bot)
     {
+        _botMemCache.Add(callId, bot);
+
         // Associate the call with this bot type in the call state manager
         var initialState = new CALLSTATETYPE
         {

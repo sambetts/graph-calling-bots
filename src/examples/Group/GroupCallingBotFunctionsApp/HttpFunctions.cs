@@ -145,7 +145,6 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
 
         if (notificationsPayload != null)
         {
-            logger.LogDebug($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s)");
             foreach (var notification in notificationsPayload.CommsNotifications)
             {
                 var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
@@ -155,6 +154,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
 
                     if (botGroupCall != null)        // Logging for negative handled in GetBotByCallId
                     {
+                        logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for GroupCall bot.");
                         try
                         {
                             await botGroupCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
@@ -172,6 +172,9 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
 
                         var botInviteCall = await GetBotAndHandleNotifications(botCallRedirectorCallInviteCall, callId, notificationsPayload);
                         if (botInviteCall != null)
+                        {
+                            logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for CallInvite bot.");
+
                             try
                             {
                                 await botInviteCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
@@ -183,6 +186,11 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                                 exResponse.WriteString(ex.ToString());
                                 return exResponse;
                             }
+                        }
+                        else
+                        {
+                            logger.LogWarning($"No bot found for call ID {callId} in notification {notification.ResourceUrl}");
+                        }
                     }
                 }
                 else
