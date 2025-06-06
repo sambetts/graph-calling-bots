@@ -118,17 +118,17 @@ public class BotNotificationsHandlerTests : BaseTests
             }
         };
 
-        var callResourceUrl = NotificationsLibrary.FailedCallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!;
+        var callId = BaseActiveCallState.GetCallId(NotificationsLibrary.FailedCallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!)!;
 
         // Handle call establish for a call never seen before
         await BotNotificationsHandler<BaseActiveCallState>.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallEstablishingP2P, BOT_NAME, _callStateManager, historyManager, callbackInfo, logger);
         Assert.IsTrue(callEstablishingCount == 1);
 
-        var postEstablishingCallState = await _callStateManager.GetStateByCallId(callResourceUrl);
+        var postEstablishingCallState = await _callStateManager.GetStateByCallId(callId);
         Assert.IsNotNull(postEstablishingCallState);
         await BotNotificationsHandler<BaseActiveCallState>.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallDeleted, BOT_NAME, _callStateManager, historyManager, callbackInfo, logger);
 
-        var postCallDeletedState = await _callStateManager.GetStateByCallId(callResourceUrl);
+        var postCallDeletedState = await _callStateManager.GetStateByCallId(callId);
         Assert.IsNull(postCallDeletedState);
 
         Assert.AreEqual(0, callConnectedCount);

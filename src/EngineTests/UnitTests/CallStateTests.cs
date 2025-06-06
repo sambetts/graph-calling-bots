@@ -62,6 +62,7 @@ public class CallStateTests : BaseTests
         Assert.AreEqual("Test2", state!.BotClassNameFull);
         Assert.AreEqual(CallState.Establishing, state.StateEnum);
 
+        await callStateManager.RemoveAll();
         await TestCallStateManager(callStateManager);
 
         // Test also a failed call
@@ -88,7 +89,7 @@ public class CallStateTests : BaseTests
             await callStateManager.Initialise();
         }
 
-        var randoId = $"/communications/calls/{Guid.NewGuid()}/";
+        var randoId = Guid.NewGuid().ToString();
 
         // Check that we have no calls
         var nonExistentState = await callStateManager.GetStateByCallId("whatever");
@@ -97,7 +98,7 @@ public class CallStateTests : BaseTests
 
 
         // Insert a call
-        var callState = new T { ResourceUrl = randoId };
+        var callState = new T { ResourceUrl = BaseActiveCallState.GetResourceUrlFromCallId(randoId) };
         await callStateManager.AddCallStateOrUpdate(callState);
 
         // Get by notification resource url

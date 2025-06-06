@@ -23,11 +23,10 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
         var r = await _tableClient!.UpsertEntityAsync(entity);
     }
 
-    public async Task<T?> GetStateByCallId(string resourceUrl)
+    public async Task<T?> GetStateByCallId(string callId)
     {
         InitCheck();
 
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId != null)
         {
             var results = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.RowKey == callId);
@@ -40,10 +39,10 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
         return null;
     }
 
-    public async Task<bool> RemoveCurrentCall(string resourceUrl)
+    public async Task<bool> RemoveCurrentCall(string callId)
     {
         InitCheck();
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
+
         var r = await _tableClient!.DeleteEntityAsync(CallStateEntity<T>.PARTITION_KEY, callId);
         return !r.IsError;
     }
@@ -86,6 +85,7 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
     public async Task<string?> GetBotTypeNameByCallId(string callId)
     {
         InitCheck();
+
         var results = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.RowKey == callId);
         await foreach (var result in results)
         {
