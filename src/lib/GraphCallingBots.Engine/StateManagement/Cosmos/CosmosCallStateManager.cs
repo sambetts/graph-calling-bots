@@ -4,14 +4,15 @@ using Microsoft.Extensions.Logging;
 
 namespace GraphCallingBots.StateManagement.Cosmos;
 
-public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE>, ICallStateManager<CALLSTATETYPE> where CALLSTATETYPE : BaseActiveCallState
+public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE>, ICallStateManager<CALLSTATETYPE> 
+    where CALLSTATETYPE : BaseActiveCallState
 {
     private readonly ILogger<CosmosCallStateManager<CALLSTATETYPE>> _logger;
 
     public override string PARTITION_KEY => "/" + nameof(CosmosCallDoc.CallId);
 
-    public CosmosCallStateManager(CosmosClient cosmosClient, string containerName, string databaseName, ILogger<CosmosCallStateManager<CALLSTATETYPE>> logger) 
-        : base(cosmosClient, containerName, databaseName)
+    public CosmosCallStateManager(CosmosClient cosmosClient, ICosmosConfig cosmosConfig, ILogger<CosmosCallStateManager<CALLSTATETYPE>> logger) 
+        : base(cosmosClient, cosmosConfig.CosmosDatabaseName, cosmosConfig.ContainerNameCallState) 
     {
         _logger = logger;
     }

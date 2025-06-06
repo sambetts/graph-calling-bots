@@ -23,9 +23,13 @@ public static class BotBuilderExtensions
         if (!string.IsNullOrEmpty(config.Storage))
         {
             services.AddSingleton(new TableServiceClient(config.Storage));
+        }
 
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
-            services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, AzTablesCallStateManager<GroupCallInviteActiveCallState>>();
+        if (!string.IsNullOrEmpty(config.CosmosConnectionString))
+        {
+            services.AddSingleton(new CosmosClient(config.CosmosConnectionString));
+            services.AddSingleton<ICallStateManager<BaseActiveCallState>, CosmosCallStateManager<BaseActiveCallState>>();
+            services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, CosmosCallStateManager<GroupCallInviteActiveCallState>>();
         }
         else
         {
@@ -46,17 +50,8 @@ public static class BotBuilderExtensions
         }
         else
         {
-            if (!string.IsNullOrEmpty(config.CosmosConnectionString))
-            {
-                services.AddSingleton(new CosmosClient(config.CosmosConnectionString));
-                services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
-                services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, CosmosCallHistoryManager<GroupCallInviteActiveCallState>>();
-            }
-            else
-            {
-                services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
-                services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>>();
-            }
+            services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
+            services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>>();
         }
 
         services.AddSingleton<ICosmosConfig>(config);
