@@ -23,7 +23,6 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
     BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState> botCallRedirectorCallInviteCall)
 {
 
-
     /// <summary>
     /// Start call triggered by HTTP request.
     /// </summary>
@@ -154,10 +153,10 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
 
                     if (botGroupCall != null)        // Logging for negative handled in GetBotByCallId
                     {
-                        logger.LogTrace($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for GroupCall bot.");
+                        logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for GroupCall bot.");
                         try
                         {
-                            await botGroupCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                            var stats = await botGroupCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
                         }
                         catch (Exception ex)
                         {
@@ -173,11 +172,11 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                         var botInviteCall = await GetBotAndHandleNotifications(botCallRedirectorCallInviteCall, callId, notificationsPayload);
                         if (botInviteCall != null)
                         {
-                            logger.LogTrace($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for CallInvite bot.");
+                            logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for CallInvite bot.");
 
                             try
                             {
-                                await botInviteCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
+                                var stats = await botInviteCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
                             }
                             catch (Exception ex)
                             {

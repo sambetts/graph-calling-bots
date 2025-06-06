@@ -70,9 +70,6 @@ public class CallStateTests : BaseTests
         Assert.IsTrue(state.BotMediaPlaylist.Count > 0); // Ensure media playlist is not empty
         await callStateManager.RemoveAll();
 
-
-
-
         // Standard tests
         await TestCallStateManager(callStateManager);
 

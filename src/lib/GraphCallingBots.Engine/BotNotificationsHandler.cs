@@ -14,11 +14,6 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
 {
     private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-    public record NotificationStats 
-    {
-        public int Processed { get; set; }
-        public int Skipped { get; set; }
-    }
 
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
@@ -92,6 +87,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
                         // User joined group call
                         logger.LogInformation($"{botTypeName}: {newPartipants.Count} user(s) joined group call {callState.CallId}");
                         if (callbackInfo.UsersJoinedGroupCall != null) await callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
+                        notificationInScope = true;
                     }
 
                     var diconnectedPartipants = callnotification.JoinedParticipants.GetDisconnectedParticipants(callState.JoinedParticipants);
@@ -100,6 +96,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
                         // User left group call
                         logger.LogInformation($"{botTypeName}: {diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
                         if (callbackInfo.UsersLeftGroupCall != null) await callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
+                        notificationInScope = true;
                     }
 
                     callState.JoinedParticipants = callnotification.JoinedParticipants;

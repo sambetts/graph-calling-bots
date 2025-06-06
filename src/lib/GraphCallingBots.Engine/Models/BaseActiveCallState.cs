@@ -3,6 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace GraphCallingBots.Models;
 
+public record NotificationStats
+{
+    public int Processed { get; set; }
+    public int Skipped { get; set; }
+}
+
 /// <summary>
 /// State of a call made by the bot. Base implementation.
 /// </summary>
@@ -55,6 +61,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     public bool Equals(BaseActiveCallState? other)
     {
         return other != null && other.ResourceUrl == ResourceUrl
+            && other.BotClassNameFull == BotClassNameFull
             && other.CallId == CallId
             && other.StateEnum == StateEnum
             && other.BotMediaPlaylist.Select(p => p.Key).SequenceEqual(BotMediaPlaylist.Select(p => p.Key))

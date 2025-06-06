@@ -12,7 +12,7 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// Base bot class that handles notifications and call state management.
 /// </summary>
-public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificationsPayloadHandler
+public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
@@ -124,7 +124,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
         }
     }
 
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
+    public async Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
         // Ensure that GetType().FullName is not null before passing it to the method
         var botTypeName = this.GetType().FullName ?? throw new InvalidOperationException("Bot type name cannot be null.");
@@ -149,12 +149,7 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             callBacks,
             _logger
         );
-        if (stats.Processed == 0)
-        {
-            _logger.LogWarning($"{BotTypeName} - No notifications processed for bot {botTypeName}");
-            // Output deserialized notifications for debugging purposes
-            _logger.LogDebug($"{BotTypeName} - Notifications: {System.Text.Json.JsonSerializer.Serialize(notifications, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })}");
-        }
+        return stats;
     }
 
     public static BOTTYPE HydrateBot<BOTTYPE>(

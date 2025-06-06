@@ -1,6 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.Graph.Contracts;
 using Microsoft.Graph.Models;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
@@ -129,7 +130,13 @@ public class GroupCallInviteActiveCallState : BaseActiveCallState, IEquatable<Gr
     public bool Equals(GroupCallInviteActiveCallState? other)
     {
         if (other is null) return false;
-        return this.GroupCallId == other.GroupCallId && this.AtendeeIdentity == other.AtendeeIdentity && base.Equals(other);
+
+        // Compare AtendeeIdentity. Serialise both if not null, otherwise compare for null.
+        var atendeeIdentityEqual = AtendeeIdentity == null && other.AtendeeIdentity == null
+            || AtendeeIdentity != null && other.AtendeeIdentity != null
+            && JsonSerializer.Serialize(AtendeeIdentity) == JsonSerializer.Serialize(other.AtendeeIdentity);
+
+        return this.GroupCallId == other.GroupCallId && atendeeIdentityEqual && base.Equals(other);
     }
 
     public override int GetHashCode()

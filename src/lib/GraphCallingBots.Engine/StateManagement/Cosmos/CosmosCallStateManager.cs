@@ -1,6 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement.Cosmos;
 
@@ -19,7 +20,8 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
 
     public async Task AddCallStateOrUpdate(CALLSTATETYPE callState)
     {
-        _logger.LogTrace($"Adding or updating call state for CallId: {callState.CallId}");
+        _logger.LogWarning($"Adding or updating call state for CallId: {callState.CallId}...");
+        _logger.LogInformation($"Call state details: {JsonSerializer.Serialize(callState)}");
         var patchOperations = new List<PatchOperation>
         {
             PatchOperation.Set("/State", callState),

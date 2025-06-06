@@ -8,6 +8,6 @@ namespace GraphCallingBots;
 /// </summary>
 public interface ICommsNotificationsPayloadHandler
 {
-    Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
+    Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
     Task<bool> ValidateNotificationRequestAsync(HttpRequest request);
 }

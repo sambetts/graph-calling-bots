@@ -15,7 +15,7 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// Bot that uses Graph API for calling. Contains common methods for calling Graph API.
 /// </summary>
-public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALLSTATETYPE>, IGraphCallingBot
+public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState, new()
         where BOTTYPE : BaseBot<CALLSTATETYPE>
 
