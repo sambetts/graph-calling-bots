@@ -124,7 +124,7 @@ public enum GroupMeetingAttendeeType
 
 public class GroupCallInviteActiveCallState : BaseActiveCallState, IEquatable<GroupCallInviteActiveCallState>
 {
-    public string GroupCallId { get; set; } = null!;
+    public string? GroupCallId { get; set; } = null!;
     public IdentitySet? AtendeeIdentity { get; set; } = null!;
     
     public bool Equals(GroupCallInviteActiveCallState? other)

@@ -71,6 +71,6 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
             BotClassNameFull = bot.BotTypeName
         };
         await callStateManager.AddCallStateOrUpdate(initialState);
-        logger.LogDebug($"{botRedirectorTypeString} - Bot registered for call {callId} with type '{bot.BotTypeName}'");
+        logger.LogError($"{botRedirectorTypeString} - Bot registered for call {callId} with type '{bot.BotTypeName}'");
     }
 }

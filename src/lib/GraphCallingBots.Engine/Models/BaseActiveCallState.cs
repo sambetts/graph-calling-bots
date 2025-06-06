@@ -67,7 +67,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
             && other.BotMediaPlaylist.Select(p => p.Key).SequenceEqual(BotMediaPlaylist.Select(p => p.Key))
             && other.BotMediaPlaylist.Select(p => p.Value).SequenceEqual(BotMediaPlaylist.Select(p => p.Value))
             && other.JoinedParticipants.SequenceEqual(JoinedParticipants)
-            && other.TonesPressed.SequenceEqual(TonesPressed);
+            && other.TonesPressed != null && other.TonesPressed.SequenceEqual(TonesPressed?? new List<Tone>());
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     /// </summary>
     public CallState? StateEnum { get; set; } = null;
 
-    public List<Tone> TonesPressed { get; set; } = new();
+    public List<Tone>? TonesPressed { get; set; } = new();
     public List<MediaPrompt> MediaPromptsPlaying { get; set; } = new();
 
     public List<CallParticipant> JoinedParticipants { get; set; } = new();

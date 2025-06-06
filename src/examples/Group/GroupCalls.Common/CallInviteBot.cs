@@ -53,7 +53,7 @@ public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiv
         if (singleAttendeeCall != null)
         {
             // Remember initial state of the call: which group-call to transfer to and who to transfer
-            await InitCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, callMediaPlayList,
+            await UpdateCallStateAndStoreMediaInfoForCreatedCall(singleAttendeeCall, callMediaPlayList,
                 createdCallState =>
                 {
                     createdCallState.GroupCallId = createdGroupCall.Id;
