@@ -19,7 +19,7 @@ public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
 {
     Task<T?> GetStateByCallId(string callId);
     Task AddCallStateOrUpdate(T callState);
-    Task<bool> RemoveCurrentCall(string resourceUrl);
+    Task<bool> RemoveCurrentCall(string callId);
     Task<List<T>> GetActiveCalls();
 }
 

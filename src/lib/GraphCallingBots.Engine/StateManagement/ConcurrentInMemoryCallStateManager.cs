@@ -26,9 +26,8 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         return Task.CompletedTask;
     }
 
-    public virtual Task<T?> GetStateByCallId(string resourceUrl)
+    public virtual Task<T?> GetStateByCallId(string callId)
     {
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult<T?>(null);
         return GetByCallId(callId);
     }
@@ -44,9 +43,8 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         }
     }
 
-    public virtual Task<bool> RemoveCurrentCall(string resourceUrl)
+    public virtual Task<bool> RemoveCurrentCall(string callId)
     {
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult(false);
 
         lock (this)
@@ -87,17 +85,5 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         {
             return Task.FromResult(_callStatesByCallId.Select(s => s.Value).ToList());
         }
-    }
-
-    public async Task<string?> GetBotTypeNameByCallId(string callId)
-    {
-        var callState = await GetByCallId(callId);
-        if (callState == null) return null;
-        return callState.BotClassNameFull;
-    }
-
-    public Task AddCall(string callId, string botTypeName)
-    {
-        throw new NotImplementedException();
     }
 }

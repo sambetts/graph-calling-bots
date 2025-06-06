@@ -23,8 +23,14 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public static async Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName, ICallStateManager<CALLSTATETYPE> callStateManager,
-    ICallHistoryManager<CALLSTATETYPE> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
+    public static async Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(
+        CommsNotificationsPayload? notificationPayload, 
+        string botTypeName, 
+        ICallStateManager<CALLSTATETYPE> callStateManager,
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, 
+        NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, 
+        ILogger logger
+    )
     {
         if (notificationPayload == null) return new NotificationStats { Processed = 0, Skipped = 0 };
 
@@ -38,7 +44,16 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
             var notificationInScope = false;
-            var callState = await callStateManager.GetStateByCallId(callnotification.ResourceUrl);
+            var callId = BaseActiveCallState.GetCallId(callnotification.ResourceUrl);
+            CALLSTATETYPE? callState = null;
+            if (callId != null)
+            {
+                callState = await callStateManager.GetStateByCallId(callId);
+            }
+            else
+            {
+                logger.LogWarning($"{botTypeName}: Received notification for call with no callId: {callnotification.ResourceUrl}");
+            }
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
@@ -191,7 +206,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
             if (!string.IsNullOrEmpty(callState.CallId))
             {
                 logger.LogInformation($"{botType}: Call {callState.CallId} terminated");
-                var removeSuccess = await callStateManager.RemoveCurrentCall(callState.ResourceUrl);
+                var removeSuccess = await callStateManager.RemoveCurrentCall(callState.CallId);
                 if (removeSuccess)
                     logger.LogInformation($"{botType}: Call {callState.CallId} state removed");
                 else

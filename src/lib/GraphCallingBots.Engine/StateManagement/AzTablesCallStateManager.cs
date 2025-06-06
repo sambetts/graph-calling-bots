@@ -59,12 +59,6 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
         }
     }
 
-    public async Task UpdateCurrentCallState(T callState)
-    {
-        // Uses Upsert so will update if exists, or insert if not
-        await AddCallStateOrUpdate(callState);
-    }
-
     public async Task<List<T>> GetActiveCalls()
     {
         InitCheck();
@@ -80,17 +74,5 @@ public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, 
             }
         }
         return list;
-    }
-
-    public async Task<string?> GetBotTypeNameByCallId(string callId)
-    {
-        InitCheck();
-
-        var results = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.RowKey == callId);
-        await foreach (var result in results)
-        {
-            return result.State?.BotClassNameFull;
-        }
-        return null;
     }
 }

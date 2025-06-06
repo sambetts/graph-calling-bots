@@ -115,7 +115,7 @@ public class CallStateTests : BaseTests
         Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 1);
 
         // Delete a call
-        await callStateManager.RemoveCurrentCall(callState.ResourceUrl);
+        await callStateManager.RemoveCurrentCall(randoId);
         var nullCallState = await callStateManager.GetStateByCallId(randoId);
         Assert.IsNull(nullCallState);
         Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 0);

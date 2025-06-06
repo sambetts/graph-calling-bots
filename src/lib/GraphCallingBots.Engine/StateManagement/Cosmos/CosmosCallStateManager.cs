@@ -68,6 +68,8 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
         {
             return null;
         }
+
+        _logger.LogInformation($"Retrieving call state for CallId: {callId} from Cosmos DB");
         var query = new QueryDefinition("SELECT * FROM c WHERE c.CallId = @callId")
             .WithParameter("@callId", callId);
         var iterator = container.GetItemQueryIterator<CallStateCosmosDoc<CALLSTATETYPE>>(query);
@@ -79,13 +81,14 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
         return null;
     }
 
-    public async Task<bool> RemoveCurrentCall(string resourceUrl)
+    public async Task<bool> RemoveCurrentCall(string callId)
     {
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null)
         {
             return false;
         }
+
+        _logger.LogInformation($"Removing call state for CallId: {callId} from Cosmos DB");
         try
         {
             await container.DeleteItemAsync<CallStateCosmosDoc<CALLSTATETYPE>>(
