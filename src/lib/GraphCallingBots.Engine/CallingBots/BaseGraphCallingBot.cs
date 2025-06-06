@@ -127,10 +127,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
 
     protected async Task<bool> TestMediaExists(string? uri)
     {
-        if (string.IsNullOrWhiteSpace(uri))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(uri)) return false;
 
         try
         {
@@ -166,7 +163,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
 
             if (callCreated?.Id != null)
             {
-                _logger.LogInformation($"{BotTypeName}: Call {callCreated.Id} created");
+                _logger.LogTrace($"{BotTypeName}: Call {callCreated.Id} created in Graph API");
 
                 await _botCallRedirector.RegisterBotForCall(callCreated.Id, this);
                 _logger.LogInformation($"{BotTypeName}: Call {callCreated.Id} added to state manager");
@@ -189,9 +186,20 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
     /// </summary>
     protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, EquatableMediaPrompt mediaPrompt)
     {
-        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompt?.MediaInfo?.Uri} media prompt on call {callState.CallId}");
 
-        callState.MediaPromptsPlaying.Add(mediaPrompt);
+        if (mediaPrompt.MediaInfo == null)
+        {
+            _logger.LogWarning(BotTypeName + ": No media info provided for media prompt. Can't play prompt.");
+            return null;
+        }
+        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompt.MediaInfo.Uri} media prompt on call {callState.CallId}");
+
+        if (string.IsNullOrEmpty(mediaPrompt.MediaInfo.OdataType))
+        {
+            mediaPrompt.MediaInfo.OdataType = "#microsoft.graph.mediaInfo";     // Ensure the media info has the correct OData type
+        }
+
+        callState.MediaPromptsPlaying.Add(mediaPrompt!);
         return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(
             new PlayPromptPostRequestBody
             {

@@ -26,7 +26,7 @@ public class GroupCallOrchestrator(GroupCallBot groupCallingBot, CallInviteBot c
                     }
                     else
                     {
-                        logger.LogInformation($"Invited '{attendee.DisplayName}' ({attendee.Id}) on new P2P call {inviteCall.Id}");
+                        logger.LogInformation($"Invited '{attendee.DisplayName ?? "Unknown display name"}' (id '{attendee.Id}') on new P2P call {inviteCall.Id}");
                     }
                 }
 

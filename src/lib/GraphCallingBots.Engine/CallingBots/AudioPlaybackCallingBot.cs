@@ -33,7 +33,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : B
         }
         else
         {
-            _logger.LogWarning("CallConnected: callState.CallId is null");
+            _logger.LogWarning($"{BotTypeName} - CallConnected: callState.CallId is null");
         }
         await base.CallConnectedWithP2PAudio(callState);
     }
@@ -46,32 +46,32 @@ public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : B
         if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(wantedPromptId))
         {
             alreadyPlaying = true;
-            _logger.LogInformation("Already playing prompt {PromptId}", wantedPromptId);
+            _logger.LogInformation($"{BotTypeName} - Already playing prompt {wantedPromptId}");
             return;
         }
 
         // But if not playing, play notification prompt again
-        var prompt = callState.BotMediaPlaylist.FirstOrDefault(m => m.Value.MediaInfo?.ResourceId == wantedPromptId).Value;
+        var promptInCallState = callState.BotMediaPlaylist.FirstOrDefault(m => m.Value.MediaInfo?.ResourceId == wantedPromptId).Value;
         if (alreadyPlaying)
         {
-            _logger.LogInformation("Prompt {PromptId} is already playing", wantedPromptId);
+            _logger.LogInformation($"{BotTypeName} - Prompt {wantedPromptId} is already playing");
             return;
         }
 
-        if (prompt != null)
+        if (promptInCallState != null)
         {
             try
             {
-                await PlayPromptAsync(callState, prompt);
+                await PlayPromptAsync(callState, promptInCallState);
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Error playing prompt");
+                _logger.LogError(ex, $"{BotTypeName} - Error playing prompt for call ID {callState.CallId}");
             }
         }
         else
         {
-            _logger.LogWarning("Prompt {PromptId} not found in playlist", wantedPromptId);
+            _logger.LogWarning($"{BotTypeName} - Prompt {wantedPromptId} not found in playlist for call ID {callState.CallId}");
         }
     }
 }

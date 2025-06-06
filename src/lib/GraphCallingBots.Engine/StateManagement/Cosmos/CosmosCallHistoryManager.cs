@@ -32,7 +32,7 @@ public class CosmosCallHistoryManager<CALLSTATETYPE> : CosmosService<CALLSTATETY
         var callHistoryRecordFound = await GetCallHistory(callState);
         if (callHistoryRecordFound != null)
         {
-            _logger.LogInformation($"Adding to existing call history for call {callState.CallId}");
+            _logger.LogTrace($"Adding to existing call history for call {callState.CallId}");
             var callHistoryRecordExistingReplacement = new CallHistoryCosmosDoc<CALLSTATETYPE>(callState);
 
             if (callHistoryRecordFound.StateHistory.Count > 0 && !callHistoryRecordFound.StateHistory.Last().Equals(callState))
@@ -46,7 +46,7 @@ public class CosmosCallHistoryManager<CALLSTATETYPE> : CosmosService<CALLSTATETY
         }
         else
         {
-            _logger.LogInformation($"Creating new call history for call {callState.CallId}");
+            _logger.LogTrace($"Creating new call history for call {callState.CallId}");
             var callHistoryRecordNew = new CallHistoryCosmosDoc<CALLSTATETYPE>(callState);
             callHistoryRecordNew.CallHistory = new CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>
             {

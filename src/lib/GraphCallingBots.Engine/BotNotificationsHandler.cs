@@ -109,8 +109,8 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
             // Processing ended. Update?
             if (updateCallState && callState != null)
             {
-                logger.LogInformation($"Updated call state for call {callState.CallId}");
                 await callStateManager.AddCallStateOrUpdate(callState);
+                logger.LogDebug($"{nameof(BotNotificationsHandler<CALLSTATETYPE>)}: {botTypeName}: Updated call state for call {callState.CallId}");
             }
 
             if (notificationInScope)
@@ -127,7 +127,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
             if (callState != null)
             {
                 await callHistoryManager.AddToCallHistory(callState, JsonDocument.Parse(JsonSerializer.Serialize(callnotification)).RootElement);
-                logger.LogInformation($"Updated call history for call {callState.CallId}");
+                logger.LogTrace($"{botTypeName}: Updated call history for call {callState.CallId}");
             }
         }
 

@@ -82,17 +82,13 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     /// </summary>
     protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, List<MediaInfo> callMedia, Action<CALLSTATETYPE>? updateCacheCallback)
     {
-        if (!_callStateManager.Initialised)
-        {
-            await _callStateManager.Initialise();
-        }
+        if (!_callStateManager.Initialised) await _callStateManager.Initialise();
+        
         if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
         {
-            _logger.LogInformation($"Created call state for call {createdCall.Id}");
-
             var initialCallState = new CALLSTATETYPE
             {
-                ResourceUrl = $"/communications/calls/{createdCall.Id}",
+                ResourceUrl = BaseActiveCallState.GetResourceUrlFromCallId(createdCall.Id),
                 StateEnum = createdCall.State
             };
 
@@ -105,8 +101,11 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             }
             await _callStateManager.AddCallStateOrUpdate(initialCallState);
 
+            var s = await _callStateManager.GetStateByCallId(createdCall.Id);
+            _logger.LogInformation($"InitCallStateAndStoreMediaInfoForCreatedCall: {BotTypeName} - Updated call state for call {createdCall.Id}");
+
             // Get state and save invite list for when call is established
-            var createdCallState = await _callStateManager.GetStateByCallId(BaseActiveCallState.GetResourceUrlFromCallId(createdCall.Id));
+            var createdCallState = await _callStateManager.GetStateByCallId(createdCall.Id);
             if (createdCallState != null)
             {
                 updateCacheCallback?.Invoke(createdCallState);
@@ -114,12 +113,13 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             }
             else
             {
-                _logger.LogError("Unable to find call state for call {CallId}", createdCall.Id);
+                _logger.LogError($"{BotTypeName} - Unable to find call state for call {createdCall.Id}");
             }
             return true;
         }
         else
         {
+            _logger.LogError($"{BotTypeName} - Call not created or no call ID found");
             throw new ArgumentOutOfRangeException(nameof(createdCall), "Call not created or no call ID found");
         }
     }
@@ -151,18 +151,19 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
         );
         if (stats.Processed == 0)
         {
-            _logger.LogInformation("No notifications processed for bot {BotTypeName}", botTypeName);
+            _logger.LogWarning($"{BotTypeName} - No notifications processed for bot {botTypeName}");
+            // Output deserialized notifications for debugging purposes
+            _logger.LogDebug($"{BotTypeName} - Notifications: {System.Text.Json.JsonSerializer.Serialize(notifications, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })}");
         }
     }
 
-    public static BOTTYPE HydrateBot<BOTTYPE, CALLSTATETYPE>(
+    public static BOTTYPE HydrateBot<BOTTYPE>(
         RemoteMediaCallingBotConfiguration botConfig,
         BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector,
         ICallStateManager<CALLSTATETYPE> callStateManager,
         ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
         ILogger<BOTTYPE> logger)
         where BOTTYPE : BaseBot<CALLSTATETYPE>
-        where CALLSTATETYPE : BaseActiveCallState, new()
     {
         // Use Activator.CreateInstance with parameters and handle potential null return
         var instance = Activator.CreateInstance(typeof(BOTTYPE), botConfig, botCallRedirector, callStateManager, callHistoryManager, logger);

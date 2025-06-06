@@ -5,6 +5,9 @@ using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Communications.Calls.Item.Participants.Invite;
 using Microsoft.Graph.Models;
+using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
@@ -44,8 +47,8 @@ public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiv
             callMediaPlayList.Add(new MediaInfo { Uri = groupMeetingRequest.MessageTransferingUrl, ResourceId = TRANSFERING_PROMPT_ID });
 
         // Start P2P call
-        var singleAttendeeCallReq = await CreateCallRequest(new InvitationParticipantInfo { Identity = initialAdd.ToIdentity() }, callMediaPlayList, groupMeetingRequest.HasPSTN, false);
-        var singleAttendeeCall = await CreateNewCall(singleAttendeeCallReq);
+        var singleAttendeeCallWithMediaReq = await CreateCallRequest(new InvitationParticipantInfo { Identity = initialAdd.ToIdentity() }, callMediaPlayList, groupMeetingRequest.HasPSTN, false);
+        var singleAttendeeCall = await CreateNewCall(singleAttendeeCallWithMediaReq);
 
         if (singleAttendeeCall != null)
         {
@@ -65,20 +68,21 @@ public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiv
     {
         if (tone == Tone.Tone1)
         {
-            _logger.LogInformation($"Tone 1 pressed on invite call {callState.CallId}, inviting to group call {callState.GroupCallId}...");
+            _logger.LogInformation($"{BotTypeName} - Tone 1 pressed on invite call {callState.CallId}, inviting to group call {callState.GroupCallId}...");
 
             // Play "transfering" WAV.
             await PlayConfiguredMediaIfNotAlreadyPlaying(callState, TRANSFERING_PROMPT_ID);
 
             await Task.Delay(3000);     // Wait for transfering prompt to play. Bit of a hack. Should be done with a callback.
 
-            // Transfer P2P call to group call, replacing the call used for the invite
+            // Transfer P2P call to group call, replacing this call for the group call in the invite
             var transferReq = new InvitePostRequestBody
             {
                 Participants = new List<InvitationParticipantInfo>
                 {
                     new InvitationParticipantInfo
                     {
+                        OdataType = "#microsoft.graph.invitationParticipantInfo",
                         Identity = callState.AtendeeIdentity,
                         ReplacesCallId = callState.CallId
                     },
@@ -86,12 +90,13 @@ public class CallInviteBot : AudioPlaybackAndDTMFCallingBot<GroupCallInviteActiv
                 },
             };
 
+            // https://learn.microsoft.com/en-us/graph/api/participant-invite
             await _graphServiceClient.Communications.Calls[callState.GroupCallId].Participants.Invite.PostAsync(transferReq);
-            _logger.LogInformation($"Invite call {callState.CallId} to group call {callState.GroupCallId} was successful");
+            _logger.LogInformation($"{BotTypeName} - Invite call {callState.CallId} to group call {callState.GroupCallId} was successful");
         }
         else
         {
-            _logger.LogInformation($"Tone {tone} pressed on invite call {callState.CallId} - ignoring");
+            _logger.LogInformation($"{BotTypeName} - Unexpected tone '{tone}' pressed on invite call {callState.CallId} - ignoring");
         }
     }
 }

@@ -93,13 +93,13 @@ public class BotNotificationsHandlerTests : BaseTests
         await FailedCallTest(_logger, _callStateManager, _historyManager);
     }
 
-    internal static async Task FailedCallTest(ILogger logger, ICallStateManager<BaseActiveCallState> _callStateManager,
-        ICallHistoryManager<BaseActiveCallState> historyManager)
+    internal static async Task FailedCallTest<T>(ILogger logger, ICallStateManager<T> callStateManager,
+        ICallHistoryManager<T> historyManager) where T : BaseActiveCallState, new()
     {
         var callEstablishingCount = 0;
         var callConnectedCount = 0;
         var callTerminatedCount = 0;
-        var callbackInfo = new NotificationCallbackInfo<BaseActiveCallState>
+        var callbackInfo = new NotificationCallbackInfo<T>
         {
             CallEstablishing = (callState) =>
             {
@@ -121,14 +121,14 @@ public class BotNotificationsHandlerTests : BaseTests
         var callId = BaseActiveCallState.GetCallId(NotificationsLibrary.FailedCallEstablishingP2P.CommsNotifications[0]!.ResourceUrl!)!;
 
         // Handle call establish for a call never seen before
-        await BotNotificationsHandler<BaseActiveCallState>.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallEstablishingP2P, BOT_NAME, _callStateManager, historyManager, callbackInfo, logger);
+        await BotNotificationsHandler<T>.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallEstablishingP2P, BOT_NAME, callStateManager, historyManager, callbackInfo, logger);
         Assert.IsTrue(callEstablishingCount == 1);
 
-        var postEstablishingCallState = await _callStateManager.GetStateByCallId(callId);
+        var postEstablishingCallState = await callStateManager.GetStateByCallId(callId);
         Assert.IsNotNull(postEstablishingCallState);
-        await BotNotificationsHandler<BaseActiveCallState>.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallDeleted, BOT_NAME, _callStateManager, historyManager, callbackInfo, logger);
+        await BotNotificationsHandler<T>.HandleNotificationsAndUpdateCallStateAsync(NotificationsLibrary.FailedCallDeleted, BOT_NAME, callStateManager, historyManager, callbackInfo, logger);
 
-        var postCallDeletedState = await _callStateManager.GetStateByCallId(callId);
+        var postCallDeletedState = await callStateManager.GetStateByCallId(callId);
         Assert.IsNull(postCallDeletedState);
 
         Assert.AreEqual(0, callConnectedCount);

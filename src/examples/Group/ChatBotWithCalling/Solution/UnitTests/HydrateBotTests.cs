@@ -40,7 +40,7 @@ public class HydrateBotTests : AbstractTest
             LoggerFactory.Create(config => { config.AddTraceSource(new System.Diagnostics.SourceSwitch("SourceSwitch")); config.AddConsole(); }).CreateLogger<GroupCallBot>());
 
         // Deserialize the JSON string back to a GroupCallBot object
-        var deserializedBot = BaseBot<BaseActiveCallState>.HydrateBot<GroupCallBot, BaseActiveCallState>(
+        var deserializedBot = BaseBot<BaseActiveCallState>.HydrateBot<GroupCallBot>(
             config, 
             callRedirector,
             callStateManager, 

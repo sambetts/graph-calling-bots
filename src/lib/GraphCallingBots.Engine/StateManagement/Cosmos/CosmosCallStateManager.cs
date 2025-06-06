@@ -12,14 +12,14 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
     public override string PARTITION_KEY => "/" + nameof(CosmosCallDoc.CallId);
 
     public CosmosCallStateManager(CosmosClient cosmosClient, ICosmosConfig cosmosConfig, ILogger<CosmosCallStateManager<CALLSTATETYPE>> logger) 
-        : base(cosmosClient, cosmosConfig.CosmosDatabaseName, cosmosConfig.ContainerNameCallState) 
+        : base(cosmosClient, cosmosConfig.ContainerNameCallState, cosmosConfig.CosmosDatabaseName) 
     {
         _logger = logger;
     }
 
     public async Task AddCallStateOrUpdate(CALLSTATETYPE callState)
     {
-        _logger.LogInformation($"Adding or updating call state for CallId: {callState.CallId}");
+        _logger.LogTrace($"Adding or updating call state for CallId: {callState.CallId}");
         var patchOperations = new List<PatchOperation>
         {
             PatchOperation.Set("/State", callState),
@@ -33,31 +33,30 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
                 partitionKey: new PartitionKey(callState.CallId),
                 patchOperations: patchOperations
             );
+            _logger.LogDebug($"Call state for CallId: {callState.CallId} updated successfully.");
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            _logger.LogInformation($"Call state for CallId: {callState.CallId} not found, creating new document.");
-            
+        {            
             var newDoc = new CallStateCosmosDoc<CALLSTATETYPE>(callState)
             {
                 State = callState,
                 LastUpdated = DateTime.UtcNow
             };
             await container.UpsertItemAsync(newDoc);
-            _logger.LogInformation($"Call state for CallId: {callState.CallId} created successfully.");
+            _logger.LogDebug($"Call state for CallId: {callState.CallId} created successfully.");
         }
     }
 
     public async Task<List<CALLSTATETYPE>> GetActiveCalls()
     {
-        _logger.LogInformation("Retrieving active calls from Cosmos DB");
+        _logger.LogTrace("Retrieving active calls from Cosmos DB");
         var query = new QueryDefinition("SELECT * FROM c WHERE c.CallId != ''"); // Adjust the query as needed
         var iterator = container.GetItemQueryIterator<CallStateCosmosDoc<CALLSTATETYPE>>(query);
         var results = new List<CALLSTATETYPE>();
         while (iterator.HasMoreResults)
         {
             var response = await iterator.ReadNextAsync();
-            results.AddRange(response.Select(r => r.State));
+            results.AddRange(response.Select(r => r.State).Where(state => state != null)!);
         }
         return results;
     }
@@ -70,7 +69,7 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
             return null;
         }
 
-        _logger.LogInformation($"Retrieving call state for CallId: {callId} from Cosmos DB");
+        _logger.LogTrace($"Retrieving call state for CallId: {callId} from Cosmos DB");
         var query = new QueryDefinition("SELECT * FROM c WHERE c.CallId = @callId")
             .WithParameter("@callId", callId);
         var iterator = container.GetItemQueryIterator<CallStateCosmosDoc<CALLSTATETYPE>>(query);
@@ -89,7 +88,7 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
             return false;
         }
 
-        _logger.LogInformation($"Removing call state for CallId: {callId} from Cosmos DB");
+        _logger.LogTrace($"Removing call state for CallId: {callId} from Cosmos DB");
         try
         {
             await container.DeleteItemAsync<CallStateCosmosDoc<CALLSTATETYPE>>(
@@ -106,7 +105,7 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
 
     public async Task RemoveAll()
     {
-        _logger.LogInformation("Removing all call states from Cosmos DB");
+        _logger.LogTrace("Removing all call states from Cosmos DB");
         var query = new QueryDefinition("SELECT * FROM c WHERE c.CallId != ''"); // Adjust the query as needed
         var iterator = container.GetItemQueryIterator<CallStateCosmosDoc<CALLSTATETYPE>>(query);
         while (iterator.HasMoreResults)

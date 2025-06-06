@@ -2,6 +2,7 @@ using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GraphCallingBots.StateManagement.Cosmos;
 using GraphCallingBots.StateManagement.Sql;
+using GroupCalls.Common;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
@@ -26,47 +27,57 @@ public class CallStateTests : BaseTests
     [TestMethod]
     public async Task CosmosCallStateManagerTests()
     {
-        var callStateManager = new CosmosCallStateManager<BaseActiveCallState>(new CosmosClient(_config.CosmosConnectionString), _config.ContainerNameCallState, _config.CosmosDatabaseName,
-            GetLogger<CosmosCallStateManager<BaseActiveCallState>>());
+        var callStateManager = new CosmosCallStateManager<GroupCallInviteActiveCallState>(new CosmosClient(_config.CosmosConnectionString), _config,
+            GetLogger<CosmosCallStateManager<GroupCallInviteActiveCallState>>());
 
         await callStateManager.Initialise();
         await callStateManager.RemoveAll();
 
         // Test partial updates
-
         var testCallId = "123" + DateTime.Now.Ticks;
         var testResourceUrl = BaseActiveCallState.GetResourceUrlFromCallId(testCallId);
 
         await callStateManager.AddCallStateOrUpdate(
-            new BaseActiveCallState 
+            new GroupCallInviteActiveCallState
             { 
                 BotClassNameFull = "Test", 
-                ResourceUrl = testResourceUrl 
+                ResourceUrl = testResourceUrl,
             }
-            );
+        );
+
         var state = await callStateManager.GetStateByCallId(testCallId);    
         Assert.IsNotNull(state);
         Assert.AreEqual("Test", state!.BotClassNameFull);
 
         // Add to same state with different properties
         await callStateManager.AddCallStateOrUpdate(
-            new BaseActiveCallState 
+            new GroupCallInviteActiveCallState
             { 
                 BotClassNameFull = "Test2", 
                 ResourceUrl = testResourceUrl, 
-                StateEnum = CallState.Establishing 
+                StateEnum = CallState.Establishing, // New state prop
+                BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
+                {
+                    { "TestMedia", new EquatableMediaPrompt { MediaInfo = new MediaInfo { Uri = "https://example.com/media.mp3" } } }
+                },
             }
-            );
+        );
         state = await callStateManager.GetStateByCallId(testCallId);
         Assert.IsNotNull(state);
-        Assert.AreEqual("Test2", state!.BotClassNameFull);
-        Assert.AreEqual(CallState.Establishing, state.StateEnum);
-
+        Assert.AreEqual("Test2", state!.BotClassNameFull);          // Updated bot class name
+        Assert.AreEqual(CallState.Establishing, state.StateEnum);   // New state prop
+        Assert.IsNotNull(state.BotMediaPlaylist); // New media playlist prop
+        Assert.IsTrue(state.BotMediaPlaylist.Count > 0); // Ensure media playlist is not empty
         await callStateManager.RemoveAll();
+
+
+
+
+        // Standard tests
         await TestCallStateManager(callStateManager);
 
         // Test also a failed call
-        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, _historyManager);
+        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, new ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>());
     }
 
     [TestMethod]

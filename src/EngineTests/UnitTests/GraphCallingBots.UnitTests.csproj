@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\examples\Group\GroupCalls.Common\GroupCalls.Common.csproj" />
     <ProjectReference Include="..\..\lib\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\..\lib\GraphCallingBots.Engine\GraphCallingBots.csproj" />
   </ItemGroup>

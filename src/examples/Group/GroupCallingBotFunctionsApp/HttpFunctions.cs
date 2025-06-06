@@ -154,7 +154,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
 
                     if (botGroupCall != null)        // Logging for negative handled in GetBotByCallId
                     {
-                        logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for GroupCall bot.");
+                        logger.LogTrace($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for GroupCall bot.");
                         try
                         {
                             await botGroupCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
@@ -173,7 +173,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
                         var botInviteCall = await GetBotAndHandleNotifications(botCallRedirectorCallInviteCall, callId, notificationsPayload);
                         if (botInviteCall != null)
                         {
-                            logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for CallInvite bot.");
+                            logger.LogTrace($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for CallInvite bot.");
 
                             try
                             {

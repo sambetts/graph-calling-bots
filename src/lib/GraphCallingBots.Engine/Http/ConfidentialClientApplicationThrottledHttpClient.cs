@@ -37,7 +37,7 @@ public class ConfidentialClientApplicationHttpHandler : DelegatingHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"HTTP {request.Method} {request.RequestUri}");
+        _logger.LogTrace($"HTTP {request.Method} {request.RequestUri}");
         var body = request.Content?.ReadAsStringAsync();
         if (_auth == null || _auth.ExpiresOn < DateTimeOffset.Now.AddMinutes(5))
         {

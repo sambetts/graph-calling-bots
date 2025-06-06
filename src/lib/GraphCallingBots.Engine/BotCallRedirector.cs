@@ -17,7 +17,11 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
         where CALLSTATETYPE : BaseActiveCallState, new()
 {
     private readonly Dictionary<string, BaseBot<CALLSTATETYPE>> _botMemCache = new();
+    private string botRedirectorTypeString = $"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)}<{typeof(BOTTYPE).Name},{typeof(CALLSTATETYPE).Name}>";
 
+    /// <summary>
+    /// Get a bot instance by call ID. Won't error if the bot is not found or of the expected type, just returns null.
+    /// </summary>
     public async Task<BOTTYPE?> GetBotByCallId(string callId)
     {
         if (_botMemCache.ContainsKey(callId))
@@ -30,12 +34,12 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
         var state = await callStateManager.GetStateByCallId(callId);
         if (state == null)
         {
-            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No call state found for call {callId} in call state manager");
+            logger.LogWarning($"{botRedirectorTypeString} - No call state found for call {callId} in call state manager");
             return null;
         }
         var typeNameForCallId = state.BotClassNameFull;
-        if (string.IsNullOrWhiteSpace(typeNameForCallId)) {
-            logger.LogWarning($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - No bot found for call {callId} in call state manager");
+        if (string.IsNullOrWhiteSpace(typeNameForCallId))
+        {
             return null;
         }
 
@@ -44,7 +48,7 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
         // Compare type names to ensure the correct bot type is used
         if (typeNameForCallId != bot.BotTypeName)
         {
-            logger.LogDebug($"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)} - call {callId} is not handled by '{typeof(BOTTYPE).FullName}', but by '{typeNameForCallId}'");
+            logger.LogDebug($"{botRedirectorTypeString} - call {callId} is not handled by '{typeof(BOTTYPE).FullName}', but by '{typeNameForCallId}'");
             return null;
         }
 
@@ -67,5 +71,6 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
             BotClassNameFull = bot.BotTypeName
         };
         await callStateManager.AddCallStateOrUpdate(initialState);
+        logger.LogDebug($"{botRedirectorTypeString} - Bot registered for call {callId} with type '{bot.BotTypeName}'");
     }
 }
