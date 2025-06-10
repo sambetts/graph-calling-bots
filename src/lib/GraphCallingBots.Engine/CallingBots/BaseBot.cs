@@ -64,29 +64,22 @@ public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo callMedia)
+    protected async Task<bool> UpdateCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo callMedia)
     {
-        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo> { callMedia }, null);
+        return await UpdateCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo> { callMedia }, null);
     }
+
 
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, Action<CALLSTATETYPE>? updateCacheCallback)
-    {
-        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo>(), updateCacheCallback);
-    }
-
-    /// <summary>
-    /// Init the call state manager and store the media info for the created call.
-    /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, List<MediaInfo> callMedia, Action<CALLSTATETYPE>? updateCacheCallback)
+    protected async Task<bool> UpdateCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, List<MediaInfo> callMedia, Action<CALLSTATETYPE>? updateCacheCallback)
     {
         if (!_callStateManager.Initialised) await _callStateManager.Initialise();
-        
+
         if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
         {
-            var initialCallState = new CALLSTATETYPE
+            var updatedCallState = new CALLSTATETYPE
             {
                 ResourceUrl = BaseActiveCallState.GetResourceUrlFromCallId(createdCall.Id),
                 StateEnum = createdCall.State
@@ -97,24 +90,14 @@ public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
             {
                 var playlistDic = new Dictionary<string, EquatableMediaPrompt>();
                 callMedia.Select(m => new EquatableMediaPrompt { MediaInfo = m }).ToList().ForEach(e => playlistDic.Add(Guid.NewGuid().ToString(), e));
-                initialCallState.BotMediaPlaylist = playlistDic;
+                updatedCallState.BotMediaPlaylist = playlistDic;
             }
-            await _callStateManager.AddCallStateOrUpdate(initialCallState);
-
-            var s = await _callStateManager.GetStateByCallId(createdCall.Id);
-            _logger.LogInformation($"InitCallStateAndStoreMediaInfoForCreatedCall: {BotTypeName} - Updated call state for call {createdCall.Id}");
 
             // Get state and save invite list for when call is established
-            var createdCallState = await _callStateManager.GetStateByCallId(createdCall.Id);
-            if (createdCallState != null)
-            {
-                updateCacheCallback?.Invoke(createdCallState);
-                await _callStateManager.AddCallStateOrUpdate(createdCallState);
-            }
-            else
-            {
-                _logger.LogError($"{BotTypeName} - Unable to find call state for call {createdCall.Id}");
-            }
+            updateCacheCallback?.Invoke(updatedCallState);
+            await _callStateManager.AddCallStateOrUpdate(updatedCallState);
+            _logger.LogInformation($"InitCallStateAndStoreMediaInfoForCreatedCall: {BotTypeName} - Updated call state for call {createdCall.Id}");
+            
             return true;
         }
         else

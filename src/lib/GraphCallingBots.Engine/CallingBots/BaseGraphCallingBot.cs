@@ -164,9 +164,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
             if (callCreated?.Id != null)
             {
                 _logger.LogTrace($"{BotTypeName}: Call {callCreated.Id} created in Graph API");
-
                 await _botCallRedirector.RegisterBotForCall(callCreated.Id, this);
-                _logger.LogInformation($"{BotTypeName}: Call {callCreated.Id} added to state manager");
             }
             else
             {

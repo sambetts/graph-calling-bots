@@ -1,6 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
+using System.Dynamic;
 using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement.Cosmos;
@@ -21,10 +22,17 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
     public async Task AddCallStateOrUpdate(CALLSTATETYPE callState)
     {
         _logger.LogWarning($"Adding or updating call state for CallId: {callState.CallId}...");
-        _logger.LogInformation($"Call state details: {JsonSerializer.Serialize(callState)}");
+
+        var updatedStatePatch = BuildDynamicNonNullProperties(callState);
+
+        _logger.LogInformation(JsonSerializer.Serialize(updatedStatePatch, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
+
+
+
+
         var patchOperations = new List<PatchOperation>
         {
-            PatchOperation.Set("/State", callState),
+            PatchOperation.Set("/State", updatedStatePatch),
             PatchOperation.Set("/LastUpdated", DateTime.UtcNow)
         };
 
@@ -44,9 +52,14 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
                 State = callState,
                 LastUpdated = DateTime.UtcNow
             };
-            await container.UpsertItemAsync(newDoc);
+            var res = await container.UpsertItemAsync(newDoc);
             _logger.LogDebug($"Call state for CallId: {callState.CallId} created successfully.");
         }
+
+        var newState = await GetStateByCallId(callState.CallId);
+        _logger.LogWarning($"Call state for CallId: {callState.CallId} after update:");
+        _logger.LogInformation(JsonSerializer.Serialize(callState, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
+
     }
 
     public async Task<List<CALLSTATETYPE>> GetActiveCalls()
@@ -121,5 +134,30 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
                 );
             }
         }
+    }
+    private static object BuildDynamicNonNullProperties(object obj)
+    {
+        if (obj == null) return new { };
+
+        var type = obj.GetType();
+        var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        var dict = new Dictionary<string, object?>();
+
+        foreach (var prop in properties)
+        {
+            var value = prop.GetValue(obj);
+            if (value != null)
+            {
+                dict[prop.Name] = value;
+            }
+        }
+
+        // Return as an ExpandoObject for dynamic usage
+        IDictionary<string, object?> expando = new System.Dynamic.ExpandoObject();
+        foreach (var kvp in dict)
+        {
+            expando[kvp.Key] = kvp.Value;
+        }
+        return (ExpandoObject)expando;
     }
 }

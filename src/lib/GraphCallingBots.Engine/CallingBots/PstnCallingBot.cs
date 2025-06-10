@@ -34,7 +34,7 @@ public abstract class PstnCallingBot<CALLSTATETYPE, BOTTYPE> : AudioPlaybackAndD
 
         var createdCall = await CreateNewCall(pstnCallRequest);
         if (createdCall != null)
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
+            await UpdateCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
 
         return createdCall;
     }
