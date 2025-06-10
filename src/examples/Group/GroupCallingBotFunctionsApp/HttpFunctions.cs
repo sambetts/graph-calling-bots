@@ -1,6 +1,5 @@
 using CommonUtils;
-using GraphCallingBots;
-using GraphCallingBots.CallingBots;
+using GraphCallingBots.EventQueue;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GroupCalls.Common;
@@ -17,10 +16,9 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator callOrchestrator,
-    ICallStateManager<BaseActiveCallState> callStateManager,
-    BotCallRedirector<GroupCallBot, BaseActiveCallState> botCallRedirectorGroupCall,
-    BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState> botCallRedirectorCallInviteCall)
+public class HttpFunctions(ILogger<HttpFunctions> logger, 
+    GroupCallOrchestrator callOrchestrator,
+    ICallStateManager<BaseActiveCallState> callStateManager, QueueManager<CommsNotificationsPayload> queueManager)
 {
 
     /// <summary>
@@ -75,6 +73,8 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
         }
     }
 
+    #region Wav Files
+
     /// <summary>
     /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
     /// </summary>
@@ -121,6 +121,8 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
         }
     }
 
+    #endregion
+
     [Function(nameof(GetActiveCalls))]
     public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
     {
@@ -132,8 +134,6 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
         return response;
     }
 
-
-
     /// <summary>
     /// Handle Graph call notifications. Must be anonymous.
     /// </summary>
@@ -144,61 +144,11 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
 
         if (notificationsPayload != null)
         {
-            foreach (var notification in notificationsPayload.CommsNotifications)
-            {
-                var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
-                if (callId != null)
-                {
-                    var botGroupCall = await GetBotAndHandleNotifications(botCallRedirectorGroupCall, callId, notificationsPayload);
-
-                    if (botGroupCall != null)        // Logging for negative handled in GetBotByCallId
-                    {
-                        logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for GroupCall bot.");
-                        try
-                        {
-                            var stats = await botGroupCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError($"Error handling notifications: {ex.Message}");
-                            var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                            exResponse.WriteString(ex.ToString());
-                            return exResponse;
-                        }
-                    }
-                    else
-                    {
-
-                        var botInviteCall = await GetBotAndHandleNotifications(botCallRedirectorCallInviteCall, callId, notificationsPayload);
-                        if (botInviteCall != null)
-                        {
-                            logger.LogInformation($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for CallInvite bot.");
-
-                            try
-                            {
-                                var stats = await botInviteCall.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.LogError($"Error handling notifications: {ex.Message}");
-                                var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                                exResponse.WriteString(ex.ToString());
-                                return exResponse;
-                            }
-                        }
-                        else
-                        {
-                            logger.LogWarning($"No bot found for call ID {callId} in notification {notification.ResourceUrl}");
-                        }
-                    }
-                }
-                else
-                {
-                    logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
-                }
-            }
-
+            await queueManager.EnqueueAsync(notificationsPayload);
+            logger.LogInformation($"Received {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for processing.");
             var response = req.CreateResponse(HttpStatusCode.Accepted);
+            response.Headers.Add("Content-Type", "application/json");
+            await response.WriteAsJsonAsync(notificationsPayload);
             return response;
         }
         else
@@ -206,20 +156,6 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
             logger.LogError($"Unrecognized request body: {body}");
             return SendBadRequest(req);
         }
-    }
-
-    private async Task<BOTTYPE?> GetBotAndHandleNotifications<BOTTYPE, CALLSTATETYPE>(
-        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector, string callId, CommsNotificationsPayload notificationsPayload)
-        where BOTTYPE : BaseBot<CALLSTATETYPE>
-        where CALLSTATETYPE : BaseActiveCallState, new()
-    {
-        var bot = await botCallRedirector.GetBotByCallId(callId);
-        if (bot != null)
-        {
-            await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
-        }
-
-        return bot;
     }
 
     HttpResponseData SendBadRequest(HttpRequestData req)
