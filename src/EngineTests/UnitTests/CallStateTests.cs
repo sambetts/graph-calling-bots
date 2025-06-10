@@ -78,6 +78,7 @@ public class CallStateTests : BaseTests
     }
 
     [TestMethod]
+    [Obsolete]
     public async Task AzTablesCallStateManagerTests()
     {
         var callStateManager = new AzTablesCallStateManager<BaseActiveCallState>(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"),
@@ -90,6 +91,9 @@ public class CallStateTests : BaseTests
         // Test also a failed call
         await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, _historyManager);
     }
+
+
+
     async Task TestCallStateManager<T>(ICallStateManager<T> callStateManager) where T : BaseActiveCallState, new()
     {
         if (!callStateManager.Initialised)

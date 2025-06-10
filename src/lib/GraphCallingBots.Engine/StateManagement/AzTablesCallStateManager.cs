@@ -7,6 +7,8 @@ namespace GraphCallingBots.StateManagement;
 /// <summary>
 /// Azure tables implementation of ICallStateManager
 /// </summary>
+/// 
+[Obsolete]
 public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, ICallStateManager<T> where T : BaseActiveCallState
 {
     public override string TableName => "CallState";
