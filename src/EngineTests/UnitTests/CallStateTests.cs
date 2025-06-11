@@ -41,6 +41,7 @@ public class CallStateTests : BaseTests
             new GroupCallInviteActiveCallState
             { 
                 BotClassNameFull = "Test", 
+                GroupCallId = testCallId,
                 ResourceUrl = testResourceUrl,
             }
         );
@@ -53,7 +54,8 @@ public class CallStateTests : BaseTests
         await callStateManager.AddCallStateOrUpdate(
             new GroupCallInviteActiveCallState
             { 
-                BotClassNameFull = "Test2", 
+                GroupCallId = null,
+                BotClassNameFull = "Test3", 
                 ResourceUrl = testResourceUrl, 
                 StateEnum = CallState.Establishing, // New state prop
                 BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
@@ -64,7 +66,8 @@ public class CallStateTests : BaseTests
         );
         state = await callStateManager.GetStateByCallId(testCallId);
         Assert.IsNotNull(state);
-        Assert.AreEqual("Test2", state!.BotClassNameFull);          // Updated bot class name
+        Assert.AreEqual(testCallId, state!.GroupCallId);          // Null update should be ignored so should be previous update
+        Assert.AreEqual("Test3", state!.BotClassNameFull);          // Updated bot class name
         Assert.AreEqual(CallState.Establishing, state.StateEnum);   // New state prop
         Assert.IsNotNull(state.BotMediaPlaylist); // New media playlist prop
         Assert.IsTrue(state.BotMediaPlaylist.Count > 0); // Ensure media playlist is not empty

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph.Models;
+using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
 namespace GraphCallingBots.Models;
@@ -85,6 +86,7 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 
     public List<CallParticipant> JoinedParticipants { get; set; } = new();
 
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
 }

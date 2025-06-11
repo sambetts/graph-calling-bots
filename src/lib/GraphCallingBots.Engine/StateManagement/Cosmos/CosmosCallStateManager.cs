@@ -21,28 +21,36 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
 
     public async Task AddCallStateOrUpdate(CALLSTATETYPE callState)
     {
+        if (string.IsNullOrEmpty(callState.CallId))
+        {
+            throw new ArgumentException("CallState must have a valid CallId.", nameof(callState.CallId));
+        }
         _logger.LogWarning($"Adding or updating call state for CallId: {callState.CallId}...");
 
-        var updatedStatePatch = BuildDynamicNonNullProperties(callState);
-
-        _logger.LogInformation(JsonSerializer.Serialize(updatedStatePatch, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
-
-
+        var updatedStatePatch = BuildPatches(callState);
 
 
         var patchOperations = new List<PatchOperation>
         {
-            PatchOperation.Set("/State", updatedStatePatch),
             PatchOperation.Set("/LastUpdated", DateTime.UtcNow)
         };
+        patchOperations.AddRange(updatedStatePatch);
 
+        
         try
         {
-            await container.PatchItemAsync<CallStateCosmosDoc<CALLSTATETYPE>>(
-                id: callState.CallId,
-                partitionKey: new PartitionKey(callState.CallId),
-                patchOperations: patchOperations
-            );
+
+            // Patch 10 operations at a time to avoid exceeding Cosmos DB limits
+            const int maxPatchOps = 10;
+            for (int i = 0; i < patchOperations.Count; i += maxPatchOps)
+            {
+                var segment = patchOperations.Skip(i).Take(maxPatchOps).ToList();
+                await container.PatchItemAsync<CallStateCosmosDoc<CALLSTATETYPE>>(
+                    id: callState.CallId,
+                    partitionKey: new PartitionKey(callState.CallId),
+                    patchOperations: segment
+                );
+            }
             _logger.LogDebug($"Call state for CallId: {callState.CallId} updated successfully.");
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -59,7 +67,6 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
         var newState = await GetStateByCallId(callState.CallId);
         if (newState != null)
         {
-
             if (string.IsNullOrEmpty(newState.BotClassNameFull))
             {
                 _logger.LogError($"Lost class name in state for call ID {callState.CallId}");
@@ -142,29 +149,35 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
             }
         }
     }
-    private static object BuildDynamicNonNullProperties(object obj)
+    private static List<PatchOperation> BuildPatches(object obj)
     {
-        if (obj == null) return new { };
+        if (obj == null) return new List<PatchOperation>();
 
         var type = obj.GetType();
         var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-        var dict = new Dictionary<string, object?>();
+
+        var rootStatName = $"/{nameof(CallStateCosmosDoc<CALLSTATETYPE>.State)}";
+        var patchOperations = new List<PatchOperation>
+        {
+            PatchOperation.Set("/LastUpdated", DateTime.UtcNow)
+        };
 
         foreach (var prop in properties)
         {
+            // Skip properties with [JsonIgnore] attribute
+            var hasJsonIgnore = prop.GetCustomAttributes(typeof(System.Text.Json.Serialization.JsonIgnoreAttribute), inherit: true).Any();
+            if (hasJsonIgnore)
+            {
+                continue;
+            }
+
             var value = prop.GetValue(obj);
             if (value != null)
             {
-                dict[prop.Name] = value;
+                patchOperations.Add(PatchOperation.Set($"{rootStatName}/{prop.Name}", value));
             }
         }
 
-        // Return as an ExpandoObject for dynamic usage
-        IDictionary<string, object?> expando = new System.Dynamic.ExpandoObject();
-        foreach (var kvp in dict)
-        {
-            expando[kvp.Key] = kvp.Value;
-        }
-        return (ExpandoObject)expando;
+        return patchOperations;
     }
 }
