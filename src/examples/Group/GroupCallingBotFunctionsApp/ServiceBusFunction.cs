@@ -9,19 +9,24 @@ using Microsoft.Extensions.Logging;
 
 namespace GroupCallingBot.FunctionApp;
 
+
 public class ServiceBusFunction(QueueManager<CommsNotificationsPayload> queueManager, ILogger<ServiceBusFunction> logger,
     BotCallRedirector<GroupCallBot, BaseActiveCallState> botCallRedirectorGroupCall,
     BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState> botCallRedirectorCallInviteCall)
 {
-    [Function(nameof(ServiceBusFunction))]
-    public async Task Run(
-        [ServiceBusTrigger("myqueue", Connection = "GraphMessages")]
+
+    public const string SB_CONNECTION_NAME = "GraphMessagesSericeBusQueueCallUpdates";
+
+    /// <summary>
+    /// Processes call notifications from the Service Bus queue, one by one in the order received.
+    /// </summary>
+    [Function(nameof(ProcessCallNotification))]
+    public async Task ProcessCallNotification(
+        [ServiceBusTrigger(GraphUpdatesAzureServiceBusJsonQueueAdapter.SB_QUEUE_NAME, Connection = SB_CONNECTION_NAME, IsBatched = false)]
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
         logger.LogInformation("Message ID: {id}", message.MessageId);
-        logger.LogInformation("Message Body: {body}", message.Body);
-        logger.LogInformation("Message Content-Type: {contentType}", message.ContentType);
 
         var notificationsPayload = await queueManager.ProcessMessage(message.Body.ToString() ?? string.Empty);
         if (notificationsPayload == null)

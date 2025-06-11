@@ -26,6 +26,8 @@ public class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
     [ConfigValue(true)]
     public string CosmosConnectionString { get; set; } = null!;
 
+    [ConfigValue]
+    public string ServiceBusRootConnectionString { get; set; } = null!;
 
 
     [ConfigValue(true)]

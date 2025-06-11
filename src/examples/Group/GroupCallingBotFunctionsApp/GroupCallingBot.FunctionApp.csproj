@@ -12,6 +12,7 @@
     <None Remove="WAVs\transfering.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="local.settings.template.json" />
     <Content Include="local.settings.json" />
   </ItemGroup>
   <ItemGroup>

@@ -147,7 +147,6 @@ public class HttpFunctions(ILogger<HttpFunctions> logger,
             await queueManager.EnqueueAsync(notificationsPayload);
             logger.LogInformation($"Received {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for processing.");
             var response = req.CreateResponse(HttpStatusCode.Accepted);
-            response.Headers.Add("Content-Type", "application/json");
             await response.WriteAsJsonAsync(notificationsPayload);
             return response;
         }

@@ -1,11 +1,19 @@
 ﻿using Azure.Messaging.ServiceBus;
+using GraphCallingBots.Models;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GraphCallingBots.EventQueue;
 
-public class AzureServiceBusJsonQueueAdapter<T> : IJsonQueueAdapter<T>
+public class GraphUpdatesAzureServiceBusJsonQueueAdapter : AzureServiceBusJsonQueueAdapter<CommsNotificationsPayload>
+{
+    public const string SB_QUEUE_NAME = "callupdates";
+    public GraphUpdatesAzureServiceBusJsonQueueAdapter(ServiceBusClient client)
+        : base(client, SB_QUEUE_NAME)
+    {
+    }
+}
+
+public abstract class AzureServiceBusJsonQueueAdapter<T> : IJsonQueueAdapter<T>
 {
     private readonly ServiceBusSender _sender;
     private readonly ServiceBusReceiver _receiver;

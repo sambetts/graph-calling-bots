@@ -57,9 +57,16 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
         }
 
         var newState = await GetStateByCallId(callState.CallId);
-        _logger.LogWarning($"Call state for CallId: {callState.CallId} after update:");
-        _logger.LogInformation(JsonSerializer.Serialize(callState, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
+        if (newState != null)
+        {
 
+            if (string.IsNullOrEmpty(newState.BotClassNameFull))
+            {
+                _logger.LogError($"Lost class name in state for call ID {callState.CallId}");
+            }
+            _logger.LogWarning($"Call state for CallId: {newState.CallId} after update:");
+            _logger.LogInformation(JsonSerializer.Serialize(newState, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
+        }
     }
 
     public async Task<List<CALLSTATETYPE>> GetActiveCalls()

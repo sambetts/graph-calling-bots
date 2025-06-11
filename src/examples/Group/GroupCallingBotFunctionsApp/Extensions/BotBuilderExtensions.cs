@@ -1,6 +1,8 @@
 ﻿using Azure.Data.Tables;
+using Azure.Messaging.ServiceBus;
 using GraphCallingBots;
 using GraphCallingBots.CallingBots;
+using GraphCallingBots.EventQueue;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GraphCallingBots.StateManagement.Cosmos;
@@ -34,6 +36,18 @@ public static class BotBuilderExtensions
         else
         {
             throw new ArgumentException("Persistent call state manager is required for function apps, but no storage is configured.");
+        }
+
+
+        if (!string.IsNullOrEmpty(config.ServiceBusRootConnectionString))
+        {
+            services.AddSingleton(new ServiceBusClient(config.ServiceBusRootConnectionString));
+            services.AddSingleton<IJsonQueueAdapter<CommsNotificationsPayload>, GraphUpdatesAzureServiceBusJsonQueueAdapter>();
+            services.AddSingleton<QueueManager<CommsNotificationsPayload>>();
+        }
+        else
+        {
+            throw new ArgumentException("Service bus is required");
         }
 
         // Prefer SQL storage if configured, then CosmosDb, otherwise use in-memory storage
