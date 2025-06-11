@@ -60,7 +60,7 @@ public class CallStateTests : BaseTests
                 StateEnum = CallState.Establishing, // New state prop
                 BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
                 {
-                    { "TestMedia", new EquatableMediaPrompt { MediaInfo = new MediaInfo { Uri = "https://example.com/media.mp3" } } }
+                    { "TestMedia", new EquatableMediaPrompt { MediaInfo = new MediaInfo { Uri = "https://example.com/media1.mp3" } } }
                 },
             }
         );
@@ -70,7 +70,30 @@ public class CallStateTests : BaseTests
         Assert.AreEqual("Test3", state!.BotClassNameFull);          // Updated bot class name
         Assert.AreEqual(CallState.Establishing, state.StateEnum);   // New state prop
         Assert.IsNotNull(state.BotMediaPlaylist); // New media playlist prop
-        Assert.IsTrue(state.BotMediaPlaylist.Count > 0); // Ensure media playlist is not empty
+        Assert.IsTrue(state.BotMediaPlaylist.Count == 1); 
+        Assert.IsTrue(state.BotMediaPlaylist.ContainsKey("TestMedia")); // Ensure specific media is present
+
+        // Update media playlist
+        await callStateManager.AddCallStateOrUpdate(
+            new GroupCallInviteActiveCallState
+            {
+                GroupCallId = null,
+                BotClassNameFull = "Test3",
+                ResourceUrl = testResourceUrl,
+                StateEnum = CallState.Establishing, // New state prop
+                BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>
+                {
+                    { "TestMedia2", new EquatableMediaPrompt { MediaInfo = new MediaInfo { Uri = "https://example.com/media2.mp3" } } }
+                },
+            }
+        );
+
+        state = await callStateManager.GetStateByCallId(testCallId);
+        Assert.IsNotNull(state);
+        Assert.IsTrue(state.BotMediaPlaylist.Count == 1);
+        Assert.IsTrue(state.BotMediaPlaylist.ContainsKey("TestMedia2")); // Ensure specific media is present
+
+        // Reset state
         await callStateManager.RemoveAll();
 
         // Standard tests

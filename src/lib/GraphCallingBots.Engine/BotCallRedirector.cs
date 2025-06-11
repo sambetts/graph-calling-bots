@@ -16,7 +16,7 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
         where BOTTYPE : BaseBot<CALLSTATETYPE>
         where CALLSTATETYPE : BaseActiveCallState, new()
 {
-    private readonly Dictionary<string, BaseBot<CALLSTATETYPE>> _botMemCache = new();
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, BaseBot<CALLSTATETYPE>> _botMemCache = new();
     private string botRedirectorTypeString = $"{nameof(BotCallRedirector<BOTTYPE, CALLSTATETYPE>)}<{typeof(BOTTYPE).Name},{typeof(CALLSTATETYPE).Name}>";
 
     /// <summary>
@@ -54,7 +54,7 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
 
         if (bot != null)
         {
-            _botMemCache.Add(callId, bot);
+            AddBotToCache(callId, bot);
         }
 
         return bot;
@@ -62,7 +62,7 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
 
     public async Task RegisterBotForCall(string callId, BaseBot<CALLSTATETYPE> bot)
     {
-        _botMemCache.Add(callId, bot);
+        AddBotToCache(callId, bot);
 
         // Associate the call with this bot type in the call state manager
         var initialState = new CALLSTATETYPE
@@ -71,6 +71,18 @@ public class BotCallRedirector<BOTTYPE, CALLSTATETYPE>(
             BotClassNameFull = bot.BotTypeName
         };
         await callStateManager.AddCallStateOrUpdate(initialState);
-        logger.LogError($"{botRedirectorTypeString} - Bot registered for call {callId} with type '{bot.BotTypeName}'");
+        logger.LogInformation($"{botRedirectorTypeString} - Bot registered for call {callId} with type '{bot.BotTypeName}'");
+    }
+
+    void AddBotToCache(string callId, BaseBot<CALLSTATETYPE> bot)
+    {
+        if (_botMemCache.TryAdd(callId, bot))
+        {
+            logger.LogDebug($"{botRedirectorTypeString} - Bot for call {callId} added to memory cache: {bot.BotTypeName}");
+        }
+        else
+        {
+            logger.LogWarning($"{botRedirectorTypeString} - Failed to add bot for call {callId} to memory cache. It may already exist.");
+        }
     }
 }

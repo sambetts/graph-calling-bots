@@ -1,8 +1,6 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
-using System.Dynamic;
-using System.Text.Json;
 
 namespace GraphCallingBots.StateManagement.Cosmos;
 
@@ -25,21 +23,17 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
         {
             throw new ArgumentException("CallState must have a valid CallId.", nameof(callState.CallId));
         }
-        _logger.LogWarning($"Adding or updating call state for CallId: {callState.CallId}...");
-
-        var updatedStatePatch = BuildPatches(callState);
-
+        _logger.LogDebug($"Adding or updating call state for CallId: {callState.CallId}...");
 
         var patchOperations = new List<PatchOperation>
         {
             PatchOperation.Set("/LastUpdated", DateTime.UtcNow)
         };
+        var updatedStatePatch = BuildPatches(callState);
         patchOperations.AddRange(updatedStatePatch);
 
-        
         try
         {
-
             // Patch 10 operations at a time to avoid exceeding Cosmos DB limits
             const int maxPatchOps = 10;
             for (int i = 0; i < patchOperations.Count; i += maxPatchOps)
@@ -62,17 +56,6 @@ public class CosmosCallStateManager<CALLSTATETYPE> : CosmosService<CALLSTATETYPE
             };
             var res = await container.UpsertItemAsync(newDoc);
             _logger.LogDebug($"Call state for CallId: {callState.CallId} created successfully.");
-        }
-
-        var newState = await GetStateByCallId(callState.CallId);
-        if (newState != null)
-        {
-            if (string.IsNullOrEmpty(newState.BotClassNameFull))
-            {
-                _logger.LogError($"Lost class name in state for call ID {callState.CallId}");
-            }
-            _logger.LogWarning($"Call state for CallId: {newState.CallId} after update:");
-            _logger.LogInformation(JsonSerializer.Serialize(newState, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
         }
     }
 

@@ -5,9 +5,6 @@ using GraphCallingBots.StateManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Communications.Calls.Item.Participants.Invite;
 using Microsoft.Graph.Models;
-using Newtonsoft.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
 
