@@ -9,11 +9,13 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// A bot that calls you over the phone.
 /// </summary>
-public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPstnCallingBot where T : BaseActiveCallState, new()
+public abstract class PstnCallingBot<CALLSTATETYPE, BOTTYPE> : AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE>, IPstnCallingBot 
+    where CALLSTATETYPE : BaseActiveCallState, new()
+    where BOTTYPE : BaseBot<CALLSTATETYPE>
 {
-    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<T> callStateManager, ICallHistoryManager<T> callHistoryManager,
-        ILogger logger, BotCallRedirector botCallRedirector)
-        : base(botConfig, callStateManager, callHistoryManager, logger, botCallRedirector)
+    protected PstnCallingBot(RemoteMediaCallingBotConfiguration botConfig, BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
+        ILogger logger)
+        : base(botConfig, botCallRedirector, callStateManager, callHistoryManager, logger)
     {
     }
 
@@ -32,7 +34,7 @@ public abstract class PstnCallingBot<T> : AudioPlaybackAndDTMFCallingBot<T>, IPs
 
         var createdCall = await CreateNewCall(pstnCallRequest);
         if (createdCall != null)
-            await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
+            await UpdateCallStateAndStoreMediaInfoForCreatedCall(createdCall, mediaInfoItem);
 
         return createdCall;
     }

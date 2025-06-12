@@ -1,6 +1,7 @@
 ﻿using GraphCallingBots.Models;
 using Microsoft.Graph.Contracts;
 using Microsoft.Graph.Models;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace GroupCalls.Common;
@@ -96,15 +97,16 @@ public class AttendeeCallInfo
 
     public IdentitySet ToIdentity()
     {
+        var idSet = new IdentitySet { OdataType = "#microsoft.graph.identitySet" };
         if (this.Type == GroupMeetingAttendeeType.Phone)
         {
-            var i = new IdentitySet();
-            i.SetPhone(new Identity { Id = Id, DisplayName = DisplayName });
-            return i;
+            idSet.SetPhone(new Identity { Id = Id, DisplayName = DisplayName, OdataType = "#microsoft.graph.identity" });
+            return idSet;
         }
         else if (Type == GroupMeetingAttendeeType.Teams)
         {
-            return new IdentitySet { User = new Identity { Id = this.Id } };
+            idSet.User = new Identity { Id = this.Id, OdataType = "#microsoft.graph.identity" };
+            return idSet;
         }
         else
         {
@@ -120,8 +122,25 @@ public enum GroupMeetingAttendeeType
     Teams
 }
 
-public class GroupCallInviteActiveCallState : BaseActiveCallState
+public class GroupCallInviteActiveCallState : BaseActiveCallState, IEquatable<GroupCallInviteActiveCallState>
 {
-    public string GroupCallId { get; set; } = null!;
-    public IdentitySet AtendeeIdentity { get; set; } = null!;
+    public string? GroupCallId { get; set; } = null!;
+    public IdentitySet? AtendeeIdentity { get; set; } = null!;
+    
+    public bool Equals(GroupCallInviteActiveCallState? other)
+    {
+        if (other is null) return false;
+
+        // Compare AtendeeIdentity. Serialise both if not null, otherwise compare for null.
+        var atendeeIdentityEqual = AtendeeIdentity == null && other.AtendeeIdentity == null
+            || AtendeeIdentity != null && other.AtendeeIdentity != null
+            && JsonSerializer.Serialize(AtendeeIdentity) == JsonSerializer.Serialize(other.AtendeeIdentity);
+
+        return this.GroupCallId == other.GroupCallId && atendeeIdentityEqual && base.Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(GroupCallId, AtendeeIdentity?.GetHashCode() ?? 0);
+    }
 }

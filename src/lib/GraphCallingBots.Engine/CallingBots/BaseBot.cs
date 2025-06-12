@@ -12,7 +12,7 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// Base bot class that handles notifications and call state management.
 /// </summary>
-public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificationsPayloadHandler
+public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
     where CALLSTATETYPE : BaseActiveCallState, new()
 {
     protected readonly RemoteMediaCallingBotConfiguration _botConfig;
@@ -20,12 +20,10 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     protected readonly ICallStateManager<CALLSTATETYPE> _callStateManager;
     private readonly ICallHistoryManager<CALLSTATETYPE> _callHistoryManager;
     private readonly IRequestAuthenticationProvider _authenticationProvider;
-    private readonly BotNotificationsHandler<CALLSTATETYPE> _botNotificationsHandler;
 
     public string BotTypeName => GetType().Name;
 
-    public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
-        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
+    public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
         _logger = logger;
@@ -34,19 +32,6 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
-
-        // Create a callback handler for notifications. Do so on each request as no state is held.
-        var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
-        {
-            CallEstablishing = CallEstablishing,
-            CallEstablished = CallEstablished,
-            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
-            NewTonePressed = NewTonePressed,
-            CallTerminated = CallTerminated,
-            PlayPromptFinished = PlayPromptFinished,
-            UsersJoinedGroupCall = UsersJoinedGroupCall
-        };
-        _botNotificationsHandler = new BotNotificationsHandler<CALLSTATETYPE>(_callStateManager, _callHistoryManager, callBacks, _logger);
     }
 
     /// <summary>
@@ -79,35 +64,24 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo callMedia)
+    protected async Task<bool> UpdateCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, MediaInfo callMedia)
     {
-        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo> { callMedia }, null);
+        return await UpdateCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo> { callMedia }, null);
     }
+
 
     /// <summary>
     /// Init the call state manager and store the media info for the created call.
     /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, Action<CALLSTATETYPE>? updateCacheCallback)
+    protected async Task<bool> UpdateCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, List<MediaInfo> callMedia, Action<CALLSTATETYPE>? updateCacheCallback)
     {
-        return await InitCallStateAndStoreMediaInfoForCreatedCall(createdCall, new List<MediaInfo>(), updateCacheCallback);
-    }
+        if (!_callStateManager.Initialised) await _callStateManager.Initialise();
 
-    /// <summary>
-    /// Init the call state manager and store the media info for the created call.
-    /// </summary>
-    protected async Task<bool> InitCallStateAndStoreMediaInfoForCreatedCall(Call createdCall, List<MediaInfo> callMedia, Action<CALLSTATETYPE>? updateCacheCallback)
-    {
-        if (!_callStateManager.Initialised)
-        {
-            await _callStateManager.Initialise();
-        }
         if (createdCall != null && !string.IsNullOrEmpty(createdCall.Id))
         {
-            _logger.LogInformation($"Created call state for call {createdCall.Id}");
-
-            var initialCallState = new CALLSTATETYPE
+            var updatedCallState = new CALLSTATETYPE
             {
-                ResourceUrl = $"/communications/calls/{createdCall.Id}",
+                ResourceUrl = BaseActiveCallState.GetResourceUrlFromCallId(createdCall.Id),
                 StateEnum = createdCall.State
             };
 
@@ -116,32 +90,68 @@ public abstract class BaseBot<CALLSTATETYPE> : IGraphCallingBot, ICommsNotificat
             {
                 var playlistDic = new Dictionary<string, EquatableMediaPrompt>();
                 callMedia.Select(m => new EquatableMediaPrompt { MediaInfo = m }).ToList().ForEach(e => playlistDic.Add(Guid.NewGuid().ToString(), e));
-                initialCallState.BotMediaPlaylist = playlistDic;
+                updatedCallState.BotMediaPlaylist = playlistDic;
             }
-            await _callStateManager.AddCallStateOrUpdate(initialCallState);
 
             // Get state and save invite list for when call is established
-            var createdCallState = await _callStateManager.GetByNotificationResourceUrl($"/communications/calls/{createdCall.Id}");
-            if (createdCallState != null)
-            {
-                updateCacheCallback?.Invoke(createdCallState);
-                await _callStateManager.UpdateCurrentCallState(createdCallState);
-            }
-            else
-            {
-                _logger.LogError("Unable to find call state for call {CallId}", createdCall.Id);
-            }
+            updateCacheCallback?.Invoke(updatedCallState);
+            await _callStateManager.AddCallStateOrUpdate(updatedCallState);
+            _logger.LogInformation($"InitCallStateAndStoreMediaInfoForCreatedCall: {BotTypeName} - Updated call state for call {createdCall.Id}");
+            
             return true;
         }
         else
         {
+            _logger.LogError($"{BotTypeName} - Call not created or no call ID found");
             throw new ArgumentOutOfRangeException(nameof(createdCall), "Call not created or no call ID found");
         }
     }
 
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
+    public async Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications)
     {
-        await _botNotificationsHandler.HandleNotificationsAndUpdateCallStateAsync(notifications, this.GetType().Name);
+        // Ensure that GetType().FullName is not null before passing it to the method
+        var botTypeName = this.GetType().FullName ?? throw new InvalidOperationException("Bot type name cannot be null.");
+
+        // Create a callback handler for notifications. Do so on each request as no state is held.
+        var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
+        {
+            CallEstablishing = CallEstablishing,
+            CallEstablished = CallEstablished,
+            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
+            NewTonePressed = NewTonePressed,
+            CallTerminated = CallTerminated,
+            PlayPromptFinished = PlayPromptFinished,
+            UsersJoinedGroupCall = UsersJoinedGroupCall
+        };
+
+        var stats = await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(
+            notifications,
+            botTypeName,
+            _callStateManager,
+            _callHistoryManager,
+            callBacks,
+            _logger
+        );
+        return stats;
+    }
+
+    public static BOTTYPE HydrateBot<BOTTYPE>(
+        RemoteMediaCallingBotConfiguration botConfig,
+        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector,
+        ICallStateManager<CALLSTATETYPE> callStateManager,
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager,
+        ILogger<BOTTYPE> logger)
+        where BOTTYPE : BaseBot<CALLSTATETYPE>
+    {
+        // Use Activator.CreateInstance with parameters and handle potential null return
+        var instance = Activator.CreateInstance(typeof(BOTTYPE), botConfig, botCallRedirector, callStateManager, callHistoryManager, logger);
+
+        if (instance is null)
+        {
+            throw new InvalidOperationException($"Failed to create an instance of type {typeof(BOTTYPE).FullName}");
+        }
+
+        return (BOTTYPE)instance;
     }
 
     #region Bot Events

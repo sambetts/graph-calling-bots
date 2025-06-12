@@ -7,7 +7,7 @@ namespace GraphCallingBots.StateManagement;
 /// <summary>
 /// Abstract base class for Azure tables storage managers. Async initialization.
 /// </summary>
-public abstract class AbstractAzTablesStorageManager
+public abstract class AbstractSingleTableAzStorageManager
 {
     protected readonly TableServiceClient _tableServiceClient;
     protected readonly ILogger _logger;
@@ -15,7 +15,7 @@ public abstract class AbstractAzTablesStorageManager
 
     public bool Initialised => _tableClient != null;
 
-    public AbstractAzTablesStorageManager(TableServiceClient tableServiceClient, ILogger logger)
+    public AbstractSingleTableAzStorageManager(TableServiceClient tableServiceClient, ILogger logger)
     {
         _tableServiceClient = tableServiceClient;
         _logger = logger;

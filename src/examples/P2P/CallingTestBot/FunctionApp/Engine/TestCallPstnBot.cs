@@ -11,7 +11,7 @@ namespace CallingTestBot.FunctionApp.Engine;
 /// A bot that calls a PSTN number and plays a wav file, and hangs up. Results of call test are recorded in Azure table storage.
 /// Call is started by a function app; this class just handles the responses once call starts.
 /// </summary>
-public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
+public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState, TestCallPstnBot>
 {
     public const string NotificationPromptName = "NotificationPrompt";
     private readonly CallingTestBotConfig _callingTestBotConfig;
@@ -21,8 +21,9 @@ public class TestCallPstnBot : PstnCallingBot<BaseActiveCallState>
     /// Initializes a new instance of the <see cref="TestCallPstnBot" /> class.
     /// </summary>
     public TestCallPstnBot(SingleWavFileBotConfig botOptions, CallingTestBotConfig callingTestBotConfig, ILogger<TestCallPstnBot> logger,
-        ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, IBotTestsLogger botTestsLogger, ILogger<BotCallRedirector> botCallRedirectorLogger)
-        : base(botOptions, callStateManager, callHistoryManager, logger, new BotCallRedirector(botCallRedirectorLogger))
+        BotCallRedirector<TestCallPstnBot, BaseActiveCallState> botCallRedirector,
+        ICallStateManager<BaseActiveCallState> callStateManager, ICallHistoryManager<BaseActiveCallState> callHistoryManager, IBotTestsLogger botTestsLogger)
+        : base(botOptions, botCallRedirector, callStateManager, callHistoryManager, logger)
     {
         _callingTestBotConfig = callingTestBotConfig;
         _botTestsLogger = botTestsLogger;

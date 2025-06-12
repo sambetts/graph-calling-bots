@@ -1,5 +1,5 @@
 using CommonUtils;
-using GraphCallingBots;
+using GraphCallingBots.EventQueue;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GroupCalls.Common;
@@ -16,57 +16,64 @@ namespace GroupCallingBot.FunctionApp;
 /// <summary>
 /// Azure Functions implementation of PSTN bot.
 /// </summary>
-public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator callOrchestrator,
-    ICallStateManager<BaseActiveCallState> callStateManager, BotCallRedirector botCallRedirector)
+public class HttpFunctions(ILogger<HttpFunctions> logger, 
+    GroupCallOrchestrator callOrchestrator,
+    ICallStateManager<BaseActiveCallState> callStateManager, QueueManager<CommsNotificationsPayload> queueManager)
 {
 
     /// <summary>
-    /// Handle Graph call notifications. Must be anonymous.
+    /// Start call triggered by HTTP request.
     /// </summary>
-    [Function(nameof(CallNotification))]
-    public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
+    [Function(nameof(StartCall))]
+    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
-        var (notificationsPayload, body) = await GetBody<CommsNotificationsPayload>(req);
-
-        if (notificationsPayload != null)
+        var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
+        if (newCallReq != null)
         {
-            logger.LogDebug($"Processing {notificationsPayload.CommsNotifications.Count} Graph call notification(s)");
-            foreach (var notification in notificationsPayload.CommsNotifications)
+            Call? groupCall;
+            try
             {
-                var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
-                if (callId != null)
-                {
-                    var bot = botCallRedirector.GetBotByCallId(callId);
-                    if (bot != null)        // Logging for negative handled in GetBotByCallId
-                    {
-                        try
-                        {
-                            await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
-                        }
-                        catch (Exception ex)
-                        {
-                            var exResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                            exResponse.WriteString(ex.ToString());
-                            return exResponse;
-                        }
-                    }
-
-                }
-                else
-                {
-                    logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
-                }
+                groupCall = await callOrchestrator.StartGroupCall(newCallReq);
+            }
+            catch (ArgumentException ex)
+            {
+                logger.LogError($"Argument exception: {ex.Message}");
+                return SendBadRequest(req);
+            }
+            catch (Microsoft.Graph.Models.ODataErrors.ODataError ex)
+            {
+                // Graph API returned an error
+                logger.LogError($"Graph API error {ex.ResponseStatusCode} creating call");
+                var response = req.CreateResponse(HttpStatusCode.BadRequest);
+                await response.WriteAsJsonAsync(ex.ToString());
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = req.CreateResponse(HttpStatusCode.InternalServerError);
+                await response.WriteAsJsonAsync(ex.ToString());
+                return response;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.Accepted);
-            return response;
+            if (groupCall == null)
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            else
+            {
+                var response = req.CreateResponse(HttpStatusCode.Accepted);
+                await response.WriteAsJsonAsync(groupCall);
+                return response;
+            }
         }
         else
         {
-            logger.LogError($"Unrecognized request body: {body}");
+            logger.LogError($"Unrecognized request body: {responseBodyRaw}");
             return SendBadRequest(req);
         }
     }
+
+    #region Wav Files
 
     /// <summary>
     /// Send WAV file for call. Recommended: use CDN to deliver content. Must be anonymous.
@@ -114,51 +121,7 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
         }
     }
 
-    /// <summary>
-    /// Start call triggered by HTTP request.
-    /// </summary>
-    [Function(nameof(StartCall))]
-    public async Task<HttpResponseData> StartCall([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
-    {
-        var (newCallReq, responseBodyRaw) = await GetBody<StartGroupCallData>(req);
-        if (newCallReq != null)
-        {
-            Call? groupCall;
-            try
-            {
-                groupCall = await callOrchestrator.StartGroupCall(newCallReq);
-            }
-            catch (ArgumentException)
-            {
-                // Something went wrong with the request
-                return SendBadRequest(req);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Failed to start group call: {ex}");
-                var response = req.CreateResponse(HttpStatusCode.InternalServerError);
-                await response.WriteAsJsonAsync(ex.ToString());
-                return response;
-            }
-
-            if (groupCall == null)
-            {
-                return req.CreateResponse(HttpStatusCode.BadRequest);
-            }
-            else
-            {
-                var response = req.CreateResponse(HttpStatusCode.Accepted);
-                await response.WriteAsJsonAsync(groupCall);
-                return response;
-            }
-        }
-        else
-        {
-            logger.LogError($"Unrecognized request body: {responseBodyRaw}");
-            return SendBadRequest(req);
-        }
-    }
-
+    #endregion
 
     [Function(nameof(GetActiveCalls))]
     public async Task<HttpResponseData> GetActiveCalls([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
@@ -169,6 +132,29 @@ public class HttpFunctions(ILogger<HttpFunctions> logger, GroupCallOrchestrator 
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(calls);
         return response;
+    }
+
+    /// <summary>
+    /// Handle Graph call notifications. Must be anonymous.
+    /// </summary>
+    [Function(nameof(CallNotification))]
+    public async Task<HttpResponseData> CallNotification([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
+    {
+        var (notificationsPayload, body) = await GetBody<CommsNotificationsPayload>(req);
+
+        if (notificationsPayload != null)
+        {
+            await queueManager.EnqueueAsync(notificationsPayload);
+            logger.LogInformation($"Received {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for processing.");
+            var response = req.CreateResponse(HttpStatusCode.Accepted);
+            await response.WriteAsJsonAsync(notificationsPayload);
+            return response;
+        }
+        else
+        {
+            logger.LogError($"Unrecognized request body: {body}");
+            return SendBadRequest(req);
+        }
     }
 
     HttpResponseData SendBadRequest(HttpRequestData req)

@@ -17,11 +17,9 @@ public interface IAsyncInit
 /// </summary>
 public interface ICallStateManager<T> : IAsyncInit where T : BaseActiveCallState
 {
-    /// <param name="resourceId">Example: "/app/calls/4d1f5d00-1a60-4db8-bed0-706b16a6cf67"</param>
-    Task<T?> GetByNotificationResourceUrl(string resourceId);
+    Task<T?> GetStateByCallId(string callId);
     Task AddCallStateOrUpdate(T callState);
-    Task<bool> RemoveCurrentCall(string resourceUrl);
-    Task UpdateCurrentCallState(T callState);
+    Task<bool> RemoveCurrentCall(string callId);
     Task<List<T>> GetActiveCalls();
 }
 
@@ -39,7 +37,8 @@ public interface ICallHistoryManager<CALLSTATETYPE> : IAsyncInit
 
 public interface ICosmosConfig
 {
-    public string CosmosDb { get; set; }
-    public string DatabaseName { get; set; }
-    public string ContainerName { get; set; }
+    public string CosmosConnectionString { get; set; }
+    public string CosmosDatabaseName { get; set; }
+    public string ContainerNameCallHistory { get; set; }
+    public string ContainerNameCallState { get; set; }
 }

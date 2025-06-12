@@ -10,18 +10,24 @@ namespace GraphCallingBots;
 /// <summary>
 /// Turns Graph call notifications into callbacks and updates base call state & history.
 /// </summary>
-public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATETYPE> callStateManager,
-    ICallHistoryManager<CALLSTATETYPE> callHistoryManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ILogger logger)
-    where CALLSTATETYPE : BaseActiveCallState, new()
+public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : BaseActiveCallState, new()
 {
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
 
     /// <summary>
     /// Handle notifications from Graph and raise events as appropriate
     /// </summary>
-    public async Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload? notificationPayload, string botTypeName)
+    public static async Task<NotificationStats> HandleNotificationsAndUpdateCallStateAsync(
+        CommsNotificationsPayload? notificationPayload, 
+        string botTypeName, 
+        ICallStateManager<CALLSTATETYPE> callStateManager,
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, 
+        NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, 
+        ILogger logger
+    )
     {
-        if (notificationPayload == null) return;
+        if (notificationPayload == null) return new NotificationStats { Processed = 0, Skipped = 0 };
 
         // Ensure processing is single-threaded to maintain processing order
         await _semaphore.WaitAsync();
@@ -29,14 +35,28 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
         if (!callStateManager.Initialised) await callStateManager.Initialise();
         if (!callHistoryManager.Initialised) await callHistoryManager.Initialise();
 
+        var stats = new NotificationStats { Processed = 0, Skipped = 0 };
         foreach (var callnotification in notificationPayload.CommsNotifications)
         {
-            var callState = await callStateManager.GetByNotificationResourceUrl(callnotification.ResourceUrl);
+            var notificationInScope = false;
+            var callId = BaseActiveCallState.GetCallId(callnotification.ResourceUrl);
+            CALLSTATETYPE? callState = null;
+            if (callId != null)
+            {
+                callState = await callStateManager.GetStateByCallId(callId);
+            }
+            else
+            {
+                logger.LogWarning($"{botTypeName}: Received notification for call with no callId: {callnotification.ResourceUrl}");
+            }
             var updateCallState = false;
 
             // Is this notification for a call we're tracking?
-            updateCallState = await HandleCallChangeTypeUpdate(callState, callnotification, botTypeName);
-
+            updateCallState = await HandleCallChangeTypeUpdate(callStateManager, callbackInfo, callState, callnotification, botTypeName, logger);
+            if (updateCallState)
+            {
+                notificationInScope = true;
+            }
             // If we're not updating the call state, check for other events
             if (!updateCallState && callState != null)
             {
@@ -45,7 +65,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                 {
                     // Is this notification for a tone on a call we're tracking?
                     updateCallState = true;
-                    await HandleToneNotificationAsync(callnotification.AssociatedCall.ToneInfo, callState, botTypeName);
+                    await HandleToneNotificationAsync(callbackInfo, callnotification.AssociatedCall.ToneInfo, callState, botTypeName, logger);
                 }
                 else if (callnotification.AssociatedPlayPromptOperation != null && callnotification.AssociatedPlayPromptOperation.Status == OperationStatus.Completed)
                 {
@@ -67,6 +87,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                         // User joined group call
                         logger.LogInformation($"{botTypeName}: {newPartipants.Count} user(s) joined group call {callState.CallId}");
                         if (callbackInfo.UsersJoinedGroupCall != null) await callbackInfo.UsersJoinedGroupCall(callState, newPartipants);
+                        notificationInScope = true;
                     }
 
                     var diconnectedPartipants = callnotification.JoinedParticipants.GetDisconnectedParticipants(callState.JoinedParticipants);
@@ -75,6 +96,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
                         // User left group call
                         logger.LogInformation($"{botTypeName}: {diconnectedPartipants.Count} user(s) left group call {callState.CallId}");
                         if (callbackInfo.UsersLeftGroupCall != null) await callbackInfo.UsersLeftGroupCall(callState, diconnectedPartipants);
+                        notificationInScope = true;
                     }
 
                     callState.JoinedParticipants = callnotification.JoinedParticipants;
@@ -84,20 +106,35 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
             // Processing ended. Update?
             if (updateCallState && callState != null)
             {
-                await callStateManager.UpdateCurrentCallState(callState);
+                await callStateManager.AddCallStateOrUpdate(callState);
+                logger.LogDebug($"{nameof(BotNotificationsHandler<CALLSTATETYPE>)}: {botTypeName}: Updated call state for call {callState.CallId}");
+            }
+
+            if (notificationInScope)
+            {
+                stats.Processed++;
+            }
+            else
+            {
+                stats.Skipped++;
+                logger.LogDebug($"{botTypeName}: Skipped notification for call '{callState?.CallId ?? "unknown"}' - no state change or not in scope");
             }
 
             // Update history even if no state changes
             if (callState != null)
             {
                 await callHistoryManager.AddToCallHistory(callState, JsonDocument.Parse(JsonSerializer.Serialize(callnotification)).RootElement);
+                logger.LogTrace($"{botTypeName}: Updated call history for call {callState.CallId}");
             }
         }
 
         _semaphore.Release();
+
+        return stats;
     }
 
-    private async Task<bool> HandleCallChangeTypeUpdate(CALLSTATETYPE? callState, CallNotification callNotification, string botType)
+    private static async Task<bool> HandleCallChangeTypeUpdate(ICallStateManager<CALLSTATETYPE> callStateManager, NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, 
+        CALLSTATETYPE? callState, CallNotification callNotification, string botType, ILogger logger)
     {
         // Not seen this call before. Is this notification for a new call?
         if (callNotification.AssociatedCall != null && callNotification.AssociatedCall.State == CallState.Establishing)
@@ -166,7 +203,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
             if (!string.IsNullOrEmpty(callState.CallId))
             {
                 logger.LogInformation($"{botType}: Call {callState.CallId} terminated");
-                var removeSuccess = await callStateManager.RemoveCurrentCall(callState.ResourceUrl);
+                var removeSuccess = await callStateManager.RemoveCurrentCall(callState.CallId);
                 if (removeSuccess)
                     logger.LogInformation($"{botType}: Call {callState.CallId} state removed");
                 else
@@ -189,7 +226,7 @@ public class BotNotificationsHandler<CALLSTATETYPE>(ICallStateManager<CALLSTATET
         return false;
     }
 
-    async Task HandleToneNotificationAsync(ToneInfo toneInfo, CALLSTATETYPE callState, string botType)
+    static async Task HandleToneNotificationAsync(NotificationCallbackInfo<CALLSTATETYPE> callbackInfo, ToneInfo toneInfo, CALLSTATETYPE callState, string botType, ILogger logger)
     {
         if (toneInfo.Tone != null)
         {

@@ -1,7 +1,11 @@
 ﻿using Azure.Data.Tables;
+using Azure.Messaging.ServiceBus;
 using GraphCallingBots;
+using GraphCallingBots.CallingBots;
+using GraphCallingBots.EventQueue;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using GraphCallingBots.StateManagement.Sql;
 using GroupCalls.Common;
 using Microsoft.Azure.Cosmos;
@@ -15,21 +19,35 @@ public static class BotBuilderExtensions
     internal static IServiceCollection AddCallingBot(this IServiceCollection services, FunctionsAppCallingBotConfig config)
     {
         services.AddSingleton<RemoteMediaCallingBotConfiguration>(config.ToRemoteMediaCallingBotConfiguration(HttpRouteConstants.CallNotificationsRoute));
-        services.AddSingleton<BotCallRedirector>();
         services.AddSingleton<GroupCallOrchestrator>();
 
         // Use in-memory storage is no storage is configured
         if (!string.IsNullOrEmpty(config.Storage))
         {
             services.AddSingleton(new TableServiceClient(config.Storage));
+        }
 
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
-            services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, AzTablesCallStateManager<GroupCallInviteActiveCallState>>();
+        if (!string.IsNullOrEmpty(config.CosmosConnectionString))
+        {
+            services.AddSingleton(new CosmosClient(config.CosmosConnectionString));
+            services.AddSingleton<ICallStateManager<BaseActiveCallState>, CosmosCallStateManager<BaseActiveCallState>>();
+            services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, CosmosCallStateManager<GroupCallInviteActiveCallState>>();
         }
         else
         {
-            services.AddSingleton<ICallStateManager<BaseActiveCallState>, ConcurrentInMemoryCallStateManager<BaseActiveCallState>>();
-            services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallStateManager<GroupCallInviteActiveCallState>>();
+            throw new ArgumentException("Persistent call state manager is required for function apps, but no storage is configured.");
+        }
+
+
+        if (!string.IsNullOrEmpty(config.ServiceBusRootConnectionString))
+        {
+            services.AddSingleton(new ServiceBusClient(config.ServiceBusRootConnectionString));
+            services.AddSingleton<IJsonQueueAdapter<CommsNotificationsPayload>, GraphUpdatesAzureServiceBusJsonQueueAdapter>();
+            services.AddSingleton<QueueManager<CommsNotificationsPayload>>();
+        }
+        else
+        {
+            throw new ArgumentException("Service bus is required");
         }
 
         // Prefer SQL storage if configured, then CosmosDb, otherwise use in-memory storage
@@ -46,20 +64,16 @@ public static class BotBuilderExtensions
         }
         else
         {
-            if (!string.IsNullOrEmpty(config.CosmosDb))
-            {
-                services.AddSingleton(new CosmosClient(config.CosmosDb));
-                services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
-                services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, CosmosCallHistoryManager<GroupCallInviteActiveCallState>>();
-            }
-            else
-            {
-                services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
-                services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>>();
-            }
+            services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
+            services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>>();
         }
 
         services.AddSingleton<ICosmosConfig>(config);
+
+
+        services.AddSingleton<BotCallRedirector<CallInviteBot, GroupCallInviteActiveCallState>>();
+        services.AddSingleton<BotCallRedirector<GroupCallBot, BaseActiveCallState>>();
+
         services.AddSingleton<CallInviteBot>();
         return services.AddSingleton<GroupCallBot>();
     }

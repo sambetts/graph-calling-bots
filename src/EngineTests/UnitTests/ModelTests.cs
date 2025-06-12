@@ -1,6 +1,8 @@
 using GraphCallingBots.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph.Models;
+using GroupCalls.Common;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GraphCallingBots.UnitTests;
 
@@ -54,8 +56,6 @@ public class ModelTests
         Assert.AreEqual("6f1f5c00-8c1b-47f1-be9d-660c501041a9", new BaseActiveCallState { ResourceUrl = "/communications/calls/6f1f5c00-8c1b-47f1-be9d-660c501041a9/operations/11cccef9-7eeb-4910-9189-977c0f0eae85" }.CallId);
     }
 
-
-
     [TestMethod]
     public void GetJoinedParticipants()
     {
@@ -98,5 +98,113 @@ public class ModelTests
         var disconnected = newList.GetDisconnectedParticipants(oldList);
         Assert.AreEqual(1, disconnected.Count);
         Assert.AreEqual("2", disconnected[0].Id);
+    }
+}
+
+[TestClass]
+public class GroupCallInviteActiveCallStateTests
+{
+    [TestMethod]
+    public void Equals_ReturnsTrue_ForIdenticalObjects()
+    {
+        var idSet1 = new IdentitySet { OdataType = "#microsoft.graph.identitySet" };
+        var idSet2 = new IdentitySet { OdataType = "#microsoft.graph.identitySet" };
+        var state1 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet1,
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+        var state2 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet2,
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+
+        Assert.IsTrue(state1.Equals(state2));
+    }
+
+    [TestMethod]
+    public void Equals_ReturnsFalse_ForDifferentGroupCallId()
+    {
+        var idSet = new IdentitySet { OdataType = "#microsoft.graph.identitySet" };
+        var state1 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet,
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+        var state2 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group2",
+            AtendeeIdentity = idSet,
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+
+        Assert.IsFalse(state1.Equals(state2));
+    }
+
+    [TestMethod]
+    public void Equals_ReturnsFalse_ForDifferentAtendeeIdentity()
+    {
+        var idSet1 = new IdentitySet { OdataType = "#microsoft.graph.identitySet" };
+        var idSet2 = new IdentitySet { OdataType = "#microsoft.graph.identitySet", User = new Identity { Id = "user2" } };
+        var state1 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet1,
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+        var state2 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet2,
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+
+        Assert.IsFalse(state1.Equals(state2));
+    }
+
+    [TestMethod]
+    public void Equals_ReturnsFalse_ForDifferentBaseProperties()
+    {
+        var idSet = new IdentitySet { OdataType = "#microsoft.graph.identitySet" };
+        var state1 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet,
+            BotClassNameFull = "Bot1",
+            ResourceUrl = "/calls/1"
+        };
+        var state2 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = idSet,
+            BotClassNameFull = "Bot2", // Different base property
+            ResourceUrl = "/calls/1"
+        };
+
+        Assert.IsFalse(state1.Equals(state2));
+    }
+
+    [TestMethod]
+    public void Equals_ReturnsFalse_WhenOtherIsNull()
+    {
+        var state1 = new GroupCallInviteActiveCallState
+        {
+            GroupCallId = "group1",
+            AtendeeIdentity = new IdentitySet { OdataType = "#microsoft.graph.identitySet" },
+            BotClassNameFull = "Bot",
+            ResourceUrl = "/calls/1"
+        };
+
+        Assert.IsFalse(state1.Equals(null));
     }
 }

@@ -4,7 +4,7 @@ namespace GraphCallingBots.StateManagement;
 
 public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where T : BaseActiveCallState
 {
-    private readonly Dictionary<string, T> _callStates = new();
+    private readonly Dictionary<string, T> _callStatesByCallId = new();
 
     public virtual Task AddCallStateOrUpdate(T callState)
     {
@@ -14,39 +14,42 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
         }
         lock (this)
         {
-            if (_callStates.ContainsKey(callState.CallId))
+            if (_callStatesByCallId.ContainsKey(callState.CallId))
             {
-                _callStates[callState.CallId] = callState;
+                _callStatesByCallId[callState.CallId] = callState;
             }
             else
             {
-                _callStates.Add(callState.CallId, callState);
+                _callStatesByCallId.Add(callState.CallId, callState);
             }
         }
         return Task.CompletedTask;
     }
 
-    public virtual Task<T?> GetByNotificationResourceUrl(string resourceUrl)
+    public virtual Task<T?> GetStateByCallId(string callId)
     {
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult<T?>(null);
+        return GetByCallId(callId);
+    }
+
+    public Task<T?> GetByCallId(string callId)
+    {
         lock (this)
         {
             T? callState = null;
 
-            _callStates.TryGetValue(callId, out callState);
+            _callStatesByCallId.TryGetValue(callId, out callState);
             return Task.FromResult(callState);
         }
     }
 
-    public virtual Task<bool> RemoveCurrentCall(string resourceUrl)
+    public virtual Task<bool> RemoveCurrentCall(string callId)
     {
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId == null) return Task.FromResult(false);
 
         lock (this)
         {
-            var r = _callStates.Remove(callId);
+            var r = _callStatesByCallId.Remove(callId);
             return Task.FromResult(r);
         }
     }
@@ -60,9 +63,9 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 
         lock (this)
         {
-            if (_callStates.ContainsKey(callState.CallId))
+            if (_callStatesByCallId.ContainsKey(callState.CallId))
             {
-                _callStates[callState.CallId] = callState;
+                _callStatesByCallId[callState.CallId] = callState;
             }
         }
         return Task.CompletedTask;
@@ -80,7 +83,7 @@ public class ConcurrentInMemoryCallStateManager<T> : ICallStateManager<T> where 
 
         lock (this)
         {
-            return Task.FromResult(_callStates.Select(s => s.Value).ToList());
+            return Task.FromResult(_callStatesByCallId.Select(s => s.Value).ToList());
         }
     }
 }

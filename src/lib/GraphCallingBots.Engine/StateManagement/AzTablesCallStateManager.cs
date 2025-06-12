@@ -7,7 +7,9 @@ namespace GraphCallingBots.StateManagement;
 /// <summary>
 /// Azure tables implementation of ICallStateManager
 /// </summary>
-public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICallStateManager<T> where T : BaseActiveCallState
+/// 
+[Obsolete]
+public class AzTablesCallStateManager<T> : AbstractSingleTableAzStorageManager, ICallStateManager<T> where T : BaseActiveCallState
 {
     public override string TableName => "CallState";
 
@@ -21,14 +23,12 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
 
         var entity = new CallStateEntity<T>(callState);
         var r = await _tableClient!.UpsertEntityAsync(entity);
-
     }
 
-    public async Task<T?> GetByNotificationResourceUrl(string resourceUrl)
+    public async Task<T?> GetStateByCallId(string callId)
     {
         InitCheck();
 
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
         if (callId != null)
         {
             var results = _tableClient!.QueryAsync<CallStateEntity<T>>(f => f.RowKey == callId);
@@ -41,10 +41,10 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         return null;
     }
 
-    public async Task<bool> RemoveCurrentCall(string resourceUrl)
+    public async Task<bool> RemoveCurrentCall(string callId)
     {
         InitCheck();
-        var callId = BaseActiveCallState.GetCallId(resourceUrl);
+
         var r = await _tableClient!.DeleteEntityAsync(CallStateEntity<T>.PARTITION_KEY, callId);
         return !r.IsError;
     }
@@ -59,12 +59,6 @@ public class AzTablesCallStateManager<T> : AbstractAzTablesStorageManager, ICall
         {
             await _tableClient!.DeleteEntityAsync(result.PartitionKey, result.RowKey);
         }
-    }
-
-    public async Task UpdateCurrentCallState(T callState)
-    {
-        // Uses Upsert so will update if exists, or insert if not
-        await AddCallStateOrUpdate(callState);
     }
 
     public async Task<List<T>> GetActiveCalls()

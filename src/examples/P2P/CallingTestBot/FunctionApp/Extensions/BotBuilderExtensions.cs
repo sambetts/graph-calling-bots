@@ -3,6 +3,7 @@ using CallingTestBot.FunctionApp.Engine;
 using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,9 +21,9 @@ public static class BotBuilderExtensions
         services.AddSingleton<ICosmosConfig>(config);
 
         // Storage must be Azure Tables. Value isn't optional.
-        services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallStateManager<BaseActiveCallState>, CosmosCallStateManager<BaseActiveCallState>>();
 
-        var cosmosClient = new CosmosClient(config.CosmosDb);
+        var cosmosClient = new CosmosClient(config.CosmosConnectionString);
         services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
 
         services.AddSingleton<IBotTestsLogger, AzTablesBotTestsLogger>();

@@ -14,7 +14,7 @@ public class ConfidentialClientApplicationThrottledHttpClient : AutoThrottleHttp
     }
 
     public ConfidentialClientApplicationThrottledHttpClient(string clientId, string secret, string tenantId, bool ignoreRetryHeader, ILogger debugTracer)
-        : base(ignoreRetryHeader, debugTracer, new ConfidentialClientApplicationHttpHandler(clientId, secret, tenantId))
+        : base(ignoreRetryHeader, debugTracer, new ConfidentialClientApplicationHttpHandler(clientId, secret, tenantId, debugTracer))
     {
     }
 }
@@ -24,17 +24,21 @@ public class ConfidentialClientApplicationHttpHandler : DelegatingHandler
     private readonly string _clientId;
     private readonly string _secret;
     private readonly string _tenantId;
+    private readonly ILogger _logger;
     private AuthenticationResult? _auth;
-    public ConfidentialClientApplicationHttpHandler(string clientId, string secret, string tenantId)
+    public ConfidentialClientApplicationHttpHandler(string clientId, string secret, string tenantId, ILogger logger)
     {
         InnerHandler = new HttpClientHandler();
         _clientId = clientId;
         _secret = secret;
         _tenantId = tenantId;
+        _logger = logger;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
+        _logger.LogTrace($"HTTP {request.Method} {request.RequestUri}");
+        var body = request.Content?.ReadAsStringAsync();
         if (_auth == null || _auth.ExpiresOn < DateTimeOffset.Now.AddMinutes(5))
         {
             var app = ConfidentialClientApplicationBuilder.Create(_clientId)

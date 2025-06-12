@@ -12,6 +12,7 @@
     <None Remove="WAVs\transfering.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="local.settings.template.json" />
     <Content Include="local.settings.json" />
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +23,7 @@
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.22.2" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
   </ItemGroup>

@@ -15,21 +15,34 @@ namespace GraphCallingBots.CallingBots;
 /// <summary>
 /// Bot that uses Graph API for calling. Contains common methods for calling Graph API.
 /// </summary>
-public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE>, IGraphCallingBot, ICommsNotificationsPayloadHandler
+public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALLSTATETYPE>
     where CALLSTATETYPE : BaseActiveCallState, new()
+        where BOTTYPE : BaseBot<CALLSTATETYPE>
+
 {
     protected readonly GraphServiceClient _graphServiceClient;
-    protected ConfidentialClientApplicationThrottledHttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
-    private readonly BotCallRedirector _botCallRedirector;
+    private readonly BotCallRedirector<BOTTYPE, CALLSTATETYPE> _botCallRedirector;
+    protected HttpClient _httpClient;     // Used for Graph API calls where there's no native SDK support
 
-    public BaseGraphCallingBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager,
-        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger, BotCallRedirector botCallRedirector)
+    public BaseGraphCallingBot(
+        RemoteMediaCallingBotConfiguration botConfig,
+        BotCallRedirector<BOTTYPE, CALLSTATETYPE> botCallRedirector,
+        ICallStateManager<CALLSTATETYPE> callStateManager,
+        ICallHistoryManager<CALLSTATETYPE> callHistoryManager, 
+        ILogger logger)
         : base(botConfig, callStateManager, callHistoryManager, logger)
     {
         var clientSecretCredential = new ClientSecretCredential(_botConfig.TenantId, _botConfig.AppId, _botConfig.AppSecret);
 
-        _graphServiceClient = new GraphServiceClient(clientSecretCredential, ["https://graph.microsoft.com/.default"]);
+
+        // In the constructor, replace the _graphServiceClient initialization with HTTP logging handler
         _httpClient = new ConfidentialClientApplicationThrottledHttpClient(_botConfig.AppId, _botConfig.AppSecret, _botConfig.TenantId, false, logger);
+
+        _graphServiceClient = new GraphServiceClient(
+            _httpClient,
+            clientSecretCredential,
+            ["https://graph.microsoft.com/.default"]
+        );
         _botCallRedirector = botCallRedirector;
     }
 
@@ -114,10 +127,7 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
 
     protected async Task<bool> TestMediaExists(string? uri)
     {
-        if (string.IsNullOrWhiteSpace(uri))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(uri)) return false;
 
         try
         {
@@ -153,8 +163,8 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
 
             if (callCreated?.Id != null)
             {
-                _logger.LogInformation($"{BotTypeName}: Call {callCreated.Id} created");
-                _botCallRedirector.AddCall(callCreated.Id, this);
+                _logger.LogTrace($"{BotTypeName}: Call {callCreated.Id} created in Graph API");
+                await _botCallRedirector.RegisterBotForCall(callCreated.Id, this);
             }
             else
             {
@@ -174,13 +184,25 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE> : BaseBot<CALLSTATETYPE
     /// </summary>
     protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, EquatableMediaPrompt mediaPrompt)
     {
-        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompt?.MediaInfo?.Uri} media prompt on call {callState.CallId}");
 
-        callState.MediaPromptsPlaying.Add(mediaPrompt);
+        if (mediaPrompt.MediaInfo == null)
+        {
+            _logger.LogWarning(BotTypeName + ": No media info provided for media prompt. Can't play prompt.");
+            return null;
+        }
+        _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompt.MediaInfo.Uri} media prompt on call {callState.CallId}");
+
+        if (string.IsNullOrEmpty(mediaPrompt.MediaInfo.OdataType))
+        {
+            mediaPrompt.MediaInfo.OdataType = "#microsoft.graph.mediaInfo";     // Ensure the media info has the correct OData type
+        }
+
+        callState.MediaPromptsPlaying.Add(mediaPrompt!);
         return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(
             new PlayPromptPostRequestBody
             {
-                Prompts = new List<Prompt> { mediaPrompt }
+                Prompts = new List<Prompt> { mediaPrompt },
+                ClientContext = Guid.NewGuid().ToString()
             });
     }
 

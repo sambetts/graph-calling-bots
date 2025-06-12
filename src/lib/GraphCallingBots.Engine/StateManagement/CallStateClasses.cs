@@ -73,6 +73,6 @@ public class CallStateAndNotificationsHistoryEntity<CALLSTATETYPE>
 
 public class NotificationHistory
 {
-    public string Payload { get; set; }
+    public string Payload { get; set; } = null!;
     public DateTime Timestamp { get; set; }
 }

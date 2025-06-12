@@ -2,6 +2,7 @@
 using GraphCallingBots.CallingBots;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 using PstnBot.Shared;
 
@@ -21,7 +22,7 @@ public static class BotBuilderExtensions
         services.AddSingleton(config);
 
         // Storage must be Azure Tables. Value isn't optional.
-        services.AddSingleton<ICallStateManager<BaseActiveCallState>, AzTablesCallStateManager<BaseActiveCallState>>();
+        services.AddSingleton<ICallStateManager<BaseActiveCallState>, CosmosCallStateManager<BaseActiveCallState>>();
         services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
 
         return services.AddSingleton<IPstnCallingBot, RickrollPstnBot>();

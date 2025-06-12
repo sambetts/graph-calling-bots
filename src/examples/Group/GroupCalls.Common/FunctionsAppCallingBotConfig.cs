@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 namespace GroupCallingBot.FunctionApp;
 
 
-internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
+public class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 {
     public FunctionsAppCallingBotConfig(IConfiguration config) : base(config) { }
 
@@ -24,8 +24,10 @@ internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 
 
     [ConfigValue(true)]
-    public string CosmosDb { get; set; } = null!;
+    public string CosmosConnectionString { get; set; } = null!;
 
+    [ConfigValue]
+    public string ServiceBusRootConnectionString { get; set; } = null!;
 
 
     [ConfigValue(true)]
@@ -33,10 +35,13 @@ internal class FunctionsAppCallingBotConfig : PropertyBoundConfig, ICosmosConfig
 
 
     [ConfigValue(true)]
-    public string DatabaseName { get; set; } = null!;
+    public string CosmosDatabaseName { get; set; } = null!;
 
     [ConfigValue(true)]
-    public string ContainerName { get; set; } = null!;
+    public string ContainerNameCallHistory { get; set; } = null!;
+
+    [ConfigValue(true)]
+    public string ContainerNameCallState { get; set; } = null!;
 
     [ConfigValue]
     public string AppInstanceObjectId { get; set; } = null!;

@@ -10,15 +10,15 @@ public class SlowInMemoryCallStateManager<T> : ConcurrentInMemoryCallStateManage
         await Delay();
         await base.AddCallStateOrUpdate(callState);
     }
-    public override async Task<T?> GetByNotificationResourceUrl(string resourceUrl)
+    public override async Task<T?> GetStateByCallId(string callId)
     {
         await Delay();
-        return await base.GetByNotificationResourceUrl(resourceUrl);
+        return await base.GetStateByCallId(callId);
     }
-    public override async Task<bool> RemoveCurrentCall(string resourceUrl)
+    public override async Task<bool> RemoveCurrentCall(string callId)
     {
         await Delay();
-        return await base.RemoveCurrentCall(resourceUrl);
+        return await base.RemoveCurrentCall(callId);
     }
 
     public override async Task UpdateCurrentCallState(T callState)

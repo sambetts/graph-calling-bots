@@ -4,13 +4,8 @@ using Microsoft.Graph.Models;
 
 namespace GraphCallingBots.CallingBots;
 
-public interface IGraphCallingBot
-{
-    Task HandleNotificationsAndUpdateCallStateAsync(CommsNotificationsPayload notifications);
-    Task<bool> ValidateNotificationRequestAsync(HttpRequest request);
-}
 
-public interface IPstnCallingBot : IGraphCallingBot
+public interface IPstnCallingBot : ICommsNotificationsPayloadHandler
 {
     Task<Call?> StartPTSNCall(string phoneNumber, string mediaUrl);
 }

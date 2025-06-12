@@ -13,13 +13,16 @@ public class UnitTestConfig : PropertyBoundConfig, ICosmosConfig
     public UnitTestConfig(IConfiguration config) : base(config) { }
 
     [ConfigValue(true)]
-    public string CosmosDb { get; set; } = null!;
+    public string CosmosConnectionString { get; set; } = null!;
 
 
     [ConfigValue(true)]
-    public string DatabaseName { get; set; } = null!;
+    public string CosmosDatabaseName { get; set; } = null!;
 
     [ConfigValue(true)]
-    public string ContainerName { get; set; } = null!;
+    public string ContainerNameCallHistory { get; set; } = null!;
+
+    [ConfigValue(true)]
+    public string ContainerNameCallState { get; set; } = null!;
 
 }

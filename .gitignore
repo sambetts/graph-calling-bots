@@ -88,3 +88,4 @@
 /src/lib/GraphCallingBots.Engine/bin/Release
 /src/examples/Group/GroupCallingBotFunctionsApp/Properties/ServiceDependencies/GroupCallingBotFunctionDev - Zip Deploy
 /src/examples/Group/GroupCallingBotFunctionsApp/Properties/serviceDependencies.GroupCallingBotFunctionDev - Zip Deploy.json
+/src/examples/Group/GroupCallingBotFunctionsApp/local.settings.json

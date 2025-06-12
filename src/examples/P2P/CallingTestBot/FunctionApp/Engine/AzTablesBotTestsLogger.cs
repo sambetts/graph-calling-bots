@@ -8,7 +8,7 @@ namespace CallingTestBot.FunctionApp.Engine;
 /// <summary>
 /// Log test call results to Azure Tables
 /// </summary>
-public class AzTablesBotTestsLogger : AbstractAzTablesStorageManager, IBotTestsLogger
+public class AzTablesBotTestsLogger : AbstractSingleTableAzStorageManager, IBotTestsLogger
 {
     public AzTablesBotTestsLogger(TableServiceClient tableServiceClient, ILogger<AzTablesBotTestsLogger> logger) : base(tableServiceClient, logger)
     {

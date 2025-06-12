@@ -3,30 +3,30 @@ using Microsoft.Graph.Models;
 
 namespace GroupCalls.Common;
 
-public class GroupCallOrchestrator(GroupCallBot _groupCallingBot, CallInviteBot _callInviteBot, ILogger<GroupCallOrchestrator> _logger)
+public class GroupCallOrchestrator(GroupCallBot groupCallingBot, CallInviteBot callInviteBot, ILogger<GroupCallOrchestrator> logger)
 {
     /// <summary>
     /// Begin both bot calls to start a group call.
     /// </summary>
     public async Task<Call?> StartGroupCall(StartGroupCallData newCallReq)
     {
-        var groupCall = await _groupCallingBot.CreateGroupCall(newCallReq);
+        var groupCall = await groupCallingBot.CreateGroupCall(newCallReq);
         if (groupCall != null)
         {
-            _logger.LogInformation($"Started group call with ID {groupCall.Id}");
+            logger.LogInformation($"Started group call with ID {groupCall.Id}");
 
             if (groupCall != null)
             {
                 foreach (var attendee in newCallReq.Attendees)
                 {
-                    var inviteCall = await _callInviteBot.CallCandidateForGroupCall(attendee, newCallReq, groupCall);
+                    var inviteCall = await callInviteBot.CallCandidateForGroupCall(attendee, newCallReq, groupCall);
                     if (inviteCall == null)
                     {
-                        _logger.LogError($"Failed to invite {attendee.DisplayName} ({attendee.Id})");
+                        logger.LogError($"Failed to invite {attendee.DisplayName} ({attendee.Id})");
                     }
                     else
                     {
-                        _logger.LogInformation($"Invited '{attendee.DisplayName}' ({attendee.Id}) on new P2P call {inviteCall.Id}");
+                        logger.LogInformation($"Invited '{attendee.DisplayName ?? "Unknown display name"}' (id '{attendee.Id}') on new P2P call {inviteCall.Id}");
                     }
                 }
 
@@ -39,7 +39,7 @@ public class GroupCallOrchestrator(GroupCallBot _groupCallingBot, CallInviteBot 
         }
         else
         {
-            _logger.LogError("Failed to start group call - empty return call from Graph");
+            logger.LogError("Failed to start group call - check previous errors");
             return null;
         }
     }

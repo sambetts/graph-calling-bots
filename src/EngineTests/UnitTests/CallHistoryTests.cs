@@ -1,5 +1,6 @@
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
+using GraphCallingBots.StateManagement.Cosmos;
 using GraphCallingBots.StateManagement.Sql;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +11,9 @@ using System.Text.Json;
 namespace GraphCallingBots.UnitTests;
 
 [TestClass]
-public class EngineTests : BaseTests
+public class CallHistoryTests : BaseTests
 {
-    public EngineTests()
+    public CallHistoryTests()
     {
     }
 
@@ -24,7 +25,7 @@ public class EngineTests : BaseTests
     [TestMethod]
     public async Task CosmosCallHistoryManager()
     {
-        await HistoryTest(new CosmosCallHistoryManager<BaseActiveCallState>(new CosmosClient(_config.CosmosDb), _config,
+        await HistoryTest(new CosmosCallHistoryManager<BaseActiveCallState>(new CosmosClient(_config.CosmosConnectionString), _config,
             GetLogger<CosmosCallHistoryManager<BaseActiveCallState>>()));
     }
 
@@ -93,61 +94,4 @@ public class EngineTests : BaseTests
         Assert.IsNull(historyNull);
     }
 
-    [TestMethod]
-    public async Task ConcurrentInMemoryCallStateManager()
-    {
-        await TestCallStateManager(_callStateManager);
-    }
-
-    [TestMethod]
-    public async Task AzTablesCallStateManagerTests()
-    {
-        var callStateManager = new AzTablesCallStateManager<BaseActiveCallState>(new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"),
-            GetLogger<AzTablesCallStateManager<BaseActiveCallState>>());
-
-        await callStateManager.Initialise();
-        await callStateManager.RemoveAll();
-        await TestCallStateManager(callStateManager);
-
-        // Test also a failed call
-        await BotNotificationsHandlerTests.FailedCallTest(_logger, callStateManager, _historyManager);
-    }
-    async Task TestCallStateManager<T>(ICallStateManager<T> callStateManager) where T : BaseActiveCallState, new()
-    {
-        if (!callStateManager.Initialised)
-        {
-            await callStateManager.Initialise();
-        }
-
-        var randoId = $"/communications/calls/{Guid.NewGuid()}/";
-
-        // Check that we have no calls
-        var nonExistentState = await callStateManager.GetByNotificationResourceUrl("whatever");
-        Assert.IsNull(nonExistentState);
-        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 0);
-
-
-        // Insert a call
-        var callState = new T { ResourceUrl = randoId };
-        await callStateManager.AddCallStateOrUpdate(callState);
-
-        // Get by notification resource url
-        var callState2 = await callStateManager.GetByNotificationResourceUrl(randoId);
-        Assert.IsNotNull(callState2);
-        Assert.AreEqual(callState2, callState);
-        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 1);
-
-        // Update state
-        callState2.StateEnum = CallState.Terminating;
-        await callStateManager.UpdateCurrentCallState(callState2);
-        var callState3 = await callStateManager.GetByNotificationResourceUrl(randoId);
-        Assert.AreEqual(callState3!.StateEnum, CallState.Terminating);
-        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 1);
-
-        // Delete a call
-        await callStateManager.RemoveCurrentCall(callState.ResourceUrl);
-        var nullCallState = await callStateManager.GetByNotificationResourceUrl(randoId);
-        Assert.IsNull(nullCallState);
-        Assert.IsTrue((await callStateManager.GetActiveCalls()).Count == 0);
-    }
 }
