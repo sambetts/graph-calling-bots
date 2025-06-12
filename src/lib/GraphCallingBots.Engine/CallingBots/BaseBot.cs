@@ -23,6 +23,10 @@ public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
 
     public string BotTypeName => GetType().Name;
 
+
+    // Create a callback handler for notifications. Do so on each request as no state is held.
+    private NotificationCallbackInfo<CALLSTATETYPE> _callBacks;
+
     public BaseBot(RemoteMediaCallingBotConfiguration botConfig, ICallStateManager<CALLSTATETYPE> callStateManager, ICallHistoryManager<CALLSTATETYPE> callHistoryManager, ILogger logger)
     {
         _botConfig = botConfig;
@@ -32,6 +36,17 @@ public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
 
         var name = GetType().Assembly.GetName().Name ?? "CallingBot";
         _authenticationProvider = new AuthenticationProvider(name, _botConfig.AppId, _botConfig.AppSecret, _logger);
+
+        _callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
+        {
+            CallEstablishing = CallEstablishing,
+            CallEstablished = CallEstablished,
+            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
+            NewTonePressed = NewTonePressed,
+            CallTerminated = CallTerminated,
+            PlayPromptFinished = PlayPromptFinished,
+            UsersJoinedGroupCall = UsersJoinedGroupCall
+        };
     }
 
     /// <summary>
@@ -112,24 +127,13 @@ public abstract class BaseBot<CALLSTATETYPE> : ICommsNotificationsPayloadHandler
         // Ensure that GetType().FullName is not null before passing it to the method
         var botTypeName = this.GetType().FullName ?? throw new InvalidOperationException("Bot type name cannot be null.");
 
-        // Create a callback handler for notifications. Do so on each request as no state is held.
-        var callBacks = new NotificationCallbackInfo<CALLSTATETYPE>
-        {
-            CallEstablishing = CallEstablishing,
-            CallEstablished = CallEstablished,
-            CallConnectedWithP2PAudio = CallConnectedWithP2PAudio,
-            NewTonePressed = NewTonePressed,
-            CallTerminated = CallTerminated,
-            PlayPromptFinished = PlayPromptFinished,
-            UsersJoinedGroupCall = UsersJoinedGroupCall
-        };
 
         var stats = await BotNotificationsHandler<CALLSTATETYPE>.HandleNotificationsAndUpdateCallStateAsync(
             notifications,
             botTypeName,
             _callStateManager,
             _callHistoryManager,
-            callBacks,
+            _callBacks,
             _logger
         );
         return stats;

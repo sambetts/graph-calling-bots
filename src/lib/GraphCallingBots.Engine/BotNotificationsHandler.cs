@@ -231,6 +231,10 @@ public class BotNotificationsHandler<CALLSTATETYPE>() where CALLSTATETYPE : Base
         if (toneInfo.Tone != null)
         {
             logger.LogTrace($"{botType}: Received tone {toneInfo.Tone.Value} on call {callState.CallId}");
+            if (callState.TonesPressed == null)
+            {
+                callState.TonesPressed = new List<Tone>();
+            }
             callState.TonesPressed.Add(toneInfo.Tone.Value);
 
             if (callbackInfo.NewTonePressed != null)

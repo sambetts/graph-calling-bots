@@ -2,11 +2,11 @@
 
 namespace GraphCallingBots.EventQueue;
 
-public class QueueManager<T>
+public class MessageQueueManager<T> where T : class, IJsonClassWithOriginalContent, new()
 {
     private readonly IJsonQueueAdapter<T> _adapter;
 
-    public QueueManager(IJsonQueueAdapter<T> adapter)
+    public MessageQueueManager(IJsonQueueAdapter<T> adapter)
     {
         _adapter = adapter;
     }
@@ -17,6 +17,10 @@ public class QueueManager<T>
     { 
         var payload = System.Text.Json.JsonSerializer.Deserialize<T>(json);
         payload ??= default;
+        if (payload != null)
+        {
+            payload.OriginalContent = json;
+        }
         return Task.FromResult(payload);
     }
 }

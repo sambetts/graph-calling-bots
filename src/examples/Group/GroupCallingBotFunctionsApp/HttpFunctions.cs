@@ -18,7 +18,7 @@ namespace GroupCallingBot.FunctionApp;
 /// </summary>
 public class HttpFunctions(ILogger<HttpFunctions> logger, 
     GroupCallOrchestrator callOrchestrator,
-    ICallStateManager<BaseActiveCallState> callStateManager, QueueManager<CommsNotificationsPayload> queueManager)
+    ICallStateManager<BaseActiveCallState> callStateManager, MessageQueueManager<CommsNotificationsPayload> queueManager)
 {
 
     /// <summary>
@@ -147,7 +147,6 @@ public class HttpFunctions(ILogger<HttpFunctions> logger,
             await queueManager.EnqueueAsync(notificationsPayload);
             logger.LogInformation($"Received {notificationsPayload.CommsNotifications.Count} Graph call notification(s) for processing.");
             var response = req.CreateResponse(HttpStatusCode.Accepted);
-            await response.WriteAsJsonAsync(notificationsPayload);
             return response;
         }
         else

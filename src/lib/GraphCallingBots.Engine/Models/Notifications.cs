@@ -1,5 +1,7 @@
-﻿using Microsoft.Graph.Models;
+﻿using GraphCallingBots.EventQueue;
+using Microsoft.Graph.Models;
 using Microsoft.Kiota.Serialization.Json;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -7,14 +9,18 @@ using System.Text.Json.Serialization;
 
 namespace GraphCallingBots.Models;
 
-public class CommsNotificationsPayload
+public class CommsNotificationsPayload : IJsonClassWithOriginalContent
 {
     [JsonPropertyName("value")]
     public List<CallNotification> CommsNotifications { get; set; } = new();
 
-    [JsonExtensionData]
+    [System.Text.Json.Serialization.JsonExtensionData]
     [NotMapped]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? OriginalContent { get; set; }
 }
 
 public class CallNotification
@@ -28,17 +34,20 @@ public class CallNotification
     [JsonPropertyName("resourceData")]
     public JsonElement? NotificationResource { get; set; }
 
-    [JsonExtensionData]
+    [System.Text.Json.Serialization.JsonExtensionData]
     [NotMapped]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
 
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public Call? AssociatedCall => GetTypedResourceObject<Call>("#microsoft.graph.call");
 
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public PlayPromptOperation? AssociatedPlayPromptOperation => GetTypedResourceObject<PlayPromptOperation>("#microsoft.graph.playPromptOperation");
 
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<CallParticipant>? JoinedParticipants => GetTypedResourceArray<CallParticipant>();
 
     T? GetTypedResourceObject<T>(string odataType) where T : Entity
@@ -76,7 +85,7 @@ public class CallNotification
                 var array = JsonNode.Parse(s);
                 if (array != null)
                 {
-                    return JsonSerializer.Deserialize<List<T>>(s);
+                    return System.Text.Json.JsonSerializer.Deserialize<List<T>>(s);
                 }
             }
         }

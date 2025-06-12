@@ -1,5 +1,6 @@
 ﻿using GraphCallingBots;
 using GraphCallingBots.CallingBots;
+using GraphCallingBots.EventQueue;
 using GraphCallingBots.Models;
 using GraphCallingBots.StateManagement;
 using GroupCalls.Common;
@@ -14,9 +15,8 @@ namespace GroupCallingChatBot.Web.Controllers;
 /// <summary>
 /// Entry point for handling call-related web hook requests from the stateful client.
 /// </summary>
-public class PlatformCallController(BotCallRedirector<GroupCallBot, BaseActiveCallState> callRedirectorGroupCallBot, ILogger<PlatformCallController> logger) : ControllerBase
+public class PlatformCallController(GroupCallOrchestrator callOrchestrator, MessageQueueManager<CommsNotificationsPayload> queueManager, ILogger<PlatformCallController> logger) : ControllerBase
 {
-
     /// <summary>
     /// Handle a callback for an existing call.
     /// </summary>
@@ -29,43 +29,27 @@ public class PlatformCallController(BotCallRedirector<GroupCallBot, BaseActiveCa
 
         if (notificationsPayload != null)
         {
-            foreach (var notification in notificationsPayload.CommsNotifications)
+            var error = false;
+            await callOrchestrator.HandleNotificationsForOneBotOrAnotherAsync(notificationsPayload,
+                queueManager, 
+                () =>
+                {
+                    logger.LogError("Failed to process notifications.");
+                    error = true;
+                    return Task.CompletedTask;
+                });
+            if (error)
             {
-                var callId = BaseActiveCallState.GetCallId(notification.ResourceUrl);
-                if (callId != null)
-                {
-
-                    var bot = await callRedirectorGroupCallBot.GetBotByCallId(callId);
-                    if (bot != null)        // Logging for negative handled in GetBotByCallId
-                    {
-                        var validRequest = await bot.ValidateNotificationRequestAsync(Request);
-
-                        if (validRequest)
-                        {
-                            try
-                            {
-                                await bot.HandleNotificationsAndUpdateCallStateAsync(notificationsPayload);
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.LogError(ex, "Error handling notifications");
-                                throw;
-                            }
-
-                            return Accepted();
-                        }
-                        else
-                        {
-                            return BadRequest();
-                        }
-                    }
-                }
-                else
-                {
-                    logger.LogError($"Unrecognized call ID in notification {notification.ResourceUrl}");
-                }
+                return StatusCode(500, "Failed to process notifications.");
+            }
+            else
+            {
+                return Accepted("Notifications processed successfully.");
             }
         }
-        return BadRequest();
+        else
+        {
+            return BadRequest("Invalid notifications payload.");
+        }
     }
 }

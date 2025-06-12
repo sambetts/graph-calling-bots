@@ -33,7 +33,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : B
         }
         else
         {
-            _logger.LogWarning($"{BotTypeName} - CallConnected: callState.CallId is null");
+            _logger.LogError($"{BotTypeName} - CallConnected: callState.CallId is null");
         }
         await base.CallConnectedWithP2PAudio(callState);
     }
@@ -41,22 +41,14 @@ public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : B
     protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(CALLSTATETYPE callState, string wantedPromptId)
     {
         // Don't play media if already playing
-        var alreadyPlaying = false;
-
         if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(wantedPromptId))
         {
-            alreadyPlaying = true;
             _logger.LogInformation($"{BotTypeName} - Already playing prompt {wantedPromptId}");
             return;
         }
 
         // But if not playing, play notification prompt again
         var promptInCallState = callState.BotMediaPlaylist.FirstOrDefault(m => m.Value.MediaInfo?.ResourceId == wantedPromptId).Value;
-        if (alreadyPlaying)
-        {
-            _logger.LogInformation($"{BotTypeName} - Prompt {wantedPromptId} is already playing");
-            return;
-        }
 
         if (promptInCallState != null)
         {
@@ -71,7 +63,7 @@ public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : B
         }
         else
         {
-            _logger.LogWarning($"{BotTypeName} - Prompt {wantedPromptId} not found in playlist for call ID {callState.CallId}");
+            _logger.LogError($"{BotTypeName} - Prompt {wantedPromptId} not found in playlist for call ID {callState.CallId}");
         }
     }
 }

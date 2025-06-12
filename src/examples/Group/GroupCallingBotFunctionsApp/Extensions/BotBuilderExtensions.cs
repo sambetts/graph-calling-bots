@@ -43,7 +43,7 @@ public static class BotBuilderExtensions
         {
             services.AddSingleton(new ServiceBusClient(config.ServiceBusRootConnectionString));
             services.AddSingleton<IJsonQueueAdapter<CommsNotificationsPayload>, GraphUpdatesAzureServiceBusJsonQueueAdapter>();
-            services.AddSingleton<QueueManager<CommsNotificationsPayload>>();
+            services.AddSingleton<MessageQueueManager<CommsNotificationsPayload>>();
         }
         else
         {
