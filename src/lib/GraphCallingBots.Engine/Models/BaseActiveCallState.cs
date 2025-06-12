@@ -61,20 +61,32 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
 
     public bool Equals(BaseActiveCallState? other)
     {
-        return other != null && other.ResourceUrl == ResourceUrl
+        if (other == null)
+            return false;
+
+        bool mediaPromptsEqual = (MediaPromptsPlaying == null && other.MediaPromptsPlaying == null)
+            || (MediaPromptsPlaying != null && other.MediaPromptsPlaying != null
+                && MediaPromptsPlaying.SequenceEqual(other.MediaPromptsPlaying));
+
+        bool botMediaPlaylistEqual = (BotMediaPlaylist == null && other.BotMediaPlaylist == null)
+            || (BotMediaPlaylist != null && other.BotMediaPlaylist != null
+                && BotMediaPlaylist.Select(p => p.Key).SequenceEqual(other.BotMediaPlaylist.Select(p => p.Key))
+                && BotMediaPlaylist.Select(p => p.Value).SequenceEqual(other.BotMediaPlaylist.Select(p => p.Value)));
+
+        return other.ResourceUrl == ResourceUrl
             && other.BotClassNameFull == BotClassNameFull
             && other.CallId == CallId
             && other.StateEnum == StateEnum
-            && other.BotMediaPlaylist.Select(p => p.Key).SequenceEqual(BotMediaPlaylist.Select(p => p.Key))
-            && other.BotMediaPlaylist.Select(p => p.Value).SequenceEqual(BotMediaPlaylist.Select(p => p.Value))
+            && botMediaPlaylistEqual
             && other.JoinedParticipants.SequenceEqual(JoinedParticipants)
-            && other.TonesPressed != null && other.TonesPressed.SequenceEqual(TonesPressed?? new List<Tone>());
+            && other.TonesPressed != null && other.TonesPressed.SequenceEqual(TonesPressed ?? new List<Tone>())
+            && mediaPromptsEqual;
     }
 
     /// <summary>
     /// Sounds to play on call
     /// </summary>
-    public Dictionary<string, EquatableMediaPrompt> BotMediaPlaylist { get; set; } = new();
+    public Dictionary<string, EquatableMediaPrompt>? BotMediaPlaylist { get; set; } = null;
 
     /// <summary>
     /// Connected, Establishing, etc
@@ -82,11 +94,30 @@ public class BaseActiveCallState : IEquatable<BaseActiveCallState>
     public CallState? StateEnum { get; set; } = null;
 
     public List<Tone>? TonesPressed { get; set; } = new();
-    public List<MediaPrompt> MediaPromptsPlaying { get; set; } = new();
+    public List<MediaPrompt>? MediaPromptsPlaying { get; set; } = null;
 
     public List<CallParticipant> JoinedParticipants { get; set; } = new();
 
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     public bool HasValidCallId => !string.IsNullOrEmpty(CallId);
+
+    public void AddToBotMediaPlaylist(string key, EquatableMediaPrompt prompt)
+    {
+        if (BotMediaPlaylist == null)
+            BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>();
+        BotMediaPlaylist.Add(key, prompt);
+    }
+
+    public static void EnsureBotMediaPlaylist(BaseActiveCallState callState, string key, EquatableMediaPrompt prompt)
+    {
+        if (callState.BotMediaPlaylist != null && callState.BotMediaPlaylist.ContainsKey(key))
+        {
+            return;
+        }
+
+        if (callState.BotMediaPlaylist == null)
+            callState.BotMediaPlaylist = new Dictionary<string, EquatableMediaPrompt>();
+        callState.BotMediaPlaylist.Add(key, prompt);
+    }
 }

@@ -184,10 +184,9 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
     /// </summary>
     protected async Task<PlayPromptOperation?> PlayPromptAsync(BaseActiveCallState callState, EquatableMediaPrompt mediaPrompt)
     {
-
         if (mediaPrompt.MediaInfo == null)
         {
-            _logger.LogWarning(BotTypeName + ": No media info provided for media prompt. Can't play prompt.");
+            _logger.LogWarning(BotTypeName + ": No media info found for media prompt. Can't play prompt.");
             return null;
         }
         _logger.LogInformation($"{BotTypeName}: Playing {mediaPrompt.MediaInfo.Uri} media prompt on call {callState.CallId}");
@@ -196,6 +195,9 @@ public abstract class BaseGraphCallingBot<CALLSTATETYPE, BOTTYPE> : BaseBot<CALL
         {
             mediaPrompt.MediaInfo.OdataType = "#microsoft.graph.mediaInfo";     // Ensure the media info has the correct OData type
         }
+
+        if (callState.MediaPromptsPlaying == null)
+            callState.MediaPromptsPlaying = new List<MediaPrompt>();
 
         callState.MediaPromptsPlaying.Add(mediaPrompt!);
         return await _graphServiceClient.Communications.Calls[callState.CallId].PlayPrompt.PostAsync(

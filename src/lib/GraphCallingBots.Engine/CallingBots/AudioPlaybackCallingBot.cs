@@ -41,7 +41,8 @@ public abstract class AudioPlaybackAndDTMFCallingBot<CALLSTATETYPE, BOTTYPE> : B
     protected async Task PlayConfiguredMediaIfNotAlreadyPlaying(CALLSTATETYPE callState, string wantedPromptId)
     {
         // Don't play media if already playing
-        if (callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(wantedPromptId))
+        if (callState.MediaPromptsPlaying != null &&
+            callState.MediaPromptsPlaying.Select(p => p.MediaInfo!.ResourceId).Contains(wantedPromptId))
         {
             _logger.LogInformation($"{BotTypeName} - Already playing prompt {wantedPromptId}");
             return;
