@@ -32,6 +32,11 @@ public static class BotBuilderExtensions
             services.AddSingleton(new CosmosClient(config.CosmosConnectionString));
             services.AddSingleton<ICallStateManager<BaseActiveCallState>, CosmosCallStateManager<BaseActiveCallState>>();
             services.AddSingleton<ICallStateManager<GroupCallInviteActiveCallState>, CosmosCallStateManager<GroupCallInviteActiveCallState>>();
+
+            if (!string.IsNullOrEmpty(config.ContainerNameCallHistory))
+            {
+
+            }
         }
         else
         {
@@ -64,8 +69,16 @@ public static class BotBuilderExtensions
         }
         else
         {
-            services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
-            services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>>();
+            if (!string.IsNullOrEmpty(config.CosmosConnectionString) && !string.IsNullOrEmpty(config.ContainerNameCallHistory))
+            {
+                services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, CosmosCallHistoryManager<BaseActiveCallState>>();
+                services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, CosmosCallHistoryManager<GroupCallInviteActiveCallState>>();
+            }
+            else
+            {
+                services.AddSingleton<ICallHistoryManager<BaseActiveCallState>, ConcurrentInMemoryCallHistoryManager<BaseActiveCallState>>();
+                services.AddSingleton<ICallHistoryManager<GroupCallInviteActiveCallState>, ConcurrentInMemoryCallHistoryManager<GroupCallInviteActiveCallState>>();
+            }
         }
 
         services.AddSingleton<ICosmosConfig>(config);

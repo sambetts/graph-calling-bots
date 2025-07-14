@@ -11,7 +11,7 @@ namespace GroupCallingBot.FunctionApp;
 public class ServiceBusFunction(MessageQueueManager<CommsNotificationsPayload> queueManager, GroupCallOrchestrator callOrchestrator, ILogger<ServiceBusFunction> logger)
 {
 
-    public const string SB_CONNECTION_NAME = "GraphMessagesSericeBusQueueCallUpdates";
+    public const string SB_CONNECTION_NAME = "GraphMessagesServiceBusQueueCallUpdates";
 
     /// <summary>
     /// Processes call notifications from the Service Bus queue, one by one in the order received.

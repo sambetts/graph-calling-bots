@@ -9,20 +9,27 @@ These configuration settings are needed (in "local.settings.json" normally):
 Name | Description
 --------------- | -----------
 MicrosoftAppId | ID of bot Azure AD application
-AppInstanceObjectId | For PSTN calls only: object ID of the user account used for calling
-AppInstanceObjectIdName | For PSTN calls only: object ID of the user account used for calling
-TenantId | Tenant ID of Azure AD application
 MicrosoftAppPassword | Bot app secret
-BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
+TenantId | Tenant ID of Azure AD application
 Storage (optional) | Azure storage account connection string. Will use in-memory provider if not configured. Example: UseDevelopmentStorage=true
-CosmosDb (optional) | Cosmos DB connection string. Will use in-memory provider if not configured. Example: AccountEndpoint=https://callingbot.documents.azure.com:443/;AccountKey=xxxxxx==;
-DatabaseName (optional) | Cosmos DB name if cosmos is used. Example: CallingBot
-ContainerName (optional) | Cosmos DB container name if cosmos is used. Example: CallsLogs
+CosmosConnectionString | Cosmos DB connection string. Used for call state. Example: AccountEndpoint=https://callingbot.documents.azure.com:443/;AccountKey=xxxxxx==;
+CosmosDatabaseName | Cosmos DB name if cosmos is used. Example: CallingBot
+ContainerNameCallHistory (optional) | Cosmos DB container name for call history if cosmos is used. Example: CallsLogs
+ContainerNameCallState | Cosmos DB container name for call state if cosmos is used. Example: CallState
 SqlCallHistory (optional) | SQL Server connection string if SQL is used for storing call history. Example: Server=tcp:callingbot.database.windows.net,1433;Initial Catalog=CallingBot;Persist Security Info=False;User ID=callingbot;Password=xxxxxx;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+ServiceBusRootConnectionString | Azure Service Bus root connection string for processing call updates in a queue.
+GraphMessagesServiceBusQueueCallUpdates | Value of ServiceBusRootConnectionString + service Bus queue name for call updates. Example: <your_connection_string_here>;EntityPath=callupdates
+AppInstanceObjectId | For PSTN calls only: object ID of the user account used for calling
+BotBaseUrl | URL root of the bot. Example: https://callingbot.eu.ngrok.io
+
+Cosmos DB is used for storing call state and, optionally call history. If Cosmos DB is not configured, the process will throw an exception.
 
 Note: the order of preference for call-history logger is: SQL, Cosmos, InMemory. If you have both SQL and Cosmos configured, it will use SQL. If you have neither, it will use InMemory.
 
 For SQL logging, the account in the connection string needs owner rights to the database as it'll create the schema (only) if the database is empty. 
+
+## Required Service Bus Queues
+``callupdates`` - used for processing call updates. Needs to be created in the Service Bus namespace used by the bot. Call updates are sent to this queue by the bot and processed in order.
 
 ## Testing the Bot
 Expose the bot with NGrok:

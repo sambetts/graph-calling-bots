@@ -3,7 +3,7 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "GraphMessagesSericeBusQueueCallUpdates": "<your_connection_string_here>;EntityPath=callupdates"
+    "GraphMessagesServiceBusQueueCallUpdates": "<your_connection_string_here>;EntityPath=callupdates"
   },
   "Logging": {
     "LogLevel": {
